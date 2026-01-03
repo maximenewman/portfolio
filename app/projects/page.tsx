@@ -5,21 +5,21 @@ export default function Portfoliorojects() {
         <div className="container">
             <div></div>
 
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center my-15 mx-15">
                 {projects.map((project, index) => (
-                    <div key={index} className="py-5">
+                    <div key={index} className="">
                         <h1><strong>{project.title}</strong></h1>
 
                         <h2><strong>Description</strong></h2>
-                        <ul>
+                        <ul className="list-disc list-inside">
                             {project.description.map((desc, i) => (
                                 <li key={i}>{desc}</li>
                             ))}
                         </ul>
 
                         <h2><strong>Technologies</strong></h2>
-                        <ul>
-                            {project.description.map((tech, i) => (
+                        <ul className="list-disc list-inside">
+                            {project.tech.map((tech, i) => (
                                 <li key={i}>{tech}</li>
                             ))}
                         </ul>
