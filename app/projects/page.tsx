@@ -1,13 +1,24 @@
-interface project{
-    name: string
-    date: Date
-    achievements: string[]
+interface project {
+    title: string
+    description: string[]
+    tech: string[]
+    link: string
 }
 
-const page = () => {
-  return (
-    <div>Projects</div>
-  )
-}
+const projects: project[] = [
+    {
 
-export default page
+    },
+    {
+
+    }
+]
+
+export default function Portfoliorojects() {
+    return (
+        <div>
+            <h1>Projects</h1>
+            <h2></h2>
+        </div>
+    )
+}
