@@ -1,5 +1,8 @@
-FROM nginx:latest
+FROM node:20-alpine AS base
 
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 
-EXPOSE 80
+COPY package.json package-lock.json*
+RUN npm ci
+
+EXPOSE 3000
