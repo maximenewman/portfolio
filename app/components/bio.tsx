@@ -20,25 +20,28 @@ const bio = {
 
 export default function MyBio(){
     return (
-        <div>
-            <div>
+        <div className="hero mt-5">
+            <div className="flex flex-col items-center">
                 <Image 
-                    className="ring-1"
+                    // className="ring-1"
                     src={bio.picture}
                     alt={`Picture of ${bio.name}`}
                     width="200"
                     height="200"
                 />
-
                 <h1>{bio.name}</h1>
                 <a href={`mailto:${bio.email}`}>{bio.email}</a>
-            </div>
+                
+                <div className="mt-4 text-center text-balance">
 
-            {bio.description.map((desc, i) => (
-                <ul> 
-                    <li key={i}>{desc}</li>
-                </ul>
-            ))}
+                    {bio.description.map((desc, i) => (
+                        <ul> 
+                            <li key={i}>{desc}</li>
+                        </ul>
+                    ))}
+
+                </div>
+            </div>
         </div>
     )
 }
