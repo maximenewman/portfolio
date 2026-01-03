@@ -1,18 +1,4 @@
-interface project {
-    title: string
-    description: string[]
-    tech: string[]
-    link: string
-}
-
-const projects: project[] = [
-    {
-
-    },
-    {
-
-    }
-]
+import { project, projects } from "./data"
 
 export default function Portfoliorojects() {
     return (
