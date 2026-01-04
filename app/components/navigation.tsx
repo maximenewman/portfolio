@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 
-const routes = [
+const Pageroutes = [
     {
         name: "Home",
         link: "/",
@@ -28,12 +28,12 @@ export default function Navbar(){
             </div>
             <div className="navbar-center">
                 <ul className="menu menu-horizontal px-1">
-                    <li>
-                        <Link href="/">Home</Link>
+                   {Pageroutes.map((page, index) => (
+                    <li key={index}>
+                        <Link href={page.link}>{page.name}</Link>
                     </li>
-                    <li>
-                        <Link href="/projects">Projects</Link>
-                    </li>
+                   
+                ))}
                 </ul>
             </div>
             <div className="navbar-end">
