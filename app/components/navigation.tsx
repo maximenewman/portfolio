@@ -1,6 +1,25 @@
 "use client"
 import Link from "next/link"
 
+const routes = [
+    {
+        name: "Home",
+        link: "/",
+    },
+    {
+        name: "Experiences",
+        link: "/experiences",
+    },
+    {
+        name: "Projects",
+        link: "/projects",
+    },
+    {
+        name: "My Passions",
+        link: "/passions",
+    }
+]
+
 export default function Navbar(){
     return (
         <div className="navbar bg-green-600">
