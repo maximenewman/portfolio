@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import Image from "next/image"
 
 const Pageroutes = [
     {
@@ -24,7 +25,12 @@ export default function Navbar(){
     return (
         <div className="navbar bg-green-600">
             <div className="navbar-start">
-                {/* <Link></Link> */}
+                <Image className="h-20 w-20"
+                    src="/logo.png"
+                    alt="Logo of Maxime"
+                    width="80"
+                    height="80"
+                    />
             </div>
             <div className="navbar-center">
                 <ul className="menu menu-horizontal px-1">
