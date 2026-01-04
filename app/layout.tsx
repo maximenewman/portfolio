@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <header>
+        <header className="mb-5">
           <Navbar/>
         </header>
         
@@ -38,7 +38,7 @@ export default function RootLayout({
           {children}
         </main>
         
-        <footer>
+        <footer className="mb-0.5">
           <Footer/>
         </footer>
       </body>
