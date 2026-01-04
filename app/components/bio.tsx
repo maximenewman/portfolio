@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-const bio = {
+export const bioData = {
     name: "Maxime Newman Nereyabagabo",
     email: "mnn6@sfu.ca",
     description: [
@@ -24,22 +24,21 @@ export default function MyBio(){
             <div className="flex flex-col items-center">
                 <Image 
                     // className="ring-1"
-                    src={bio.picture}
-                    alt={`Picture of ${bio.name}`}
+                    src={bioData.picture}
+                    alt={`Picture of ${bioData.name}`}
                     width="200"
                     height="200"
                 />
-                <h1>{bio.name}</h1>
-                <a href={`mailto:${bio.email}`}>{bio.email}</a>
+                <h1>{bioData.name}</h1>
+                <a href={`mailto:${bioData.email}`}>{bioData.email}</a>
                 
                 <div className="mt-4 text-center text-balance">
 
-                    {bio.description.map((desc, i) => (
-                        <ul> 
-                            <li key={i}>{desc}</li>
-                        </ul>
-                    ))}
-
+                    <ul> 
+                        {bioData.description.map((desc, i) => (
+                                <li key={i}>{desc}</li>
+                            ))}
+                    </ul>
                 </div>
             </div>
         </div>
