@@ -1,6 +1,6 @@
 import { project } from "@/app/projects/data/projects"
 
-interface experience{
+export interface experience{
     role: string
     company: string
     date: string
@@ -8,7 +8,7 @@ interface experience{
     projects: project[]
 }
 
-const experiences: experience[] = [
+export const experiences: experience[] = [
     {
         role: "AI Engineer",
         company: "SKC Engineering",
