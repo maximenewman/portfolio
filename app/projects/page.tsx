@@ -8,7 +8,11 @@ export default function Portfoliorojects() {
                 <h1><strong>My Projects</strong></h1>
             </header>
             <main>
-                {display_project(projects)}
+                {projects.map((project, index) => (
+                    <div key={index}>
+                        {display_project(project)}
+                    </div>
+                ))}
             </main>
         </div>
     )

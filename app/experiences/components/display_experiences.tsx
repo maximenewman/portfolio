@@ -10,7 +10,11 @@ export function display_experience(experiences: experience[]){
                     <h2><strong>Company:</strong> {experience.company}</h2>
                     <h2><strong>Date:</strong> {experience.date}</h2>
                     <h2><strong>Location:</strong> {experience.location}</h2>
-                    {display_project(experience.projects)}
+                    {experience.projects.map((project, index) => (
+                                        <div key={index}>
+                                            {display_project(project)}
+                                        </div>
+                                    ))}
                 </div>
             ))}
         </div>
