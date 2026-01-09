@@ -49,7 +49,7 @@ export function display_project(proj: project){
                 ))}
             </ul>
             
-            <a href={proj.link}><strong>View Project</strong></a>
+            {proj.link && <a href={proj.link}><strong>View Project</strong></a>}
         </div>
     )
 }
