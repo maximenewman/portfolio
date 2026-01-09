@@ -3,18 +3,20 @@ import { experience } from "@/app/experiences/data/experience"
 
 export function display_experience(experiences: experience[]){
     return (
-        <div className="container flex flex-col items-center">
+        <div className="">
             {experiences.map( (experience, index) => (
                 <div key={index} className="border border-black mx-2">
                     <h2><strong>Role:</strong> {experience.role}</h2>
                     <h2><strong>Company:</strong> {experience.company}</h2>
                     <h2><strong>Date:</strong> {experience.date}</h2>
                     <h2><strong>Location:</strong> {experience.location}</h2>
-                    {experience.projects.map((project, index) => (
-                                        <div key={index}>
-                                            {display_project(project)}
-                                        </div>
-                                    ))}
+                    <ul key={index} className="flex flex-col pl-10">
+                        {experience.projects.map((project, index) => (
+                            <li key={index}>
+                                {display_project(project)}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             ))}
         </div>
