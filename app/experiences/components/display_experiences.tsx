@@ -5,7 +5,7 @@ export function display_experience(experiences: experience[]){
     return (
         <div className="">
             {experiences.map( (experience, index) => (
-                <div key={index} className="border border-black mx-2">
+                <div key={index} className="">
                     <h2><strong>Role:</strong> {experience.role}</h2>
                     <h2><strong>Company:</strong> {experience.company}</h2>
                     <h2><strong>Date:</strong> {experience.date}</h2>
