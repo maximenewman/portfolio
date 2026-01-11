@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio
 
-## Getting Started
+A personal portfolio website built with [Next.js](https://nextjs.org) 16, showcasing experiences, projects, and passions.
 
-First, run the development server:
+## 🚀 Live Deployment
 
+The application is deployed on **Fly.io**: [Your Fly.io URL]
+
+## 📋 Prerequisites
+
+- Node.js 20 or higher
+- npm, yarn, pnpm, or bun
+- Docker (for containerized deployment)
+
+## 🛠️ Development
+
+### Running Locally
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The page auto-updates as you edit files in the `app/` directory.
 
-## Learn More
+### Available Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🐳 Docker
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Building the Image
 
-## Deploy on Vercel
+```bash
+docker build -t portfolio .
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Running the Container
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker run -d -p 80:3000 --name portfolio portfolio
+```
+
+The app will be available at [http://localhost](http://localhost)
+
+### Volume Mounting for Development
+
+To mount your local code into the container for live development:
+
+```bash
+docker run -d -p 80:3000 -v $(pwd)/app:/app/app --name portfolio-dev portfolio
+```
+
+This mounts the local `app/` directory into the container's `/app/app` directory, allowing hot-reload during development.
+
+## 📂 Project Structure
+
+```
+portfolio/
+├── app/
+│   ├── components/      # Reusable UI components
+│   │   ├── bio.tsx
+│   │   ├── footer.tsx
+│   │   └── navigation.tsx
+│   ├── experiences/     # Experience section
+│   │   ├── components/
+│   │   └── data/
+│   ├── projects/        # Projects showcase
+│   │   ├── components/
+│   │   └── data/
+│   ├── passions/        # Personal interests
+│   ├── globals.css      # Global styles
+│   ├── layout.tsx       # Root layout
+│   ├── page.tsx         # Home page
+│   └── not-found.tsx    # 404 page
+├── public/              # Static assets
+├── Dockerfile           # Docker configuration
+└── next.config.ts       # Next.js configuration
+```
+
+## 🚢 Deployment
+
+### Fly.io Deployment
+
+The application is configured for deployment on Fly.io:
+
+1. Install Fly.io CLI:
+```bash
+curl -L https://fly.io/install.sh | sh
+```
+
+2. Login to Fly.io:
+```bash
+fly auth login
+```
+
+3. Deploy:
+```bash
+fly deploy
+```
+
+## 🛠️ Technologies
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + DaisyUI
+- **Deployment:** Fly.io
+- **Containerization:** Docker
+
+## 📄 License
+
+Private project
