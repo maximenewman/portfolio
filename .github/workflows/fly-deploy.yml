@@ -5,6 +5,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'app/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'next.config.ts'
+      - 'tsconfig.json'
+      - 'Dockerfile'
+      - 'fly.toml'
 jobs:
   deploy:
     name: Deploy app
