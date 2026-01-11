@@ -3,7 +3,7 @@ import { bioData } from "./bio"
 
 export default function Footer(){
     return (
-        <div className="footer footer-horizontal justify-items-center border border-black">
+        <div className="footer footer-horizontal justify-items-center">
             <nav>
                 <h6 className="footer-title">Site</h6>
                 <Link href="/experiences">Experiences</Link>
