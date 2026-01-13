@@ -1,7 +1,10 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link"
 import { bioData } from "./bio"
 
 export default function Footer(){
+    const [resumePath, setResumePath] = useState("/Maxime_Resume.pdf");
     return (
         <div className="footer footer-horizontal justify-items-center">
             <nav>
@@ -18,7 +21,15 @@ export default function Footer(){
             </nav>
             <nav>
                 <h6 className="footer-title">Resume</h6>
-                <a>Resume</a>
+                <a
+                    href={resumePath}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.open(resumePath, "_blank", "noopener,noreferrer")
+                    }}
+                >
+                    Resume
+                </a>
             </nav>
         </div>
     )
