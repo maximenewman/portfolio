@@ -1,15 +1,21 @@
-import { display_experience } from "./components/display_experiences"
+import { ExperiencesList } from "./components/display_experiences"
 import { experiences } from "./data/experience"
 
-export default function Experiences(){
-    return (
-        <div className="justify-items-center">
-            <header>
-                <h1><strong>My Experiences</strong></h1>
-            </header>
-            <main>
-                {display_experience(experiences)}
-            </main>
-        </div>
-    )
+export default function ExperiencesPage() {
+  return (
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+          My Experiences
+        </h1>
+        <p className="mt-2 text-muted-foreground">
+          Professional experience and work history
+        </p>
+      </header>
+
+      <main>
+        <ExperiencesList experiences={experiences} />
+      </main>
+    </div>
+  )
 }

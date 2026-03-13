@@ -1,90 +1,56 @@
-import { project } from "@/app/projects/data/projects"
+import { Project } from "@/app/projects/data/projects"
 
-export interface experience{
-    role: string
-    company: string
-    date: string
-    location: string
-    projects: project[]
+export interface Experience {
+  role: string
+  company: string
+  date: string
+  location: string
+  projects: Project[]
 }
 
-export const experiences: experience[] = [
-    {
-        role: "AI Engineer",
-        company: "SKC Engineering",
-        date: "Sept 2025 - Present",
-        location: "Surrey, BC",
-        projects: [
-            {
-                title: "Weldcost Estimation Tool",
-                description: [
-                    ` Engineered a full-stack cost estimation platform with a Next.js frontend and Python FastAPI
-                    backend, enabling engineers to generate precise weld cost reports directly in-browser.`,
-                    ` Designed and implemented RESTful APIs using FastAPI to manage weld calculations,
-                    threads, and workflow state, enforcing structured request/response contracts and scalable ser
-                    vice boundaries.`,
-                    `Orchestrated LLM-driven workflows with LangGraphbyequipping agents with domain-specific
-                    tools, ensuring deterministic calculations and controlled state transitions.`,
-                    `Optimized token usage by summarizing long conversational context prior to main LLM invoca
-                    tion, reducing token consumption by 40% and improving response latency.`,
-                    `Validated API inputs and agent state transitions using Pydantic, preventing malformed re
-                    quests and improving overall system robustness.`,
-                    ` Improved observability and developer velocity by integrating LangSmith for end-to-end tracing
-                    and debugging of LLM workflows prior to production deployment.`,
-                    ` Implemented automated testing with Pytest and continuous integration via GitHub Actions,
-                    ensuring correctness and stability across feature branches before merging.`,
-                    `Integrated Redis as a high-performance caching layer to accelerate repeated cost-estimation
-                    lookups, reducing latency and unnecessary recomputation.`
-                ],
-                tech: [
-                    "Next.js",
-                    "Python FastAPI",
-                    "LangGraph, Langchain, Langsmith",
-                    "PostgreSQL"
-                ],
-                link: ""
-            },
-            {
-                title: "Migration Script",
-                description: [
-                    ` Automated the migration and organization of 15,639 historical welding-procedure files from
-                    SharePoint to support fine-tuning of an internal ML model.`,
-                    `Developed a PowerShell-based migration pipeline authenticated via Azure App Registration,
-                    enabling secure, programmatic access to SharePoint resources at scale.`,
-                    ` Implemented CSV-based logging and verification to track all processed files, enabling auditabil
-                    ity, error detection, and iterative improvements to the migration workflow.`
-                ],
-                tech: [
-                    "Azure App",
-                    "PnP PowerShell"
-                ],
-                link: ""
-            },
-        ]
-    },
-    {
-        role: "Undergraduate Research Assistant",
-        company: "SFU CS ARCH Group",
-        date: "Jun 2025 - Present",
-        location: "Burnaby, BC",
-        projects: [
-            {
-                title: "Optimizing GPU Programming",
-                description: [
-                    ` Engineered a GPU-accelerated matrix multiplication kernel using CUDA, achieving 93% of cuBLAS
-                    performance in benchmark tests.`,
-                    ` Conducted performance evaluations of sparse and dense matrix operations, identifying bottlenecks
-                    and proposing optimization strategies.`,
-                    ` Collaborated with research team on ThunderKittens simulation validation, ensuring accuracy of
-                    computational physics models.`,
-                ],
-                tech: [
-                    "CUDA",
-                    "C++/C",
-                ],
-                link: ""
-            }
-        ]
-    }
+export const experiences: Experience[] = [
+  {
+    role: "AI Engineering Co-op",
+    company: "SKC Engineering Ltd",
+    date: "Sept 2025 - Present",
+    location: "Surrey, BC",
+    projects: [
+      {
+        title: "WeldCost - AI-Powered Cost Estimation Platform",
+        description: [
+          `Built a full-stack welding cost calculator with a conversational AI chatbot using Next.js, FastAPI, and LangGraph, replacing a stateless print-only tool with a persistent, multi-user workspace.`,
+          `Designed an agentic workflow that separates intent classification from deterministic cost math, with human-in-the-loop interrupts and Pydantic-validated structured outputs to keep calculations correct and auditable.`,
+          `Implemented full persistence using Supabase Postgres for conversation threads, saved welds, and projects, enabling users to revisit estimates and organize work by job or quote.`,
+          `Deployed to Fly.io via Docker multi-stage builds and GitHub Actions CI/CD, with JWT auth, idempotent API endpoints, and a LangSmith evaluation suite for regression monitoring.`,
+        ],
+        tech: [
+          "Next.js",
+          "FastAPI",
+          "LangGraph",
+          "Supabase Postgres",
+          "Fly.io",
+          "Docker",
+          "GitHub Actions",
+          "LangSmith",
+        ],
+        link: "",
+      },
+      {
+        title: "SharePoint Migration Pipeline",
+        description: [
+          `Eliminated months of manual file-handling delays by automating the migration of 15,639 historical welding-procedure files from SharePoint, saving an estimated $15,000+ in engineer time at prevailing BC welder rates.`,
+          `Built an authenticated PowerShell pipeline via Azure App Registration and a Python decision engine using regex-based path exclusions, filename allowlists, duplicate detection, and a depth-first search over a nested regex lookup table to classify and route each file automatically.`,
+          `Implemented CSV logging that tracks company-level and file-level outcomes, enabling full auditability and iterative improvement across migration runs.`,
+        ],
+        tech: [
+          "PowerShell",
+          "Azure App Registration",
+          "Python",
+          "Regex",
+          "CSV",
+        ],
+        link: "",
+      },
+    ],
+  },
 ]
-
