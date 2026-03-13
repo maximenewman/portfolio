@@ -1,9 +1,9 @@
-import MyBio from "./components/bio";
+import MyBio from "./components/bio"
 
 export default function Home() {
   return (
-    <div>
-      <MyBio/>
-    </div>
-  );
+    <main>
+      <MyBio />
+    </main>
+  )
 }

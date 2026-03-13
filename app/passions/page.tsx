@@ -1,9 +1,7 @@
-export default function Passions(){
+export default function PassionsPage() {
     return (
-        <div>
-            <header className="hero">
-                <h1 className="hero-content text-center text-5xl font-bold">My Passions: Coming Soon</h1>
-            </header>
+        <div className="container mx-auto px-4 py-8 md:py-12">
+            <h1>Coming Soon</h1>
         </div>
     )
 }
