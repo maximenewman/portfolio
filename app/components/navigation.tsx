@@ -1,50 +1,77 @@
 "use client"
+
 import Link from "next/link"
 import Image from "next/image"
+import { useState } from "react"
+import { Menu, X } from "lucide-react"
 
-const Pageroutes = [
-    {
-        name: "Home",
-        link: "/",
-    },
-    {
-        name: "Experiences",
-        link: "/experiences",
-    },
-    {
-        name: "Projects",
-        link: "/projects",
-    },
-    {
-        name: "My Passions",
-        link: "/passions",
-    }
+const pageRoutes = [
+  { name: "Home", link: "/" },
+  { name: "Experiences", link: "/experiences" },
+  { name: "Projects", link: "/projects" },
+  { name: "My Passions", link: "/passions" },
 ]
 
-export default function Navbar(){
-    return (
-        <div className="navbar bg-green-600">
-            <div className="navbar-start">
-                <Image className="h-20 w-20"
-                    src="/logo.png"
-                    alt="Logo of Maxime"
-                    width="80"
-                    height="80"
-                    />
-            </div>
-            <div className="navbar-center">
-                <ul className="menu menu-horizontal px-1">
-                   {Pageroutes.map((page, index) => (
-                    <li key={index}>
-                        <Link href={page.link}>{page.name}</Link>
-                    </li>
-                   
-                ))}
-                </ul>
-            </div>
-            <div className="navbar-end">
+export default function Navbar() {
+  const [open, setOpen] = useState(false)
 
-            </div>
+  return (
+    <nav className="bg-primary text-primary-foreground">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between md:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="Logo of Maxime"
+              width={64}
+              height={64}
+              className="h-12 w-12 md:h-16 md:w-16"
+            />
+          </Link>
+
+          {/* Desktop Navigation */}
+          <ul className="hidden flex-1 justify-center gap-1 md:flex">
+            {pageRoutes.map((page) => (
+              <li key={page.link}>
+                <Link
+                  href={page.link}
+                  className="rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10"
+                >
+                  {page.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="rounded-md p-2 transition-colors hover:bg-white/10 md:hidden"
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
-    )
+
+        {/* Mobile Navigation */}
+        {open && (
+          <div className="border-t border-white/20 pb-4 md:hidden">
+            <nav className="flex flex-col gap-2 pt-4">
+              {pageRoutes.map((page) => (
+                <Link
+                  key={page.link}
+                  href={page.link}
+                  onClick={() => setOpen(false)}
+                  className="rounded-md px-4 py-2 text-lg font-medium transition-colors hover:bg-white/10"
+                >
+                  {page.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
+      </div>
+    </nav>
+  )
 }

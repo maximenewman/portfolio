@@ -1,36 +1,98 @@
-"use client";
-import { useState } from "react";
+"use client"
+
 import Link from "next/link"
 import { bioData } from "./bio"
+import { Github, Linkedin, Mail, FileText } from "lucide-react"
 
-export default function Footer(){
-    const [resumePath, setResumePath] = useState("/Maxime_Resume.pdf");
-    return (
-        <div className="footer footer-horizontal justify-items-center">
-            <nav>
-                <h6 className="footer-title">Site</h6>
-                <Link href="/experiences">Experiences</Link>
-                <Link href="/projects">Projects</Link>
-                <Link href="/passions">Passions</Link>
+export default function Footer() {
+  const resumePath = "/Maxime_Resume.pdf"
+
+  return (
+    <footer className="border-t border-border bg-muted/50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Site Links */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Site
+            </h3>
+            <nav className="flex flex-col gap-2">
+              <Link
+                href="/experiences"
+                className="text-sm transition-colors hover:text-primary"
+              >
+                Experiences
+              </Link>
+              <Link
+                href="/projects"
+                className="text-sm transition-colors hover:text-primary"
+              >
+                Projects
+              </Link>
+              <Link
+                href="/passions"
+                className="text-sm transition-colors hover:text-primary"
+              >
+                Passions
+              </Link>
             </nav>
-            <nav>
-                <h6 className="footer-title">Socials</h6>
-                <a href="https://github.com/maximenewman">GitHub</a>
-                <a href="https://www.linkedin.com/in/maxime-newman-a546b42b5">LinkedIn</a>
-                <a href={`mailto:${bioData.email}`}>Email</a>
+          </div>
+
+          {/* Socials */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Socials
+            </h3>
+            <nav className="flex flex-col gap-2">
+              <a
+                href="https://github.com/maximenewman"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm transition-colors hover:text-primary"
+              >
+                <Github className="h-4 w-4" />
+                GitHub
+              </a>
+              <a
+                href="https://www.linkedin.com/in/maxime-newman-a546b42b5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm transition-colors hover:text-primary"
+              >
+                <Linkedin className="h-4 w-4" />
+                LinkedIn
+              </a>
+              <a
+                href={`mailto:${bioData.email}`}
+                className="flex items-center gap-2 text-sm transition-colors hover:text-primary"
+              >
+                <Mail className="h-4 w-4" />
+                Email
+              </a>
             </nav>
-            <nav>
-                <h6 className="footer-title">Resume</h6>
-                <a
-                    href={resumePath}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.open(resumePath, "_blank", "noopener,noreferrer")
-                    }}
-                >
-                    Resume
-                </a>
-            </nav>
+          </div>
+
+          {/* Resume */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Resume
+            </h3>
+            <button
+              onClick={() => window.open(resumePath, "_blank", "noopener,noreferrer")}
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              <FileText className="h-4 w-4" />
+              View Resume
+            </button>
+          </div>
         </div>
-    )
+
+        <hr className="my-6 border-border" />
+
+        <p className="text-center text-sm text-muted-foreground">
+          &copy; {new Date().getFullYear()} Maxime Newman Nereyabagabo. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  )
 }
