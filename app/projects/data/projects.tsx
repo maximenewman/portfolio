@@ -55,14 +55,12 @@ export const projects: Project[] = [
       {
         type: "image",
         src: "/doubleComputer.jpg",
-        alt: "Double Computer",
-        thumbnailSrc: "",
+        alt: "Debugging Code",
       },
       {
         type: "image",
         src: "/winning.jpeg",
-        alt: "Podium",
-        thumbnailSrc: "",
+        alt: "Winning the Hackathon",
       },
     ],
   },
