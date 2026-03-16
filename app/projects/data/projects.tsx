@@ -54,7 +54,7 @@ export const projects: Project[] = [
     media: [
       {
         type: "image",
-        src: "/doublecomputer.jpg",
+        src: "/doublecomputer.JPG",
         alt: "Debugging Code",
       },
       {
