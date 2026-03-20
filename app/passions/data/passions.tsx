@@ -12,6 +12,7 @@ export interface Passion {
   hoverColor: string
   details: string[]
   media?: PassionMediaLink[]
+  images?: string[]
 }
 
 export const passions: Passion[] = [
@@ -27,6 +28,12 @@ export const passions: Passion[] = [
       "Competitively, I've played for FVSL and VMSL Premier teams over the last two seasons.",
       "Beyond that, I've captained intramural futsal and outdoor football sides, leading both to championship wins — two titles and counting.",
     ],
+    images: [
+      "/portfolio/football/IMG_0682.JPG.jpeg",
+      "/portfolio/football/IMG_0683.JPG.jpeg",
+      "/portfolio/football/IMG_2485.JPG.jpeg",
+      "/portfolio/football/IMG_2488.JPG.jpeg",
+    ],
   },
   {
     id: "chess",
@@ -41,6 +48,10 @@ export const passions: Passion[] = [
     ],
     media: [
       { label: "Play me on Chess.com", url: "https://www.chess.com/member/hunchom99" },
+    ],
+    images: [
+      "/portfolio/chess/IMG_2095.jpg",
+      "/portfolio/chess/IMG_2098.jpg",
     ],
   },
   {
@@ -60,6 +71,11 @@ export const passions: Passion[] = [
       "Letters of a Stoic — Seneca",
       "Discourses — Epictetus",
     ],
+    images: [
+      "/portfolio/reading/IMG_0227.jpg",
+      "/portfolio/reading/IMG_0229.jpg",
+      "/portfolio/reading/IMG_0242.jpg",
+    ],
   },
   {
     id: "motivational-speaking",
@@ -78,6 +94,9 @@ export const passions: Passion[] = [
       { label: "Instagram", url: "https://www.instagram.com/tungsten_gains/" },
       { label: "TikTok", url: "https://www.tiktok.com/@yvngg_max" },
     ],
+    images: [
+      "/portfolio/motivational speaking/happiness.png",
+    ],
   },
   {
     id: "running",
@@ -88,6 +107,11 @@ export const passions: Passion[] = [
     hoverColor: "hover:from-orange-500 hover:to-orange-700",
     details: [
       "Running is my daily reset. They say it's Vancouver's biggest addiction — I can confirm that's true.",
+    ],
+    images: [
+      "/portfolio/running/IMG_8814.JPG.jpeg",
+      "/portfolio/running/IMG_8815.JPG.jpeg",
+      "/portfolio/running/IMG_8819.JPG.jpeg",
     ],
   },
   {
@@ -100,6 +124,11 @@ export const passions: Passion[] = [
     details: [
       "Everything is digital, but nature never loses its beauty.",
       "I've been lucky enough to take in some truly breathtaking views on the trails, and I try never to take that for granted.",
+    ],
+    images: [
+      "/portfolio/hiking/IMG_6551.jpg",
+      "/portfolio/hiking/IMG_6668.jpg",
+      "/portfolio/hiking/IMG_6935.jpg",
     ],
   },
 ]
