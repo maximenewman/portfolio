@@ -60,8 +60,6 @@ export const passions: Passion[] = [
       "A few books I'd recommend: The Art of War (Sun Tzu), Meditations (Marcus Aurelius), Letters of a Stoic (Seneca), Discourses (Epictetus).",
     ],
     images: [
-      "/portfolio/reading/IMG_0227.jpg",
-      "/portfolio/reading/IMG_0229.jpg",
       "/portfolio/reading/IMG_0242.jpg",
     ],
   },

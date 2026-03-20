@@ -18,7 +18,7 @@ export const experiences: Experience[] = [
     type: "tech",
     role: "AI Engineering Co-op",
     company: "SKC Engineering Ltd",
-    date: "Sept 2025 - Present",
+    date: "May 2025 - Present",
     location: "Surrey, BC",
     projects: [
       {

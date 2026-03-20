@@ -89,7 +89,7 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
         <div className="flex flex-1 flex-col overflow-y-auto md:flex-row">
           {/* Image Gallery Section */}
           {hasImages && currentImage && (
-            <div className="relative flex h-64 w-full flex-shrink-0 flex-col bg-muted md:h-auto md:w-1/2">
+            <div className="relative flex h-96 w-full flex-shrink-0 flex-col bg-muted md:h-[500px] md:w-1/2">
               {/* Main Image */}
               <div className="relative flex-1">
                 <Image
