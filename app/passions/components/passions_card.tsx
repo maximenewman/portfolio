@@ -125,7 +125,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
         <div className="flex flex-col lg:flex-row">
           {/* Image Gallery - Featured */}
           {passion.images && passion.images.length > 0 && (
-            <div className="relative h-64 w-full lg:h-auto lg:min-h-[400px] lg:w-1/2">
+            <div className="relative aspect-[4/3] w-full lg:aspect-auto lg:min-h-[500px] lg:w-3/5">
               <div className="grid h-full grid-cols-2 gap-1">
                 {passion.images.slice(0, 4).map((src, i) => (
                   <div
@@ -138,6 +138,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
                       src={src}
                       alt={`${passion.title} photo ${i + 1}`}
                       fill
+                      sizes="(max-width: 768px) 100vw, 60vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
@@ -190,20 +191,21 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
   }
 
   return (
-    <div className="group">
-      {/* Image Preview */}
+    <div className="group flex h-full flex-col">
+      {/* Image Preview - Full prominent display */}
       {passion.images && passion.images.length > 0 && (
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className="relative aspect-[4/3] w-full overflow-hidden">
           <Image
             src={passion.images[0]}
             alt={`${passion.title} preview`}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
           {/* Image count badge */}
           {passion.images.length > 1 && (
-            <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2 py-1 text-xs font-medium backdrop-blur-sm">
+            <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
               +{passion.images.length - 1} photos
             </div>
           )}
@@ -211,9 +213,9 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
       )}
 
       {/* Content */}
-      <div className="p-5">
+      <div className="flex flex-1 flex-col p-5">
         <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
             <IconComponent className="h-5 w-5 text-primary" />
           </div>
           <h3 className="text-lg font-semibold text-card-foreground">
@@ -221,7 +223,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
           </h3>
         </div>
 
-        <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+        <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
           {passion.description}
         </p>
 
