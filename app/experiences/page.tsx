@@ -1,5 +1,4 @@
 import { ExperiencesList } from "./components/display_experiences"
-import { experiences } from "./data/experience"
 
 export default function ExperiencesPage() {
   return (
@@ -14,7 +13,7 @@ export default function ExperiencesPage() {
       </header>
 
       <main>
-        <ExperiencesList experiences={experiences} />
+        <ExperiencesList />
       </main>
     </div>
   )

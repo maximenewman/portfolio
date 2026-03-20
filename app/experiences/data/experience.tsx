@@ -1,15 +1,20 @@
 import { Project } from "@/app/projects/data/projects"
 
+export type ExperienceType = "tech" | "leadership" | "other"
+
 export interface Experience {
+  type: ExperienceType
   role: string
   company: string
   date: string
   location: string
-  projects: Project[]
+  projects?: Project[]
+  highlights?: string[]
 }
 
 export const experiences: Experience[] = [
   {
+    type: "tech",
     role: "AI Engineering Co-op",
     company: "SKC Engineering Ltd",
     date: "Sept 2025 - Present",
@@ -51,6 +56,56 @@ export const experiences: Experience[] = [
         ],
         link: "",
       },
+    ],
+  },
+  {
+    type: "tech",
+    role: "Robotics Instructor",
+    company: "Zebra Robotics Surrey",
+    date: "Jan 2025 - Jun 2025",
+    location: "Surrey, BC",
+    highlights: [
+      "Taught students the fundamentals of programming, introducing key concepts through engaging, hands-on lessons.",
+      "Programmed microcontroller-based systems with students to control motors, sensors, and inputs.",
+      "Led robotics projects where students designed, tested, and iterated on mechanical models.",
+    ],
+  },
+  {
+    type: "leadership",
+    role: "Calculus Teaching Assistant",
+    company: "Simon Fraser University",
+    date: "Jan 2025 - Apr 2025",
+    location: "Burnaby, BC",
+    highlights: [
+      "Led weekly peer-led sessions for a dedicated group of students, fostering collaborative learning and long-term academic growth.",
+      "Explained key concepts through interactive discussions and guided problem-solving sessions.",
+      "Reinforced personal mastery of calculus through teaching, feedback, and real-time troubleshooting.",
+    ],
+  },
+  {
+    type: "leadership",
+    role: "Hive Leader",
+    company: "Simon Fraser University",
+    date: "Aug 2024 - Sep 2024",
+    location: "Burnaby, BC",
+    highlights: [
+      "Organized and led events to welcome and engage new students.",
+      "Collaborated with other Hive Leaders to plan and execute group activities.",
+      "Supported and mentored HIVE volunteers aspiring to become Hive Leaders.",
+      "Led orientation sessions, ensuring new students had a smooth transition.",
+    ],
+  },
+  {
+    type: "other",
+    role: "Recreation Assistant",
+    company: "SFU Recreation",
+    date: "Apr 2024 - Aug 2024",
+    location: "Burnaby, BC",
+    highlights: [
+      "Front Desk Reception: Managed check-ins, answered inquiries, and kept daily operations running smoothly.",
+      "Customer Service: Built relationships with clients, addressed concerns, and made sure every member felt welcomed.",
+      "Fitness Class Assistant: Supported instructors with class setup and equipment while keeping participants motivated and sessions running safely.",
+      "Intramural Soccer League Assistant: Helped organize and run a soccer league — handling scheduling, officiating, and ensuring games ran smoothly.",
     ],
   },
 ]
