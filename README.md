@@ -6,7 +6,6 @@ A personal portfolio website built with Next.js, showcasing professional experie
 
 Deployed on **Fly.io** via Docker + GitHub Actions CI/CD.
 
-`middleware.ts` permanently redirects (301) any `.fly.dev` traffic to your custom domain, keeping a single canonical entrypoint. Update the hostname in that file to match your own domain.
 
 ## Getting Started
 
