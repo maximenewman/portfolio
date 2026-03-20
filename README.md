@@ -68,3 +68,4 @@ portfolio/
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS + shadcn/ui
+- **Icons:** Lucide React
