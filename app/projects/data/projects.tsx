@@ -30,13 +30,13 @@ export const projects: Project[] = [
         type: "video",
         src: "https://www.youtube.com/embed/rfutVAvH3XI?si=STyJvM1nm5jhnoiY",
         alt: "Goblin's Keep gameplay demo",
-        thumbnailSrc: "/titleScreenText.png",
+        thumbnailSrc: "/projects/goblinskeep/titleScreenText.png",
       },
       {
         type: "video",
         src: "https://www.youtube.com/embed/odKOk1AjdDs?si=3cBbO5N8X7uaWPd8",
         alt: "LOS smart Goblin",
-        thumbnailSrc: "/LOS.png",
+        thumbnailSrc: "/projects/goblinskeep/LOS.png",
       },
     ],
   },
@@ -54,12 +54,12 @@ export const projects: Project[] = [
     media: [
       {
         type: "image",
-        src: "/doublecomputer.JPG",
+        src: "/projects/dsss-hackathon/doublecomputer.JPG",
         alt: "Debugging Code",
       },
       {
         type: "image",
-        src: "/winning.JPEG",
+        src: "/projects/dsss-hackathon/winning.JPEG",
         alt: "Winning the Hackathon",
       },
     ],
