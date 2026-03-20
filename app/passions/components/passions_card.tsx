@@ -52,6 +52,50 @@ function PlaneIcon({ className }: { className?: string }) {
   )
 }
 
+function FootballIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.5m0 13V21M3 12h2.5m13 0H21M6.4 6.4l1.8 1.8m7.6-1.8-1.8 1.8m-7.6 7.6 1.8-1.8m7.6 1.8-1.8-1.8" />
+    </svg>
+  )
+}
+
+function ChessIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 21h6M12 21v-3M8 18h8M10 15V9.5c0-.828-.448-1.5-1-1.5H8V6h8v2h-1c-.552 0-1 .672-1 1.5V15H10z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 8.5c0-.828.448-1.5 1-1.5h2c.552 0 1 .672 1 1.5" />
+    </svg>
+  )
+}
+
+function MicIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+    </svg>
+  )
+}
+
+function RunningIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 20.25l3-4.5 2.25 2.25L13.5 15l3 5.25" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 7.5 9l3.75-.75 1.5 3.75" />
+    </svg>
+  )
+}
+
+function MountainIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 20.25 9 9l3.75 5.25L15.75 9l4.5 11.25H3.75Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m13.5 12 1.5-2.25 1.5 2.25" />
+    </svg>
+  )
+}
+
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   code: CodeIcon,
   palette: PaletteIcon,
@@ -59,6 +103,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   book: BookIcon,
   dumbbell: DumbbellIcon,
   plane: PlaneIcon,
+  football: FootballIcon,
+  chess: ChessIcon,
+  mic: MicIcon,
+  running: RunningIcon,
+  mountain: MountainIcon,
 }
 
 interface PassionCardProps {
@@ -99,18 +148,33 @@ export function PassionCard({ passion, index }: PassionCardProps) {
           }`}
         >
           <div className="overflow-hidden">
-            <ul className="space-y-2 pt-4 border-t border-white/20">
+            <div className="space-y-3 pt-4 border-t border-white/20">
               {passion.details.map((detail, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2 text-white/80 text-sm"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+                <p key={i} className="text-white/80 text-sm leading-relaxed">
                   {detail}
-                </li>
+                </p>
               ))}
-            </ul>
+            </div>
+
+            {passion.media && passion.media.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Media</p>
+                <div className="flex flex-col gap-1">
+                  {passion.media.map((link) => (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-white/80 text-sm hover:text-white underline underline-offset-2"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
