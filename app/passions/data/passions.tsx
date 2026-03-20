@@ -11,6 +11,7 @@ export interface Passion {
   details: string[]
   media?: PassionMediaLink[]
   images?: string[]
+  videoEmbed?: string
 }
 
 export const passions: Passion[] = [
@@ -81,6 +82,7 @@ export const passions: Passion[] = [
     images: [
       "/portfolio/motivational speaking/happiness.png",
     ],
+    videoEmbed: "https://www.tiktok.com/embed/v2/7595900361513176340",
   },
   {
     id: "running",
