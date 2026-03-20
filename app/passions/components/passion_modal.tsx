@@ -14,21 +14,25 @@ interface PassionModalProps {
 export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
+  // Filter out empty strings from images
+  const validImages = passion?.images?.filter((img) => img && img.trim() !== "") || []
+  const imageCount = validImages.length
+
   const nextImage = useCallback(() => {
-    if (passion?.images) {
+    if (imageCount > 1) {
       setCurrentImageIndex((prev) =>
-        prev === passion.images!.length - 1 ? 0 : prev + 1
+        prev === imageCount - 1 ? 0 : prev + 1
       )
     }
-  }, [passion?.images])
+  }, [imageCount])
 
   const prevImage = useCallback(() => {
-    if (passion?.images) {
+    if (imageCount > 1) {
       setCurrentImageIndex((prev) =>
-        prev === 0 ? passion.images!.length - 1 : prev - 1
+        prev === 0 ? imageCount - 1 : prev - 1
       )
     }
-  }, [passion?.images])
+  }, [imageCount])
 
   // Reset image index when passion changes
   useEffect(() => {
@@ -56,7 +60,9 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
 
   if (!isOpen || !passion) return null
 
-  const hasMultipleImages = passion.images && passion.images.length > 1
+  const hasImages = validImages.length > 0
+  const hasMultipleImages = validImages.length > 1
+  const currentImage = validImages[currentImageIndex] || validImages[0]
 
   return (
     <div
@@ -82,12 +88,12 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
 
         <div className="flex flex-1 flex-col overflow-y-auto md:flex-row">
           {/* Image Gallery Section */}
-          {passion.images && passion.images.length > 0 && (
+          {hasImages && currentImage && (
             <div className="relative flex h-64 w-full flex-shrink-0 flex-col bg-muted md:h-auto md:w-1/2">
               {/* Main Image */}
               <div className="relative flex-1">
                 <Image
-                  src={passion.images[currentImageIndex]}
+                  src={currentImage}
                   alt={`${passion.title} photo ${currentImageIndex + 1}`}
                   fill
                   className="object-cover"
@@ -118,7 +124,7 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
               {/* Thumbnail Strip */}
               {hasMultipleImages && (
                 <div className="flex gap-2 bg-card/50 p-3 backdrop-blur-sm">
-                  {passion.images.map((src, i) => (
+                  {validImages.map((src, i) => (
                     <button
                       key={i}
                       onClick={() => setCurrentImageIndex(i)}
@@ -144,7 +150,7 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
               {/* Image Counter */}
               {hasMultipleImages && (
                 <div className="absolute bottom-16 right-3 rounded-full bg-background/80 px-3 py-1 text-sm font-medium backdrop-blur-sm">
-                  {currentImageIndex + 1} / {passion.images.length}
+                  {currentImageIndex + 1} / {validImages.length}
                 </div>
               )}
             </div>
