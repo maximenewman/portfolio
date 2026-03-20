@@ -50,7 +50,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border bg-muted/50">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap justify-center gap-100">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-0">
           {/* Site Links */}
           <div className="flex flex-col items-center rounded-lg px-8 py-6">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
