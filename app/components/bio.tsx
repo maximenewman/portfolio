@@ -21,6 +21,7 @@ export default function MyBio() {
               src={bioData.picture}
               alt={`Picture of ${bioData.name}`}
               fill
+              sizes="192px"
               className="object-cover"
               priority
             />
