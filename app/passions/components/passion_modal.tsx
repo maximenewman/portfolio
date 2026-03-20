@@ -13,6 +13,7 @@ interface PassionModalProps {
 
 export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [showVideo, setShowVideo] = useState(false)
 
   // Filter out empty strings from images
   const validImages = passion?.images?.filter((img) => img && img.trim() !== "") || []
@@ -34,9 +35,10 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
     }
   }, [imageCount])
 
-  // Reset image index when passion changes
+  // Reset image index and video state when passion changes
   useEffect(() => {
     setCurrentImageIndex(0)
+    setShowVideo(false)
   }, [passion?.id])
 
   // Handle keyboard navigation
@@ -90,7 +92,25 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
           {/* Image Gallery Section */}
           {hasImages && currentImage && (
             <div className="relative flex h-96 w-full flex-shrink-0 flex-col bg-muted md:h-[500px] md:w-1/2">
-              {/* Main Image */}
+              {/* Video embed */}
+              {showVideo && passion.videoEmbed ? (
+                <div className="relative flex-1">
+                  <iframe
+                    src={passion.videoEmbed}
+                    className="h-full w-full"
+                    allowFullScreen
+                    allow="autoplay"
+                  />
+                  <button
+                    onClick={() => setShowVideo(false)}
+                    className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
+                    aria-label="Back to image"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                </div>
+              ) : (
+              /* Main Image */
               <div className="relative flex-1">
                 <Image
                   src={currentImage}
@@ -99,6 +119,20 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
+                {/* Play button overlay for video */}
+                {passion.videoEmbed && (
+                  <button
+                    onClick={() => setShowVideo(true)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors hover:bg-black/40"
+                    aria-label="Play video"
+                  >
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                      <svg className="h-7 w-7 translate-x-0.5 text-black" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </button>
+                )}
 
                 {/* Image Navigation */}
                 {hasMultipleImages && (
@@ -120,6 +154,7 @@ export function PassionModal({ passion, isOpen, onClose }: PassionModalProps) {
                   </>
                 )}
               </div>
+              )}
 
               {/* Thumbnail Strip */}
               {hasMultipleImages && (
