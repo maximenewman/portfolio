@@ -18,9 +18,9 @@ export default function Navbar() {
   return (
     <nav className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between md:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
+        <div className="flex h-16 items-center md:h-20">
+          {/* Logo - Far Left */}
+          <Link href="/" className="mr-auto flex items-center">
             <Image
               src="/logo.png"
               alt="Logo of Maxime"
@@ -30,8 +30,8 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <ul className="hidden flex-1 justify-center gap-1 md:flex">
+          {/* Desktop Navigation - Centered */}
+          <ul className="absolute left-1/2 hidden -translate-x-1/2 gap-1 md:flex">
             {pageRoutes.map((page) => (
               <li key={page.link}>
                 <Link

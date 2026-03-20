@@ -44,13 +44,33 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           </div>
         )}
         {experience.highlights && experience.highlights.length > 0 && (
-          <ul className="list-inside list-disc space-y-1 text-sm">
-            {experience.highlights.map((point, index) => (
-              <li key={index} className="leading-relaxed text-card-foreground">
-                {point}
-              </li>
-            ))}
-          </ul>
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-muted-foreground">Highlights</h4>
+            <ul className="list-inside list-disc space-y-1 text-sm">
+              {experience.highlights.map((point, index) => (
+                <li key={index} className="leading-relaxed text-card-foreground">
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Skills */}
+        {experience.skills && experience.skills.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <h4 className="text-sm font-semibold text-muted-foreground">Skills</h4>
+            <div className="flex flex-wrap gap-2">
+              {experience.skills.map((skill, i) => (
+                <span
+                  key={i}
+                  className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

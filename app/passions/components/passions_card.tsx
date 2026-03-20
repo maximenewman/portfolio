@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import type { Passion } from "@/app/passions/data/passions"
+import { ChevronDown, ExternalLink } from "lucide-react"
 
 // Icon components
 function CodeIcon({ className }: { className?: string }) {
@@ -114,107 +115,194 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 interface PassionCardProps {
   passion: Passion
   index: number
+  featured?: boolean
 }
 
-export function PassionCard({ passion, index }: PassionCardProps) {
+export function PassionCard({ passion, index, featured = false }: PassionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const IconComponent = iconMap[passion.icon] || CodeIcon
 
-  return (
-    <div
-      className={`group relative overflow-hidden rounded-2xl ${passion.color} ${passion.hoverColor} transition-all duration-500 ease-out cursor-pointer`}
-      style={{ animationDelay: `${index * 100}ms` }}
-      onClick={() => setIsExpanded(!isExpanded)}
-    >
-      <div className="relative z-10 p-6 md:p-8">
-        {/* Icon */}
-        <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-          <IconComponent className="w-6 h-6 text-white" />
-        </div>
+  if (featured) {
+    return (
+      <div className="group">
+        <div className="flex flex-col lg:flex-row">
+          {/* Image Gallery - Featured */}
+          {passion.images && passion.images.length > 0 && (
+            <div className="relative h-64 w-full lg:h-auto lg:w-1/2">
+              <div className="grid h-full grid-cols-2 gap-1">
+                {passion.images.slice(0, 4).map((src, i) => (
+                  <div
+                    key={i}
+                    className={`relative overflow-hidden ${
+                      passion.images!.length === 1 ? "col-span-2 row-span-2" : ""
+                    } ${passion.images!.length === 2 ? "row-span-2" : ""}`}
+                  >
+                    <Image
+                      src={src}
+                      alt={`${passion.title} photo ${i + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-        {/* Title */}
-        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-1">
-          {passion.title}
-        </h3>
+          {/* Content - Featured */}
+          <div className="flex flex-1 flex-col p-6 lg:p-8">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                <IconComponent className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Featured
+                </span>
+                <h3 className="text-2xl font-bold text-card-foreground md:text-3xl">
+                  {passion.title}
+                </h3>
+              </div>
+            </div>
 
-        {/* Description */}
-        <p className="text-white/70 text-sm md:text-base leading-relaxed mb-4">
-          {passion.description}
-        </p>
+            <p className="mb-4 leading-relaxed text-muted-foreground">
+              {passion.description}
+            </p>
 
-        {/* Expandable Details */}
-        <div
-          className={`grid transition-all duration-500 ease-out ${
-            isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-          }`}
-        >
-          <div className="overflow-hidden">
-            <div className="space-y-3 pt-4 border-t border-white/20">
+            {/* Details */}
+            <div className="space-y-3">
               {passion.details.map((detail, i) => (
-                <p key={i} className="text-white/80 text-sm leading-relaxed">
+                <p key={i} className="text-sm leading-relaxed text-card-foreground">
                   {detail}
                 </p>
               ))}
             </div>
 
-            {passion.images && passion.images.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Photos</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {passion.images.map((src, i) => (
-                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-white/10">
-                      <Image
-                        src={src}
-                        alt={`${passion.title} photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  ))}
-                </div>
+            {/* Media Links */}
+            {passion.media && passion.media.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {passion.media.map((link) => (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="group cursor-pointer"
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
+      {/* Image Preview */}
+      {passion.images && passion.images.length > 0 && (
+        <div className="relative h-48 w-full overflow-hidden">
+          <Image
+            src={passion.images[0]}
+            alt={`${passion.title} preview`}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="p-5">
+        <div className="mb-3 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
+            <IconComponent className="h-5 w-5 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-card-foreground">
+            {passion.title}
+          </h3>
+        </div>
+
+        <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
+          {passion.description}
+        </p>
+
+        {/* Expandable Details */}
+        <div
+          className={`grid transition-all duration-300 ease-out ${
+            isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="space-y-2 border-t border-border pt-3">
+              {passion.details.map((detail, i) => (
+                <p key={i} className="text-sm leading-relaxed text-card-foreground">
+                  {detail}
+                </p>
+              ))}
+            </div>
+
+            {/* Expanded Images */}
+            {passion.images && passion.images.length > 1 && (
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {passion.images.slice(1).map((src, i) => (
+                  <div
+                    key={i}
+                    className="relative aspect-square overflow-hidden rounded-lg"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Image
+                      src={src}
+                      alt={`${passion.title} photo ${i + 2}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
               </div>
             )}
 
+            {/* Media Links */}
             {passion.media && passion.media.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Media</p>
-                <div className="flex flex-col gap-1">
-                  {passion.media.map((link) => (
-                    <a
-                      key={link.url}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-white/80 text-sm hover:text-white underline underline-offset-2"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {passion.media.map((link) => (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {link.label}
+                  </a>
+                ))}
               </div>
             )}
           </div>
         </div>
 
         {/* Expand indicator */}
-        <div className="mt-4 flex items-center gap-2 text-white/50 text-xs">
-          <span>{isExpanded ? "Click to collapse" : "Click to explore"}</span>
-          <svg
-            className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m19 9-7 7-7-7" />
-          </svg>
-        </div>
+        <button
+          className="mt-3 flex w-full items-center justify-center gap-1 text-xs text-muted-foreground transition-colors hover:text-card-foreground"
+          aria-expanded={isExpanded}
+        >
+          <span>{isExpanded ? "Show less" : "Learn more"}</span>
+          <ChevronDown
+            className={`h-4 w-4 transition-transform duration-300 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       </div>
-
-      {/* Background decoration */}
-      <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-white/5 transition-transform duration-500 group-hover:scale-150" />
-      <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5 transition-transform duration-700 group-hover:scale-150" />
     </div>
   )
 }
