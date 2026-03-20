@@ -1,9 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import type { Passion } from "@/app/passions/data/passions"
-import { ChevronDown, ExternalLink } from "lucide-react"
 
 // Icon components
 function CodeIcon({ className }: { className?: string }) {
@@ -118,8 +116,7 @@ interface PassionCardProps {
   featured?: boolean
 }
 
-export function PassionCard({ passion, index, featured = false }: PassionCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export function PassionCard({ passion, featured = false }: PassionCardProps) {
   const IconComponent = iconMap[passion.icon] || CodeIcon
 
   if (featured) {
@@ -128,7 +125,7 @@ export function PassionCard({ passion, index, featured = false }: PassionCardPro
         <div className="flex flex-col lg:flex-row">
           {/* Image Gallery - Featured */}
           {passion.images && passion.images.length > 0 && (
-            <div className="relative h-64 w-full lg:h-auto lg:w-1/2">
+            <div className="relative h-64 w-full lg:h-auto lg:min-h-[400px] lg:w-1/2">
               <div className="grid h-full grid-cols-2 gap-1">
                 {passion.images.slice(0, 4).map((src, i) => (
                   <div
@@ -145,6 +142,10 @@ export function PassionCard({ passion, index, featured = false }: PassionCardPro
                     />
                   </div>
                 ))}
+              </div>
+              {/* Click to expand hint */}
+              <div className="absolute bottom-4 right-4 rounded-full bg-background/80 px-3 py-1.5 text-xs font-medium backdrop-blur-sm transition-opacity group-hover:opacity-100 md:opacity-0">
+                Click to view gallery
               </div>
             </div>
           )}
@@ -169,32 +170,19 @@ export function PassionCard({ passion, index, featured = false }: PassionCardPro
               {passion.description}
             </p>
 
-            {/* Details */}
+            {/* Preview of details */}
             <div className="space-y-3">
-              {passion.details.map((detail, i) => (
+              {passion.details.slice(0, 2).map((detail, i) => (
                 <p key={i} className="text-sm leading-relaxed text-card-foreground">
                   {detail}
                 </p>
               ))}
+              {passion.details.length > 2 && (
+                <p className="text-sm font-medium text-primary">
+                  Click to read more...
+                </p>
+              )}
             </div>
-
-            {/* Media Links */}
-            {passion.media && passion.media.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {passion.media.map((link) => (
-                  <a
-                    key={link.url}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -202,10 +190,7 @@ export function PassionCard({ passion, index, featured = false }: PassionCardPro
   }
 
   return (
-    <div
-      className="group cursor-pointer"
-      onClick={() => setIsExpanded(!isExpanded)}
-    >
+    <div className="group">
       {/* Image Preview */}
       {passion.images && passion.images.length > 0 && (
         <div className="relative h-48 w-full overflow-hidden">
@@ -216,6 +201,12 @@ export function PassionCard({ passion, index, featured = false }: PassionCardPro
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+          {/* Image count badge */}
+          {passion.images.length > 1 && (
+            <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2 py-1 text-xs font-medium backdrop-blur-sm">
+              +{passion.images.length - 1} photos
+            </div>
+          )}
         </div>
       )}
 
@@ -230,78 +221,14 @@ export function PassionCard({ passion, index, featured = false }: PassionCardPro
           </h3>
         </div>
 
-        <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
+        <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
           {passion.description}
         </p>
 
-        {/* Expandable Details */}
-        <div
-          className={`grid transition-all duration-300 ease-out ${
-            isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-          }`}
-        >
-          <div className="overflow-hidden">
-            <div className="space-y-2 border-t border-border pt-3">
-              {passion.details.map((detail, i) => (
-                <p key={i} className="text-sm leading-relaxed text-card-foreground">
-                  {detail}
-                </p>
-              ))}
-            </div>
-
-            {/* Expanded Images */}
-            {passion.images && passion.images.length > 1 && (
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {passion.images.slice(1).map((src, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-square overflow-hidden rounded-lg"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Image
-                      src={src}
-                      alt={`${passion.title} photo ${i + 2}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Media Links */}
-            {passion.media && passion.media.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {passion.media.map((link) => (
-                  <a
-                    key={link.url}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Expand indicator */}
-        <button
-          className="mt-3 flex w-full items-center justify-center gap-1 text-xs text-muted-foreground transition-colors hover:text-card-foreground"
-          aria-expanded={isExpanded}
-        >
-          <span>{isExpanded ? "Show less" : "Learn more"}</span>
-          <ChevronDown
-            className={`h-4 w-4 transition-transform duration-300 ${
-              isExpanded ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+        {/* Click hint */}
+        <span className="text-xs font-medium text-primary transition-colors group-hover:text-primary/80">
+          Click to explore
+        </span>
       </div>
     </div>
   )
