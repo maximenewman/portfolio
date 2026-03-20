@@ -10,6 +10,7 @@ export interface Experience {
   location: string
   projects?: Project[]
   highlights?: string[]
+  skills?: string[]
 }
 
 export const experiences: Experience[] = [
@@ -17,7 +18,7 @@ export const experiences: Experience[] = [
     type: "tech",
     role: "AI Engineering Co-op",
     company: "SKC Engineering Ltd",
-    date: "Sept 2025 - Present",
+    date: "May 2025 - Present",
     location: "Surrey, BC",
     projects: [
       {
@@ -69,6 +70,7 @@ export const experiences: Experience[] = [
       "Programmed microcontroller-based systems with students to control motors, sensors, and inputs.",
       "Led robotics projects where students designed, tested, and iterated on mechanical models.",
     ],
+    skills: ["Teaching", "Python", "Microcontrollers", "Arduino", "Robotics", "Curriculum Design"],
   },
   {
     type: "leadership",
@@ -81,6 +83,7 @@ export const experiences: Experience[] = [
       "Explained key concepts through interactive discussions and guided problem-solving sessions.",
       "Reinforced personal mastery of calculus through teaching, feedback, and real-time troubleshooting.",
     ],
+    skills: ["Calculus", "Teaching", "Mentoring", "Problem Solving", "Communication"],
   },
   {
     type: "leadership",
@@ -94,6 +97,7 @@ export const experiences: Experience[] = [
       "Supported and mentored HIVE volunteers aspiring to become Hive Leaders.",
       "Led orientation sessions, ensuring new students had a smooth transition.",
     ],
+    skills: ["Leadership", "Event Planning", "Mentoring", "Public Speaking", "Team Collaboration"],
   },
   {
     type: "other",
@@ -107,5 +111,6 @@ export const experiences: Experience[] = [
       "Fitness Class Assistant: Supported instructors with class setup and equipment while keeping participants motivated and sessions running safely.",
       "Intramural Soccer League Assistant: Helped organize and run a soccer league — handling scheduling, officiating, and ensuring games ran smoothly.",
     ],
+    skills: ["Customer Service", "Event Coordination", "Communication", "Teamwork", "Organization"],
   },
 ]

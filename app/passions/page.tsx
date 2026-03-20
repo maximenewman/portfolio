@@ -8,7 +8,7 @@ export default function PassionsPage() {
           My Passions
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Things I love outside of work
+          Beyond code, these are the pursuits that shape who I am
         </p>
       </header>
       <main>

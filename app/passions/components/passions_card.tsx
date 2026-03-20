@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import type { Passion } from "@/app/passions/data/passions"
 
@@ -114,107 +113,113 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 interface PassionCardProps {
   passion: Passion
   index: number
+  featured?: boolean
 }
 
-export function PassionCard({ passion, index }: PassionCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export function PassionCard({ passion, featured = false }: PassionCardProps) {
   const IconComponent = iconMap[passion.icon] || CodeIcon
 
+  if (featured) {
+    return (
+      <div className="group">
+        <div className="flex flex-col lg:flex-row">
+          {/* Image Gallery - Featured */}
+          {passion.images && passion.images.length > 0 && (
+            <div className="relative aspect-[4/3] w-full lg:aspect-auto lg:min-h-[500px] lg:w-3/5">
+              <div className="grid h-full grid-cols-2 gap-1">
+                {passion.images.slice(0, 4).map((src, i) => (
+                  <div
+                    key={i}
+                    className={`relative overflow-hidden ${
+                      passion.images!.length === 1 ? "col-span-2 row-span-2" : ""
+                    } ${passion.images!.length === 2 ? "row-span-2" : ""}`}
+                  >
+                    <Image
+                      src={src}
+                      alt={`${passion.title} photo ${i + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 60vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Click to expand hint */}
+              <div className="absolute bottom-4 right-4 rounded-full bg-background/80 px-3 py-1.5 text-xs font-medium backdrop-blur-sm transition-opacity group-hover:opacity-100 md:opacity-0">
+                Click to view gallery
+              </div>
+            </div>
+          )}
+
+          {/* Content - Featured */}
+          <div className="flex flex-1 flex-col p-6 lg:p-8">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                <IconComponent className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Featured
+                </span>
+                <h3 className="text-2xl font-bold text-card-foreground md:text-3xl">
+                  {passion.title}
+                </h3>
+              </div>
+            </div>
+
+            <p className="mb-4 leading-relaxed text-muted-foreground">
+              {passion.description}
+            </p>
+
+            <span className="mt-auto text-sm font-medium text-primary">Click to explore →</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={`group relative overflow-hidden rounded-2xl ${passion.color} ${passion.hoverColor} transition-all duration-500 ease-out cursor-pointer`}
-      style={{ animationDelay: `${index * 100}ms` }}
-      onClick={() => setIsExpanded(!isExpanded)}
-    >
-      <div className="relative z-10 p-6 md:p-8">
-        {/* Icon */}
-        <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-          <IconComponent className="w-6 h-6 text-white" />
+    <div className="group flex h-full flex-col">
+      {/* Image Preview - Full prominent display */}
+      {passion.images && passion.images.length > 0 && (
+        <div className="relative aspect-[4/3] w-full overflow-hidden">
+          <Image
+            src={passion.images[0]}
+            alt={`${passion.title} preview`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
+          {/* Image count badge */}
+          {passion.images.length > 1 && (
+            <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
+              +{passion.images.length - 1} photos
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-3 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
+            <IconComponent className="h-5 w-5 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-card-foreground">
+            {passion.title}
+          </h3>
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 transition-transform duration-300 group-hover:translate-x-1">
-          {passion.title}
-        </h3>
-
-        {/* Description */}
-        <p className="text-white/70 text-sm md:text-base leading-relaxed mb-4">
+        <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
           {passion.description}
         </p>
 
-        {/* Expandable Details */}
-        <div
-          className={`grid transition-all duration-500 ease-out ${
-            isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-          }`}
-        >
-          <div className="overflow-hidden">
-            <div className="space-y-3 pt-4 border-t border-white/20">
-              {passion.details.map((detail, i) => (
-                <p key={i} className="text-white/80 text-sm leading-relaxed">
-                  {detail}
-                </p>
-              ))}
-            </div>
-
-            {passion.images && passion.images.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Photos</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {passion.images.map((src, i) => (
-                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-white/10">
-                      <Image
-                        src={src}
-                        alt={`${passion.title} photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {passion.media && passion.media.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Media</p>
-                <div className="flex flex-col gap-1">
-                  {passion.media.map((link) => (
-                    <a
-                      key={link.url}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-white/80 text-sm hover:text-white underline underline-offset-2"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Expand indicator */}
-        <div className="mt-4 flex items-center gap-2 text-white/50 text-xs">
-          <span>{isExpanded ? "Click to collapse" : "Click to explore"}</span>
-          <svg
-            className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m19 9-7 7-7-7" />
-          </svg>
-        </div>
+        {/* Click hint */}
+        <span className="text-xs font-medium text-primary transition-colors group-hover:text-primary/80">
+          Click to explore
+        </span>
       </div>
-
-      {/* Background decoration */}
-      <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-white/5 transition-transform duration-500 group-hover:scale-150" />
-      <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/5 transition-transform duration-700 group-hover:scale-150" />
     </div>
   )
 }
