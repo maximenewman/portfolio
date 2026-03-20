@@ -6,6 +6,8 @@ A personal portfolio website built with Next.js, showcasing professional experie
 
 Deployed on **Fly.io** via Docker + GitHub Actions CI/CD.
 
+`middleware.ts` permanently redirects (301) any `.fly.dev` traffic to your custom domain, keeping a single canonical entrypoint. Update the hostname in that file to match your own domain.
+
 ## Getting Started
 
 ### Prerequisites
@@ -31,7 +33,6 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint |
 | `npm run type-check` | Run TypeScript type checking |
-| `npm test` | Run tests |
 
 ## Project Structure
 
@@ -66,5 +67,4 @@ portfolio/
 
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS + DaisyUI
-- **Icons:** Lucide React
+- **Styling:** Tailwind CSS + shadcn/ui
