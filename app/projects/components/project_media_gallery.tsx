@@ -42,6 +42,7 @@ export function ProjectMediaGallery({ media, title }: ProjectMediaGalleryProps) 
                 src={item.src}
                 alt={item.alt || `${title} media ${index + 1}`}
                 fill
+                sizes="(max-width: 768px) 50vw, 33vw"
                 className="object-cover transition-transform group-hover:scale-105"
               />
             ) : item.thumbnailSrc ? (
@@ -50,6 +51,7 @@ export function ProjectMediaGallery({ media, title }: ProjectMediaGalleryProps) 
                   src={item.thumbnailSrc}
                   alt={item.alt || `${title} video thumbnail ${index + 1}`}
                   fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
                   className="object-cover transition-transform group-hover:scale-105"
                 />
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
@@ -90,6 +92,7 @@ export function ProjectMediaGallery({ media, title }: ProjectMediaGalleryProps) 
                   src={media[selectedIndex].src}
                   alt={media[selectedIndex].alt || `${title} media`}
                   fill
+                  sizes="(max-width: 768px) 100vw, 896px"
                   className="object-contain"
                 />
               ) : (
