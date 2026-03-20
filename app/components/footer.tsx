@@ -5,7 +5,7 @@ import { bioData } from "./bio"
 import { Github, Linkedin, Mail, FileText } from "lucide-react"
 
 export default function Footer() {
-  const resumePath = "/Maxime_Resume.pdf"
+  const resumePath = "/resume/Maxime_resume.pdf"
 
   return (
     <footer className="border-t border-border bg-muted/50">
