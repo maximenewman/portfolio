@@ -108,9 +108,10 @@ export const passions: Passion[] = [
       "I've been lucky enough to take in some truly breathtaking views on the trails, and I try never to take that for granted.",
     ],
     images: [
-      "/portfolio/hiking/IMG_6551.jpg",
-      "/portfolio/hiking/IMG_6668.jpg",
+      "/portfolio/hiking/IMG_6930.jpg",
       "/portfolio/hiking/IMG_6935.jpg",
+      "/portfolio/hiking/IMG_6668.jpg",
+      "/portfolio/hiking/IMG_6551.jpg",
     ],
   },
 ]
