@@ -171,19 +171,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
               {passion.description}
             </p>
 
-            {/* Preview of details */}
-            <div className="space-y-3">
-              {passion.details.slice(0, 2).map((detail, i) => (
-                <p key={i} className="text-sm leading-relaxed text-card-foreground">
-                  {detail}
-                </p>
-              ))}
-              {passion.details.length > 2 && (
-                <p className="text-sm font-medium text-primary">
-                  Click to read more...
-                </p>
-              )}
-            </div>
+            <span className="mt-auto text-sm font-medium text-primary">Click to explore →</span>
           </div>
         </div>
       </div>
