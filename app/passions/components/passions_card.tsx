@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import type { Passion } from "@/app/passions/data/passions"
 
 // Icon components
@@ -155,6 +156,25 @@ export function PassionCard({ passion, index }: PassionCardProps) {
                 </p>
               ))}
             </div>
+
+            {passion.images && passion.images.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Photos</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {passion.images.map((src, i) => (
+                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-white/10">
+                      <Image
+                        src={src}
+                        alt={`${passion.title} photo ${i + 1}`}
+                        fill
+                        className="object-cover"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {passion.media && passion.media.length > 0 && (
               <div className="mt-4 pt-3 border-t border-white/10">
