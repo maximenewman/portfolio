@@ -16,7 +16,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
 
   return (
-    <nav className="bg-primary text-primary-foreground">
+    <nav className="sticky top-0 z-50 bg-primary text-primary-foreground">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center md:h-20">
           {/* Logo - Far Left */}
@@ -63,7 +63,7 @@ export default function Navbar() {
                   key={page.link}
                   href={page.link}
                   onClick={() => setOpen(false)}
-                  className="rounded-md px-4 py-2 text-lg font-medium transition-colors hover:bg-white/10"
+                  className="rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-white/10"
                 >
                   {page.name}
                 </Link>
