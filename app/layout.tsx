@@ -1,8 +1,9 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import Navbar from "./components/navigation"
 import Footer from "./components/footer"
+import { ThemeProvider } from "./components/theme-provider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,11 +16,18 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Maxime's Portfolio",
-  description: `Walk through my experience and projects, as I start my journey on the road to become a Cybersecurity Analyst`,
+  title: "Maxime Newman | Portfolio",
+  description: `Software developer and Cybersecurity enthusiast. Explore my experiences, projects, and passions.`,
   icons: {
     icon: "/logo.png",
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#16a34a" },
+    { media: "(prefers-color-scheme: dark)", color: "#22c55e" },
+  ],
 }
 
 export default function RootLayout({
@@ -28,13 +36,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col font-sans antialiased`}
       >
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ThemeProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   )
