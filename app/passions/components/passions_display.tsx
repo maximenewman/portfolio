@@ -24,7 +24,7 @@ export function PassionsDisplay() {
         {/* Featured passion - first one gets special treatment */}
         {passions.length > 0 && (
           <div
-            className="cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-shadow hover:shadow-xl"
+            className="card-hover cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
             onClick={() => handleCardClick(passions[0])}
           >
             <PassionCard passion={passions[0]} index={0} featured />
@@ -37,7 +37,7 @@ export function PassionsDisplay() {
             {passions.slice(1).map((passion, index) => (
               <div
                 key={passion.id}
-                className="cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-lg"
+                className="card-hover cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
                 onClick={() => handleCardClick(passion)}
               >
                 <PassionCard passion={passion} index={index + 1} />
