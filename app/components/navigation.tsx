@@ -41,6 +41,7 @@ export default function Navbar() {
                 alt="Logo of Maxime"
                 width={64}
                 height={64}
+                loading="eager"
                 className="h-10 w-10 rounded-full md:h-12 md:w-12"
               />
             </div>
