@@ -48,68 +48,105 @@ export default function Footer() {
   const resumePath = "/resume/Maxime_resume.pdf"
 
   return (
-    <footer className="border-t border-border bg-muted/50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-0">
+    <footer className="border-t border-border bg-card">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           {/* Site Links */}
-          <div className="flex flex-col items-center rounded-lg px-8 py-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="flex flex-col items-center sm:items-start">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
               Site
             </h3>
-            <nav className="flex flex-col items-center gap-2">
-              <Link href="/experiences" className="text-sm transition-colors hover:text-primary">
+            <nav className="flex flex-col items-center gap-3 sm:items-start">
+              <Link 
+                href="/experiences" 
+                className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
+              >
                 Experiences
               </Link>
-              <Link href="/projects" className="text-sm transition-colors hover:text-primary">
+              <Link 
+                href="/projects" 
+                className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
+              >
                 Projects
               </Link>
-              <Link href="/passions" className="text-sm transition-colors hover:text-primary">
+              <Link 
+                href="/passions" 
+                className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
+              >
                 Passions
               </Link>
             </nav>
           </div>
 
           {/* Socials */}
-          <div className="flex flex-col items-center rounded-lg px-8 py-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Socials
+          <div className="flex flex-col items-center">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
+              Connect
             </h3>
-            <nav className="grid grid-cols-2 gap-x-6 gap-y-2">
-              <a href="https://github.com/maximenewman" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm transition-colors hover:text-primary">
-                <GithubIcon className="h-4 w-4" />
-                GitHub
+            <div className="flex flex-wrap justify-center gap-3">
+              <a 
+                href="https://github.com/maximenewman" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="GitHub"
+              >
+                <GithubIcon className="h-5 w-5" />
               </a>
-              <a href="https://www.instagram.com/tungsten_gains/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm transition-colors hover:text-primary">
-                <InstagramIcon className="h-4 w-4" />
-                Instagram
+              <a 
+                href="https://www.linkedin.com/in/maxime-newman-a546b42b5" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="LinkedIn"
+              >
+                <LinkedinIcon className="h-5 w-5" />
               </a>
-              <a href="https://www.linkedin.com/in/maxime-newman-a546b42b5" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm transition-colors hover:text-primary">
-                <LinkedinIcon className="h-4 w-4" />
-                LinkedIn
+              <a 
+                href="https://www.instagram.com/tungsten_gains/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="Instagram"
+              >
+                <InstagramIcon className="h-5 w-5" />
               </a>
-              <a href="https://www.tiktok.com/@yvngg_max" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm transition-colors hover:text-primary">
-                <TiktokIcon className="h-4 w-4" />
-                TikTok
+              <a 
+                href="https://www.youtube.com/@yvngg_max" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="YouTube"
+              >
+                <YoutubeIcon className="h-5 w-5" />
               </a>
-              <a href="https://www.youtube.com/@yvngg_max" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm transition-colors hover:text-primary">
-                <YoutubeIcon className="h-4 w-4" />
-                YouTube
+              <a 
+                href="https://www.tiktok.com/@yvngg_max" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="TikTok"
+              >
+                <TiktokIcon className="h-5 w-5" />
               </a>
-              <a href={`mailto:${bioData.email}`} className="flex items-center gap-2 text-sm transition-colors hover:text-primary">
-                <Mail className="h-4 w-4" />
-                Email
+              <a 
+                href={`mailto:${bioData.email}`} 
+                className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+                aria-label="Email"
+              >
+                <Mail className="h-5 w-5" />
               </a>
-            </nav>
+            </div>
           </div>
 
           {/* Resume */}
-          <div className="flex flex-col items-center rounded-lg px-8 py-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="flex flex-col items-center sm:items-end">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
               Resume
             </h3>
             <button
               onClick={() => window.open(resumePath, "_blank", "noopener,noreferrer")}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-muted px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/80"
+              className="btn-hover inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition-colors hover:bg-primary/90"
             >
               <FileText className="h-4 w-4" />
               View Resume
@@ -117,10 +154,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <hr className="my-6 border-border" />
+        <hr className="my-8 border-border" />
 
         <p className="text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} Maxime Newman Nereyabagabo. All rights reserved.
+          {new Date().getFullYear()} Maxime Newman Nereyabagabo. All rights reserved.
         </p>
       </div>
     </footer>

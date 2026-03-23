@@ -204,7 +204,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                      className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
                     >
                       <ExternalLink className="h-4 w-4" />
                       {link.label}
