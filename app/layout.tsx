@@ -4,6 +4,7 @@ import "./globals.css"
 import Navbar from "./components/navigation"
 import Footer from "./components/footer"
 import { ThemeProvider } from "./components/theme-provider"
+import PageNavigationWrapper from "./components/page-navigation-wrapper"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
         <ThemeProvider>
           <Navbar />
           <main className="flex-1">{children}</main>
+          <PageNavigationWrapper />
           <Footer />
         </ThemeProvider>
       </body>
