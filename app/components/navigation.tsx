@@ -17,7 +17,7 @@ const pageRoutes = [
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, mounted } = useTheme()
 
   const isActive = (link: string) => {
     if (link === "/") {
@@ -68,17 +68,19 @@ export default function Navbar() {
 
           {/* Right side - Theme toggle */}
           <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="btn-hover rounded-full p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-            >
-              {theme === "light" ? (
-                <Moon className="h-5 w-5" />
-              ) : (
-                <Sun className="h-5 w-5" />
-              )}
-            </button>
+            {mounted && (
+              <button
+                onClick={toggleTheme}
+                className="btn-hover rounded-full p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              >
+                {theme === "light" ? (
+                  <Moon className="h-5 w-5" />
+                ) : (
+                  <Sun className="h-5 w-5" />
+                )}
+              </button>
+            )}
 
             {/* Mobile Menu Button */}
             <button
