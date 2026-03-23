@@ -8,7 +8,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <div className="flex flex-col rounded-lg border border-border bg-card shadow-sm">
+    <div className="card-hover flex flex-col rounded-lg border border-border bg-card shadow-sm">
       <div className="border-b border-border p-4">
         <h3 className="text-lg font-semibold text-card-foreground md:text-xl">
           {project.title}
@@ -59,7 +59,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                className="btn-hover inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
               >
                 <ExternalLink className="h-4 w-4" />
                 View Project
@@ -70,7 +70,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 href={project.linkedinPostUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                className="btn-hover inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
               >
                 <Linkedin className="h-4 w-4" />
                 View LinkedIn Post
