@@ -18,19 +18,20 @@
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --card: #171717;
-  --card-foreground: #fafafa;
-  --primary: #22c55e;
-  --primary-foreground: #0a0a0a;
-  --secondary: #262626;
-  --secondary-foreground: #fafafa;
-  --muted: #262626;
-  --muted-foreground: #a1a1aa;
-  --accent: #14532d;
+  /* Night sky inspired palette - deep blue-black */
+  --background: #0c1222;
+  --foreground: #f0f4f8;
+  --card: #141d2f;
+  --card-foreground: #f0f4f8;
+  --primary: #4ade80;
+  --primary-foreground: #0c1222;
+  --secondary: #1e293b;
+  --secondary-foreground: #f0f4f8;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1a3a2a;
   --accent-foreground: #bbf7d0;
-  --border: #404040;
+  --border: #334155;
 }
 
 @theme inline {

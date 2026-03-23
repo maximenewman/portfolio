@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { FileText, ArrowDown, Github, Linkedin, Mail } from "lucide-react"
+import { FileText, Github, Linkedin, Mail } from "lucide-react"
 
 export const bioData = {
   name: "Maxime Newman Nereyabagabo",
@@ -117,10 +117,6 @@ export default function MyBio() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 animate-bounce md:block">
-          <ArrowDown className="h-6 w-6 text-muted-foreground" />
-        </div>
       </div>
 
       {/* About Section - Below the fold */}
