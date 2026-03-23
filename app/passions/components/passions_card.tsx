@@ -136,7 +136,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
                   >
                     <Image
                       src={src}
-                      alt={`${passion.title} photo ${i + 1}`}
+                      alt={passion.imageAlts?.[i] || `${passion.title} photo ${i + 1}`}
                       fill
                       sizes="(max-width: 768px) 100vw, 60vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -185,7 +185,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           <Image
             src={passion.images[0]}
-            alt={`${passion.title} preview`}
+            alt={passion.imageAlts?.[0] || `${passion.title} preview`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"

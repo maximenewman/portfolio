@@ -8,7 +8,7 @@ interface ExperienceCardProps {
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm">
+    <div className="card-hover rounded-lg border border-border bg-card shadow-sm">
       <div className="border-b border-border p-4 md:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>

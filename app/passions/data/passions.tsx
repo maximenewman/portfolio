@@ -11,6 +11,7 @@ export interface Passion {
   details: string[]
   media?: PassionMediaLink[]
   images?: string[]
+  imageAlts?: string[]
   videoEmbed?: string
 }
 
@@ -31,6 +32,12 @@ export const passions: Passion[] = [
       "/portfolio/football/IMG_2485.JPG.jpeg",
       "/portfolio/football/IMG_2488.JPG.jpeg",
     ],
+    imageAlts: [
+      "Maxime dribbling down the wing",
+      "Maxime dribbling past the goalkeeper",
+      "Maxime and his team, Futsal champions",
+      "Maxime with the Futsal trophy",
+    ],
   },
   {
     id: "chess",
@@ -48,6 +55,10 @@ export const passions: Passion[] = [
       "/portfolio/chess/IMG_2095.jpg",
       "/portfolio/chess/IMG_2098.jpg",
     ],
+    imageAlts: [
+      "Maxime deep in thought while playing chess",
+      "Maxime's opponent making a move during their chess game",
+    ],
   },
   {
     id: "reading",
@@ -62,6 +73,9 @@ export const passions: Passion[] = [
     ],
     images: [
       "/portfolio/reading/IMG_0242.jpg",
+    ],
+    imageAlts: [
+      "Maxime reading Meditations by Marcus Aurelius",
     ],
   },
   {
@@ -82,6 +96,9 @@ export const passions: Passion[] = [
     images: [
       "/portfolio/motivational speaking/happiness.png",
     ],
+    imageAlts: [
+      "Maxime speaking on happiness",
+    ],
     videoEmbed: "https://www.tiktok.com/embed/v2/7595900361513176340",
   },
   {
@@ -96,6 +113,11 @@ export const passions: Passion[] = [
       "/portfolio/running/IMG_8814.JPG.jpeg",
       "/portfolio/running/IMG_8815.JPG.jpeg",
       "/portfolio/running/IMG_8819.JPG.jpeg",
+    ],
+    imageAlts: [
+      "Maxime running a marathon",
+      "Maxime running a marathon",
+      "Maxime running a marathon",
     ],
   },
   {
@@ -112,6 +134,12 @@ export const passions: Passion[] = [
       "/portfolio/hiking/IMG_6935.jpg",
       "/portfolio/hiking/IMG_6668.jpg",
       "/portfolio/hiking/IMG_6551.jpg",
+    ],
+    imageAlts: [
+      "Maxime hiking in Chief Squamish",
+      "Maxime hiking in Chief Squamish",
+      "Maxime hiking on Grouse Mountain, overlooking the city",
+      "Maxime in front of a waterfall",
     ],
   },
 ]
