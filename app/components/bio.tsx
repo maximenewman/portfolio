@@ -6,7 +6,7 @@ import { FileText, Github, Linkedin, Mail } from "lucide-react"
 export const bioData = {
   name: "Maxime Newman Nereyabagabo",
   title: "Software Developer & Cybersecurity Enthusiast",
-  email: "mnn6@sfu.ca",
+  email: "maximenewman05@gmail.com",
   description: [
     `Hello, welcome to my Universe! I'm Max, currently I'm pursuing Computer Science at Simon Fraser University, focusing on machine learning, networking, and embedded systems.`,
     `There is no a unique purpose for programming, I see it as a big toolbox that can be used solve complex problems. One of these tools that has sky rocketed is generative AI, and while some are concerned on the growing dependency for it in our daily lives, I see it as inevitable progression of the human race in search for innovation. Before, we had to scavenge for food, and now we are eliminating mundane tasks that will give us more time for progression. With this in mind I pride myself in integrating AI into products to facilitate users' experiences when navigating the vast tech world.`,
@@ -49,6 +49,7 @@ export default function MyBio() {
                   sizes="(max-width: 768px) 192px, 288px"
                   className="object-cover"
                   priority
+                  loading="eager"
                 />
               </div>
             </div>
