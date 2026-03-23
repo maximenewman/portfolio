@@ -59,7 +59,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-hover inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                className="btn-hover inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
               >
                 <ExternalLink className="h-4 w-4" />
                 View Project
@@ -70,7 +70,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 href={project.linkedinPostUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-hover inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                className="btn-hover inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
               >
                 <Linkedin className="h-4 w-4" />
                 View LinkedIn Post

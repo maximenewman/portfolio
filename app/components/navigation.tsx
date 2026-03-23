@@ -30,18 +30,20 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-card/80 backdrop-blur-md">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center md:h-20">
-          {/* Logo - Far Left */}
+          {/* Logo - Far Left with circle border */}
           <Link 
             href="/" 
             className="mr-auto flex items-center transition-transform hover:scale-105"
           >
-            <Image
-              src="/logo.png"
-              alt="Logo of Maxime"
-              width={64}
-              height={64}
-              className="h-12 w-12 md:h-14 md:w-14"
-            />
+            <div className="rounded-full border-2 border-primary/30 p-1 transition-colors hover:border-primary/60">
+              <Image
+                src="/logo.png"
+                alt="Logo of Maxime"
+                width={64}
+                height={64}
+                className="h-10 w-10 rounded-full md:h-12 md:w-12"
+              />
+            </div>
           </Link>
 
           {/* Desktop Navigation - Centered */}
