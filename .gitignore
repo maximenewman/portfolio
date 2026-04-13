@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude
+
+.claude/
+
 # fly.io — copy fly.toml.example to fly.toml locally (app name is personal)
 /fly.toml
 
