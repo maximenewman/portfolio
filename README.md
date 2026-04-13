@@ -106,6 +106,10 @@ portfolio/
 └── next.config.ts
 ```
 
+## Attribution
+
+If you use this template for your own site, please give credit by linking back to this repo in your site's footer or README. It's not required by the license, but it's appreciated!
+
 ## Technologies
 
 - **Framework:** Next.js (App Router)

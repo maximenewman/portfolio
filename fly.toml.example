@@ -2,7 +2,7 @@
 # https://fly.io/docs/reference/configuration/
 
 app = 'YOUR_APP_NAME'
-primary_region = 'yyz'
+primary_region = 'YOUR_APP_REGION'
 
 [build]
 
