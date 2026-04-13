@@ -61,6 +61,19 @@ export const experiences: Experience[] = [
   },
   {
     type: "tech",
+    role: "Undergraduate Research Assistant",
+    company: "SFU CS ARCH Group",
+    date: "Jun 2025 - Sep 2025",
+    location: "Burnaby, BC",
+    highlights: [
+      "Achieved 93% of cuBLAS performance by engineering a GPU-accelerated matrix multiplication kernel using CUDA, applying tiling, shared memory optimization, and coalesced memory access patterns.",
+      "Identified key bottlenecks in sparse and dense matrix operations through systematic performance profiling, proposing optimization strategies that informed the team's kernel design decisions.",
+      "Validated computational physics models by collaborating on ThunderKittens simulation accuracy, ensuring correctness of GPU-accelerated numerical methods.",
+    ],
+    skills: ["CUDA", "GPU Computing", "C/C++", "Performance Profiling", "Linear Algebra", "Research"],
+  },
+  {
+    type: "tech",
     role: "Robotics Instructor",
     company: "Zebra Robotics Surrey",
     date: "Jan 2025 - Jun 2025",
