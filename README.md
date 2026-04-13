@@ -58,7 +58,7 @@ docker run -p 3000:3000 portfolio
    cp fly.toml.example fly.toml
    ```
 
-   Edit `fly.toml`: set `app` to your Fly app name (create the app with `fly apps create <name>` or `fly launch` if you prefer the wizard).
+   Edit `fly.toml`: set `app` to your Fly app name and `primary_region` to your preferred [Fly.io region](https://fly.io/docs/reference/regions/) (create the app with `fly apps create <name>` or `fly launch` if you prefer the wizard).
 
 3. Deploy:
 
@@ -76,6 +76,7 @@ The workflow `.github/workflows/fly-deploy.yml` deploys on pushes to `main` when
 2. In the repo **Settings → Secrets and variables → Actions**, add:
    - `FLY_API_TOKEN` — your token  
    - `FLY_APP_NAME` — same string as `app` in your local `fly.toml` (the workflow generates `fly.toml` from `fly.toml.example` during deploy)
+   - `FLY_APP_REGION` — your preferred [Fly.io region](https://fly.io/docs/reference/regions/) (e.g. `yyz`, `iad`, `lhr`)
 
 ## Project structure
 
