@@ -1,21 +1,29 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useSyncExternalStore } from "react"
 import { Maximize2, Minimize2 } from "lucide-react"
+
+const noopSubscribe = () => () => {}
+
+const subscribeFullscreenChange = (cb: () => void) => {
+  document.addEventListener("fullscreenchange", cb)
+  return () => document.removeEventListener("fullscreenchange", cb)
+}
 
 export default function GameFrame() {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [supported, setSupported] = useState(true)
 
-  useEffect(() => {
-    setSupported(typeof document !== "undefined" && !!document.fullscreenEnabled)
-
-    const onChange = () => setIsFullscreen(Boolean(document.fullscreenElement))
-    document.addEventListener("fullscreenchange", onChange)
-    return () => document.removeEventListener("fullscreenchange", onChange)
-  }, [])
+  const isFullscreen = useSyncExternalStore(
+    subscribeFullscreenChange,
+    () => Boolean(document.fullscreenElement),
+    () => false,
+  )
+  const supported = useSyncExternalStore(
+    noopSubscribe,
+    () => !!document.fullscreenEnabled,
+    () => false,
+  )
 
   useEffect(() => {
     const prev = document.body.style.overflow
