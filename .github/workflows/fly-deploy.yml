@@ -43,10 +43,12 @@ jobs:
 
       - name: Build game
         working-directory: GoblinsKeep/web
+        # Build with base=/goblinskeep/ so emitted asset URLs resolve under
+        # the portfolio's /goblinskeep/ subpath instead of the site root.
         run: |
           corepack enable
           pnpm install --frozen-lockfile
-          pnpm build
+          pnpm exec vite build --base=/goblinskeep/
 
       - name: Copy game into portfolio public folder
         run: |
