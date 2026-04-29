@@ -5,6 +5,7 @@ import { Maximize2, Minimize2 } from "lucide-react"
 
 export default function GameFrame() {
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [supported, setSupported] = useState(true)
 
@@ -15,6 +16,16 @@ export default function GameFrame() {
     document.addEventListener("fullscreenchange", onChange)
     return () => document.removeEventListener("fullscreenchange", onChange)
   }, [])
+
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [])
+
+  const focusGame = () => iframeRef.current?.contentWindow?.focus()
 
   const toggleFullscreen = async () => {
     const el = wrapperRef.current
@@ -33,6 +44,7 @@ export default function GameFrame() {
   return (
     <div
       ref={wrapperRef}
+      onMouseEnter={focusGame}
       className={`relative w-full bg-[#04040a] ${
         isFullscreen
           ? "h-screen"
@@ -40,11 +52,13 @@ export default function GameFrame() {
       }`}
     >
       <iframe
+        ref={iframeRef}
         src="/goblinskeep/index.html"
         title="Goblin's Keep"
         className="block h-full w-full border-0"
         allow="autoplay; fullscreen"
         allowFullScreen
+        onLoad={focusGame}
       />
 
       {supported && (

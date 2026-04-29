@@ -1,5 +1,6 @@
+import Link from "next/link"
 import { Project } from "@/app/projects/data/projects"
-import { ExternalLink, Linkedin } from "lucide-react"
+import { ExternalLink, Gamepad2, Linkedin } from "lucide-react"
 import { ProjectMediaGallery } from "./project_media_gallery"
 
 interface ProjectCardProps {
@@ -52,8 +53,17 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         {/* Links */}
-        {(project.link || project.linkedinPostUrl) && (
+        {(project.link || project.playUrl || project.linkedinPostUrl) && (
           <div className="mt-auto flex flex-wrap gap-2 pt-2">
+            {project.playUrl && (
+              <Link
+                href={project.playUrl}
+                className="btn-hover inline-flex items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+              >
+                <Gamepad2 className="h-4 w-4" />
+                Play Game
+              </Link>
+            )}
             {project.link && (
               <a
                 href={project.link}
