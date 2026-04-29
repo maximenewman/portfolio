@@ -10,6 +10,7 @@ export interface Project {
   description: string[]
   tech: string[]
   link: string
+  playUrl?: string
   linkedinPostUrl?: string
   media?: ProjectMedia[]
 }
@@ -25,6 +26,7 @@ export const projects: Project[] = [
     ],
     tech: ["Java", "Maven", "JUnit", "Mockito"],
     link: "https://github.com/maximenewman/GoblinsKeep",
+    playUrl: "/goblinskeep",
     media: [
       {
         type: "video",
