@@ -14,13 +14,48 @@ on:
       - 'tsconfig.json'
       - 'Dockerfile'
       - 'fly.toml.example'
+      - '.github/workflows/fly-deploy.yml'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [game-updated]
+
 jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
     concurrency: deploy-group    # optional: ensure only one action runs at a time
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout portfolio
+        uses: actions/checkout@v4
+
+      - name: Checkout GoblinsKeep (browser build branch)
+        uses: actions/checkout@v4
+        with:
+          repository: maximenewman/GoblinsKeep
+          ref: game/browser
+          path: GoblinsKeep
+          token: ${{ secrets.GAME_REPO_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build game
+        working-directory: GoblinsKeep/web
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Copy game into portfolio public folder
+        run: |
+          mkdir -p public/goblinskeep
+          cp -R GoblinsKeep/web/dist/. public/goblinskeep/
+
+      - name: Remove GoblinsKeep checkout (avoid sending to Fly build context)
+        run: rm -rf GoblinsKeep
+
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run:  |
           cp fly.toml.example fly.toml
