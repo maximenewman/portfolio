@@ -52,7 +52,7 @@ export const projects: Project[] = [
     ],
     tech: ["Python", "Scikit-learn", "Pandas", "NumPy"],
     link: "https://github.com/dshak1/hackML",
-    linkedinPostUrl: "https://www.linkedin.com/posts/maxime-newman-a546b42b5_i-am-happy-to-announce-that-we-won-the-first-activity-7424259085505761280-7RSu?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEu-c-ABBcothc9d0ASy0bv87_d6rpnjpcc",
+    linkedinPostUrl: "https://www.linkedin.com/posts/maxime-newman-nereyabagabo-a546b42b5_i-am-happy-to-announce-that-we-won-the-first-ugcPost-7424256215029055488-Dsj1?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEu-c-ABBcothc9d0ASy0bv87_d6rpnjpcc",
     media: [
       {
         type: "image",

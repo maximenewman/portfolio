@@ -94,7 +94,7 @@ export default function Footer() {
                 <GithubIcon className="h-5 w-5" />
               </a>
               <a 
-                href="https://www.linkedin.com/in/maxime-newman-a546b42b5" 
+                href="https://www.linkedin.com/in/maxime-newman-nereyabagabo-a546b42b5/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="btn-hover rounded-full bg-muted p-2.5 text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"

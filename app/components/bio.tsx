@@ -16,7 +16,7 @@ export const bioData = {
   resumePath: "/resume/Maxime_resume.pdf",
   socials: {
     github: "https://github.com/maximenewman",
-    linkedin: "https://www.linkedin.com/in/maxime-newman-a546b42b5",
+    linkedin: "https://www.linkedin.com/in/maxime-newman-nereyabagabo-a546b42b5/",
   },
 }
 
