@@ -36,7 +36,11 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
         {experience.projects && experience.projects.length > 0 && (
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-muted-foreground">Projects</h4>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div
+              className={`grid gap-4 ${
+                experience.projects.length > 1 ? "md:grid-cols-2" : ""
+              }`}
+            >
               {experience.projects.map((project, index) => (
                 <ProjectCard key={index} project={project} />
               ))}
