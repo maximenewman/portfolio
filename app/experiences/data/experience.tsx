@@ -16,6 +16,22 @@ export interface Experience {
 export const experiences: Experience[] = [
   {
     type: "tech",
+    role: "Research Assistant",
+    company: "SFU Cybersecurity",
+    date: "May 2026 - Present",
+    location: "Burnaby, BC",
+    highlights: [
+      "Co-authoring research paper on automated multi-agent security vulnerability remediation, contributing pipeline architecture and end-to-end evaluation framework across 120 Java CVE benchmarks.",
+      "Designed and evaluated a 4-stage agentic security pipeline (Finder → Exploiter → Patcher → Verifier) integrating IRIS/CodeQL static analysis with LLM-driven exploit and patch generation, benchmarked end-to-end on 120 Java CVE projects.",
+      "Reduced pipeline iteration latency by 72% and cut redundant static-analysis recomputation by 85% by implementing a state-based SARIF caching layer for the Finder stage of a LangGraph-based agentic pipeline.",
+      "Increased pipeline coverage from 73% to 100% across a 120-project Java CVE benchmark by introducing graceful fallback handling for missing cache artifacts, eliminating startup failures on previously-unseen projects.",
+      "Reduced redundant analysis on retry paths by 40% by decoupling source-tree extraction from cache invalidation in the Finder dispatch logic, collapsing 4 incoherent flag-state combinations into 2 well-defined modes.",
+      "Cut per-experiment setup time by 85% by refactoring CLI flag semantics, eliminating manual code edits previously required to toggle between cached and fresh pipeline modes.",
+    ],
+    skills: ["LangGraph", "IRIS", "CodeQL", "SARIF", "Python", "Java", "Static Analysis", "LLM Agents", "Research"],
+  },
+  {
+    type: "tech",
     role: "Data Engineer",
     company: "SKC Engineering Ltd",
     date: "Jan 2026 - May 2026",
