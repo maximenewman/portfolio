@@ -17,6 +17,24 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    title: "AutoSec",
+    description: [
+      `Contributing to an agentic security pipeline that autonomously detects, exploits, patches, and verifies software vulnerabilities using LLMs.`,
+      `Primary owner of end-to-end pipeline runs across 120 Java projects from CWE-Bench-Java, producing the scans, exploits, and patches behind the paper's evaluation.`,
+      `Improved pipeline reliability to run unattended across the full 120-project benchmark by adding graceful fallback that reuses cached scan results and runs fresh analysis otherwise, eliminating prior startup failures.`,
+      `Documenting the work as a formal research manuscript intended for submission to the ACM Conference on Computer and Communications Security (CCS), emphasizing system reliability, verification, and auditability.`,
+    ],
+    tech: ["Python", "Java", "LangGraph", "LLM Agents", "CodeQL", "Static Analysis"],
+    link: "https://github.com/KoushaAm/AutoSec",
+    media: [
+      {
+        type: "image",
+        src: "/projects/autosec/Autosec-thumbnail.png",
+        alt: "AutoSec agentic security pipeline",
+      },
+    ],
+  },
+  {
     title: "Goblin's Keep",
     description: [
       `Led backend development of a 2D tile-based escape game by architecting game logic and AI systems, coordinating code reviews and integration across a team of developers.`,
