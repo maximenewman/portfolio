@@ -22,9 +22,9 @@ export default function ProjectsPage() {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-12 md:py-16">
-        <div className="stagger-children grid gap-6 md:grid-cols-2">
+        <div className="stagger-children flex flex-col gap-10">
           {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} />
+            <ProjectCard key={index} project={project} priority={index === 0} />
           ))}
         </div>
       </main>

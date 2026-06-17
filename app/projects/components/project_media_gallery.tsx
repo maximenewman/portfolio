@@ -3,14 +3,21 @@
 import { useState } from "react"
 import Image from "next/image"
 import { ProjectMedia } from "@/app/projects/data/projects"
-import { ChevronLeft, ChevronRight, Play, X } from "lucide-react"
+import { ChevronLeft, ChevronRight, Maximize2, Play, X } from "lucide-react"
 
 interface ProjectMediaGalleryProps {
   media: ProjectMedia[]
   title: string
+  priority?: boolean
 }
 
-export function ProjectMediaGallery({ media, title }: ProjectMediaGalleryProps) {
+function previewSrc(item: ProjectMedia): string | null {
+  if (item.type === "image") return item.src
+  return item.thumbnailSrc ?? null
+}
+
+export function ProjectMediaGallery({ media, title, priority = false }: ProjectMediaGalleryProps) {
+  const [active, setActive] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   if (media.length === 0) return null
@@ -27,54 +34,103 @@ export function ProjectMediaGallery({ media, title }: ProjectMediaGalleryProps) 
     }
   }
 
+  const activeItem = media[active]
+  const activePreview = previewSrc(activeItem)
+
   return (
     <>
-      {/* Thumbnail Grid */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {media.slice(0, 6).map((item, index) => (
-          <button
-            key={index}
-            onClick={() => setSelectedIndex(index)}
-            className="group relative aspect-video overflow-hidden rounded-md border border-border bg-muted transition-all hover:border-primary"
-          >
-            {item.type === "image" ? (
+      <div className="flex flex-col gap-2">
+        {/* Hero */}
+        <button
+          onClick={() => setSelectedIndex(active)}
+          className="group relative aspect-video w-full overflow-hidden rounded-xl border border-border bg-muted transition-all hover:ring-2 hover:ring-primary/50"
+        >
+          {activePreview ? (
+            <>
+              {/* Blurred letterbox backdrop */}
               <Image
-                src={item.src}
-                alt={item.alt || `${title} media ${index + 1}`}
+                src={activePreview}
+                alt=""
                 fill
-                sizes="(max-width: 768px) 50vw, 33vw"
-                className="object-cover transition-transform group-hover:scale-105"
+                aria-hidden
+                sizes="(max-width: 768px) 100vw, 55vw"
+                className="scale-110 object-cover blur-2xl brightness-50"
               />
-            ) : item.thumbnailSrc ? (
-              <>
-                <Image
-                  src={item.thumbnailSrc}
-                  alt={item.alt || `${title} video thumbnail ${index + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                  className="object-cover transition-transform group-hover:scale-105"
-                />
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
-                  <Play className="h-8 w-8 text-white drop-shadow" />
-                </div>
-              </>
-            ) : (
-              <div className="flex h-full items-center justify-center bg-muted">
-                <Play className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
-            {index === 5 && media.length > 6 && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-white">
-                <span className="text-lg font-semibold">+{media.length - 6}</span>
-              </div>
-            )}
-          </button>
-        ))}
+              {/* Uncropped foreground */}
+              <Image
+                src={activePreview}
+                alt={activeItem.alt || `${title} media ${active + 1}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 55vw"
+                className="object-contain"
+                priority={priority}
+              />
+            </>
+          ) : (
+            <div className="flex h-full items-center justify-center bg-muted">
+              <Play className="h-10 w-10 text-muted-foreground" />
+            </div>
+          )}
+
+          {/* Video play overlay */}
+          {activeItem.type === "video" && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-transform group-hover:scale-110">
+                <Play className="h-6 w-6 translate-x-0.5 fill-white text-white" />
+              </span>
+            </div>
+          )}
+
+          {/* Counter / view badge */}
+          <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
+            <Maximize2 className="h-3.5 w-3.5" />
+            {media.length > 1 ? `${active + 1} / ${media.length}` : "View"}
+          </div>
+        </button>
+
+        {/* Thumbnail strip */}
+        {media.length > 1 && (
+          <div className="flex flex-wrap gap-2">
+            {media.map((item, index) => {
+              const thumb = previewSrc(item)
+              const isActive = index === active
+              return (
+                <button
+                  key={index}
+                  onClick={() => setActive(index)}
+                  aria-label={`Show media ${index + 1}`}
+                  className={`relative h-11 w-[62px] overflow-hidden rounded-md border border-border bg-muted transition-all ${
+                    isActive ? "opacity-100 ring-2 ring-primary" : "opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  {thumb ? (
+                    <Image
+                      src={thumb}
+                      alt={item.alt || `${title} thumbnail ${index + 1}`}
+                      width={62}
+                      height={44}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <Play className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  )}
+                  {item.type === "video" && thumb && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/25">
+                      <Play className="h-3.5 w-3.5 fill-white text-white" />
+                    </div>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* Lightbox Modal */}
       {selectedIndex !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
           {/* Close Button */}
           <button
             onClick={() => setSelectedIndex(null)}
@@ -86,7 +142,7 @@ export function ProjectMediaGallery({ media, title }: ProjectMediaGalleryProps) 
 
           {/* Media Display */}
           <div className="relative max-h-[80vh] max-w-4xl">
-            <div className="relative aspect-video w-full min-w-[300px] md:min-w-[600px]">
+            <div className="relative aspect-video w-full min-w-[300px] overflow-hidden rounded-xl md:min-w-[600px]">
               {media[selectedIndex].type === "image" ? (
                 <Image
                   src={media[selectedIndex].src}
