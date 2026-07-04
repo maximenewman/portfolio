@@ -1,7 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { FileText, Github, Linkedin, Mail } from "lucide-react"
+import { ChevronDown, FileText, Github, Linkedin, Mail } from "lucide-react"
+import HomeTimeline from "./home-timeline"
 
 export const bioData = {
   name: "Maxime Newman Nereyabagabo",
@@ -33,7 +34,7 @@ export default function MyBio() {
         <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4">
+      <div className="container relative mx-auto px-4">
         {/* Hero Section - Above the fold */}
         <div className="flex min-h-[calc(100vh-5rem)] flex-col items-center justify-center py-8 md:flex-row md:gap-12 md:py-12 lg:gap-20">
           {/* Profile Image - Centered and prominent */}
@@ -118,7 +119,21 @@ export default function MyBio() {
           </div>
         </div>
 
+        {/* Scroll-down cue */}
+        <a
+          href="#journey"
+          aria-label="Scroll to my experience"
+          className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-muted-foreground transition-colors hover:text-primary md:flex"
+        >
+          <span className="text-xs font-medium uppercase tracking-widest">
+            Scroll
+          </span>
+          <ChevronDown className="scroll-cue h-5 w-5" />
+        </a>
       </div>
+
+      {/* Experience Timeline - resume-style, revealed on scroll */}
+      <HomeTimeline />
 
       {/* About Section - Below the fold */}
       <div className="border-t border-border bg-card/50">
