@@ -118,6 +118,7 @@ interface PassionCardProps {
 
 export function PassionCard({ passion, featured = false }: PassionCardProps) {
   const IconComponent = iconMap[passion.icon] || CodeIcon
+  const objectPosition = passion.imagePosition === "top" ? "object-top" : "object-center"
 
   if (featured) {
     return (
@@ -139,7 +140,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
                       alt={passion.imageAlts?.[i] || `${passion.title} photo ${i + 1}`}
                       fill
                       sizes="(max-width: 768px) 100vw, 60vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className={`object-cover ${objectPosition} transition-transform duration-500 group-hover:scale-105`}
                     />
                   </div>
                 ))}
@@ -188,7 +189,7 @@ export function PassionCard({ passion, featured = false }: PassionCardProps) {
             alt={passion.imageAlts?.[0] || `${passion.title} preview`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className={`object-cover ${objectPosition} transition-transform duration-500 group-hover:scale-105`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
           {/* Image count badge */}

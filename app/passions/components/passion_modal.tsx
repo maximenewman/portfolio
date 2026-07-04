@@ -54,6 +54,18 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
   const hasImages = validImages.length > 0
   const hasMultipleImages = validImages.length > 1
   const currentImage = validImages[currentImageIndex] || validImages[0]
+  const objectPosition = passion.imagePosition === "top" ? "object-top" : "object-center"
+
+  // Cap the thumbnail strip so it never overflows past the image column.
+  // The window slides to keep the current image visible; the rest are reached
+  // by clicking through (arrows or the "+N" tile).
+  const MAX_THUMBS = 8
+  const thumbStart = Math.min(
+    Math.max(0, currentImageIndex - Math.floor(MAX_THUMBS / 2)),
+    Math.max(0, validImages.length - MAX_THUMBS)
+  )
+  const thumbEnd = Math.min(validImages.length, thumbStart + MAX_THUMBS)
+  const moreAfter = validImages.length - thumbEnd
 
   return (
     <div
@@ -103,7 +115,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                     src={currentImage}
                     alt={passion.imageAlts?.[currentImageIndex] || `${passion.title} photo ${currentImageIndex + 1}`}
                     fill
-                    className="object-cover"
+                    className={`object-cover ${objectPosition}`}
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   {/* Play button overlay */}
@@ -142,29 +154,44 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                 </div>
               )}
 
-              {/* Thumbnail Strip */}
+              {/* Thumbnail Strip — windowed so it never overflows the column */}
               {hasMultipleImages && !showVideo && (
-                <div className="flex gap-2 bg-card/50 p-3 backdrop-blur-sm">
-                  {validImages.map((src, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentImageIndex(i)}
-                      className={`relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                        currentImageIndex === i
-                          ? "border-primary"
-                          : "border-transparent opacity-60 hover:opacity-100"
-                      }`}
-                      aria-label={`View image ${i + 1}`}
-                    >
-                      <Image
-                        src={src}
-                        alt={passion.imageAlts?.[i] || `${passion.title} thumbnail ${i + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
-                    </button>
-                  ))}
+                <div className="flex gap-2 overflow-hidden bg-card/50 p-3 backdrop-blur-sm">
+                  {validImages.slice(thumbStart, thumbEnd).map((src, i) => {
+                    const index = thumbStart + i
+                    const showMoreBadge = index === thumbEnd - 1 && moreAfter > 0
+                    return (
+                      <button
+                        key={index}
+                        onClick={() =>
+                          setCurrentImageIndex(showMoreBadge ? thumbEnd : index)
+                        }
+                        className={`relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                          currentImageIndex === index && !showMoreBadge
+                            ? "border-primary"
+                            : "border-transparent opacity-60 hover:opacity-100"
+                        }`}
+                        aria-label={
+                          showMoreBadge
+                            ? `View ${moreAfter} more images`
+                            : `View image ${index + 1}`
+                        }
+                      >
+                        <Image
+                          src={src}
+                          alt={passion.imageAlts?.[index] || `${passion.title} thumbnail ${index + 1}`}
+                          fill
+                          className={`object-cover ${objectPosition}`}
+                          sizes="48px"
+                        />
+                        {showMoreBadge && (
+                          <span className="absolute inset-0 flex items-center justify-center bg-background/70 text-xs font-semibold backdrop-blur-sm">
+                            +{moreAfter}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               )}
 
@@ -192,6 +219,36 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                 </p>
               ))}
             </div>
+            {passion.timeline && passion.timeline.length > 0 && (
+              <div className="mt-8 border-t border-border pt-6">
+                <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  Progress Log
+                </h3>
+                <div className="relative space-y-6 pl-6">
+                  {/* Vertical rail */}
+                  <span className="absolute bottom-1.5 left-[3px] top-1.5 w-px bg-border" />
+                  {passion.timeline.map((entry, i) => (
+                    <div key={i} className="relative">
+                      {/* Node */}
+                      <span className="absolute -left-6 top-1.5 h-[9px] w-[9px] rounded-full bg-primary ring-4 ring-card" />
+                      <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                        {entry.date}
+                      </p>
+                      <ul className="mt-2 space-y-1.5">
+                        {entry.items.map((item, j) => (
+                          <li
+                            key={j}
+                            className="relative pl-4 text-sm leading-relaxed text-card-foreground before:absolute before:left-0 before:top-2 before:h-1.5 before:w-1.5 before:rounded-full before:bg-primary/60"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {passion.media && passion.media.length > 0 && (
               <div className="mt-8 border-t border-border pt-6">
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">

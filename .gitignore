@@ -53,3 +53,7 @@ Documentation/
 
 # generated game build (fetched from GoblinsKeep during CI deploy)
 public/goblinskeep/
+
+# raw camera files — convert to jpeg before adding to public/
+*.DNG
+*.dng

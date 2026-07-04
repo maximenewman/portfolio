@@ -3,6 +3,13 @@ export interface PassionMediaLink {
   url: string
 }
 
+export interface PassionTimelineEntry {
+  /** When this update happened, e.g. "Jul 2026". */
+  date: string
+  /** What was added / achieved in this update. */
+  items: string[]
+}
+
 export interface Passion {
   id: string
   title: string
@@ -13,6 +20,10 @@ export interface Passion {
   images?: string[]
   imageAlts?: string[]
   videoEmbed?: string
+  /** Milestone log in chronological order (oldest first). Rendered as a timeline in the modal. */
+  timeline?: PassionTimelineEntry[]
+  /** Crop anchor for images. "top" keeps heads in frame for tall action shots. Defaults to center. */
+  imagePosition?: "top" | "center"
 }
 
 export const passions: Passion[] = [
@@ -23,20 +34,29 @@ export const passions: Passion[] = [
     icon: "football",
     details: [
       "Football has been part of my life for as long as I can remember - it's more than a sport; it's an escape and a unifying force.",
-      "Competitively, I've played for FVSL and VMSL Premier teams over the last two seasons.",
-      "Beyond that, I've captained intramural futsal and outdoor football sides, leading both to championship wins - two titles and counting.",
+      "Competitively, I've played for FVSL and VMSL Premier teams, and I now captain my church team in the BCCSL - where I was named Man of the Match twice this season.",
+      "I'm a 4x intramural champion (1x Co-ed and 3x Division 1), having captained both futsal and outdoor sides to the title.",
+      "Most recently, I was named MVP of the 2026 BCMSA tournament.",
     ],
     images: [
       "/portfolio/football/IMG_0682.JPG.jpeg",
       "/portfolio/football/IMG_0683.JPG.jpeg",
       "/portfolio/football/IMG_2485.JPG.jpeg",
       "/portfolio/football/IMG_2488.JPG.jpeg",
+      "/portfolio/football/IMG_2584.JPG.jpeg",
+      "/portfolio/football/IMG_1184.jpeg",
+      "/portfolio/football/IMG_8511.jpeg",
+      "/portfolio/football/IMG_8537.jpeg",
     ],
     imageAlts: [
       "Maxime dribbling down the wing",
       "Maxime dribbling past the goalkeeper",
       "Maxime and his team, Futsal champions",
       "Maxime with the Futsal trophy",
+      "football",
+      "football",
+      "football",
+      "football",
     ],
   },
   {
@@ -106,18 +126,61 @@ export const passions: Passion[] = [
     title: "Running",
     description: "Running is my daily reset.",
     icon: "running",
+    imagePosition: "top",
     details: [
       "Running is my daily reset. They say it's Vancouver's biggest addiction - I can confirm that's true.",
+    ],
+    timeline: [
+      {
+        date: "Oct 2025",
+        items: ["Ran my first full marathon (42.2 km)"],
+      },
+      {
+        date: "Feb 2026",
+        items: ["Ran my first official half marathon (21.1 km)"],
+      },
+      {
+        date: "May 2026",
+        items: ["Ran my second full marathon (42.2 km)"],
+      },
+      {
+        date: "Jun 2026",
+        items: ["Ran my second official half marathon (21.1 km)"],
+      },
     ],
     images: [
       "/portfolio/running/IMG_8814.JPG.jpeg",
       "/portfolio/running/IMG_8815.JPG.jpeg",
       "/portfolio/running/IMG_8819.JPG.jpeg",
+      "/portfolio/running/IMG_0787.JPG.jpeg",
+      "/portfolio/running/IMG_0788.JPG.jpeg",
+      "/portfolio/running/IMG_0789.JPG.jpeg",
+      "/portfolio/running/IMG_0790.JPG.jpeg",
+      "/portfolio/running/IMG_0791.JPG.jpeg",
+      "/portfolio/running/IMG_1957.JPG.jpeg",
+      "/portfolio/running/IMG_1958.JPG.jpeg",
+      "/portfolio/running/IMG_1959.JPG.jpeg",
+      "/portfolio/running/IMG_1960.JPG.jpeg",
+      "/portfolio/running/IMG_1961.JPG.jpeg",
+      "/portfolio/running/IMG_1962.JPG.jpeg",
+      "/portfolio/running/IMG_1963.JPG.jpeg",
     ],
     imageAlts: [
       "Maxime running a marathon",
       "Maxime running a marathon",
       "Maxime running a marathon",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
+      "running",
     ],
   },
   {
