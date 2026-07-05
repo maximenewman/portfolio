@@ -5,12 +5,14 @@ import Image from "next/image"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { Menu, X, Sun, Moon } from "lucide-react"
+import { Show, UserButton } from "@clerk/nextjs"
 import { useTheme } from "./theme-provider"
 
 const pageRoutes = [
   { name: "Home", link: "/" },
   { name: "Experiences", link: "/experiences" },
   { name: "Projects", link: "/projects" },
+  { name: "Blog", link: "/blog" },
   { name: "Passions", link: "/passions" },
 ]
 
@@ -71,6 +73,19 @@ export default function Navbar() {
 
           {/* Right side - Theme toggle */}
           <div className="flex items-center gap-2">
+            {/* Owner-only controls (only render when signed in) */}
+            <Show when="signed-in">
+              <Link
+                href="/admin"
+                className="hidden rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
+              >
+                Admin
+              </Link>
+              <UserButton
+                appearance={{ elements: { avatarBox: "h-8 w-8" } }}
+              />
+            </Show>
+
             <button
               onClick={toggleTheme}
               className="btn-hover rounded-full p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"

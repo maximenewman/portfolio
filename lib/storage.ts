@@ -33,8 +33,10 @@ export function getS3(): S3Client {
 }
 
 export function bucket(): string {
-  const b = process.env.TIGRIS_BUCKET
-  if (!b) throw new Error("TIGRIS_BUCKET is not set")
+  // `fly storage create` provisions Tigris and sets BUCKET_NAME; keep
+  // TIGRIS_BUCKET as an accepted alias.
+  const b = process.env.BUCKET_NAME ?? process.env.TIGRIS_BUCKET
+  if (!b) throw new Error("BUCKET_NAME is not set")
   return b
 }
 
@@ -45,14 +47,15 @@ export function assetKey(sha256: string, ext: string): string {
 }
 
 /**
- * Public CDN URL for a stored object. The bucket is public-read, so the blog
- * can serve media straight from Tigris's edge. Base is configurable because
- * Tigris exposes both `<bucket>.fly.storage.tigris.dev` and custom domains.
+ * URL the app uses to render a stored object. The bucket is private, so by
+ * default we serve through the same-origin `/media/<key>` proxy route. If the
+ * bucket is ever made truly public/CDN-backed, set TIGRIS_PUBLIC_CDN to that
+ * base and media will be linked directly instead — no other code changes.
  */
 export function publicUrl(key: string): string {
-  const base = process.env.TIGRIS_PUBLIC_BASE
-  if (base) return `${base.replace(/\/$/, "")}/${key}`
-  return `https://${bucket()}.fly.storage.tigris.dev/${key}`
+  const cdn = process.env.TIGRIS_PUBLIC_CDN
+  if (cdn) return `${cdn.replace(/\/$/, "")}/${key}`
+  return `/media/${key}`
 }
 
 /** Presigned PUT so the browser can upload big files (video) straight to Tigris. */

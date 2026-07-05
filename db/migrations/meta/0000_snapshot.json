@@ -1,5 +1,5 @@
 {
-  "id": "edc328e3-92cc-48d6-8661-0b813dd4fea0",
+  "id": "d5ec849f-89e0-4f94-b733-a81b5e9653cf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -254,12 +254,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "published": {
-          "name": "published",
-          "type": "boolean",
+        "visibility": {
+          "name": "visibility",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": "'draft'"
         },
         "published_at": {
           "name": "published_at",
@@ -284,11 +284,11 @@
         }
       },
       "indexes": {
-        "posts_published_idx": {
-          "name": "posts_published_idx",
+        "posts_visibility_idx": {
+          "name": "posts_visibility_idx",
           "columns": [
             {
-              "expression": "published",
+              "expression": "visibility",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

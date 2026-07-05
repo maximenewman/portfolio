@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
@@ -41,13 +42,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col font-sans antialiased`}
       >
-        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.classList.toggle('dark',t==='dark')}catch(e){}` }} />
-        <ThemeProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <PageNavigationWrapper />
-          <Footer />
-        </ThemeProvider>
+        <ClerkProvider appearance={{ variables: { colorPrimary: "#16a34a" } }}>
+          <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.classList.toggle('dark',t==='dark')}catch(e){}` }} />
+          <ThemeProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <PageNavigationWrapper />
+            <Footer />
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   )

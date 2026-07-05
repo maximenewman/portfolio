@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, timestamp, boolean, index } from "drizzle-orm/pg-core"
+import { pgTable, uuid, text, integer, timestamp, index } from "drizzle-orm/pg-core"
 
 /**
  * Content-addressed media/assets. `sha256` is the dedup key: the same bytes
@@ -40,13 +40,15 @@ export const posts = pgTable(
     kind: text("kind").notNull().default("note"), // idea|in-progress|shipped|success|failure|note
     tags: text("tags").array().notNull().default([]),
     coverAssetId: uuid("cover_asset_id").references(() => assets.id, { onDelete: "set null" }),
-    published: boolean("published").notNull().default(false),
+    // draft = owner-only in admin, private = on /blog but only when signed in,
+    // public = visible to everyone.
+    visibility: text("visibility").notNull().default("draft"),
     publishedAt: timestamp("published_at", { withTimezone: true }).defaultNow().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => [
-    index("posts_published_idx").on(t.published, t.publishedAt),
+    index("posts_visibility_idx").on(t.visibility, t.publishedAt),
     index("posts_slug_idx").on(t.slug),
   ],
 )

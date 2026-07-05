@@ -30,7 +30,7 @@ CREATE TABLE "posts" (
 	"kind" text DEFAULT 'note' NOT NULL,
 	"tags" text[] DEFAULT '{}' NOT NULL,
 	"cover_asset_id" uuid,
-	"published" boolean DEFAULT false NOT NULL,
+	"visibility" text DEFAULT 'draft' NOT NULL,
 	"published_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -42,5 +42,5 @@ ALTER TABLE "post_assets" ADD CONSTRAINT "post_assets_asset_id_assets_id_fk" FOR
 ALTER TABLE "posts" ADD CONSTRAINT "posts_cover_asset_id_assets_id_fk" FOREIGN KEY ("cover_asset_id") REFERENCES "public"."assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "assets_kind_idx" ON "assets" USING btree ("kind");--> statement-breakpoint
 CREATE INDEX "post_assets_post_idx" ON "post_assets" USING btree ("post_id");--> statement-breakpoint
-CREATE INDEX "posts_published_idx" ON "posts" USING btree ("published","published_at");--> statement-breakpoint
+CREATE INDEX "posts_visibility_idx" ON "posts" USING btree ("visibility","published_at");--> statement-breakpoint
 CREATE INDEX "posts_slug_idx" ON "posts" USING btree ("slug");
