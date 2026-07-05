@@ -21,6 +21,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Clerk's publishable key is inlined into the client bundle at build time
+# (all NEXT_PUBLIC_* vars are). It must be present here, not just at runtime —
+# a runtime-only secret bakes in `undefined` and Clerk throws Missing
+# publishableKey on every render. It's not secret (ships to browsers), so a
+# build arg is fine.
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.

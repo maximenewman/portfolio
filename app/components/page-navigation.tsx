@@ -6,8 +6,8 @@ import { ChevronUp, ChevronDown } from "lucide-react"
 // Define the page order for navigation
 const pageOrder = [
   { path: "/", label: "Home" },
-  { path: "/experiences", label: "Experiences" },
   { path: "/projects", label: "Projects" },
+  { path: "/blog", label: "Blog" },
   { path: "/passions", label: "Passions" },
 ]
 

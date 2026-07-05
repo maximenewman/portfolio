@@ -10,7 +10,6 @@ import { useTheme } from "./theme-provider"
 
 const pageRoutes = [
   { name: "Home", link: "/" },
-  { name: "Experiences", link: "/experiences" },
   { name: "Projects", link: "/projects" },
   { name: "Blog", link: "/blog" },
   { name: "Passions", link: "/passions" },

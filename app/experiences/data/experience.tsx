@@ -1,4 +1,5 @@
 import { Project } from "@/app/projects/data/projects"
+import { slugify } from "@/lib/posts"
 
 export type ExperienceType = "tech" | "leadership" | "other"
 
@@ -8,9 +9,26 @@ export interface Experience {
   company: string
   date: string
   location: string
+  /** One-line summary / signature achievement shown on the timeline. */
+  headline: string
+  /** Overview paragraph for the detail page (falls back to headline). */
+  overview?: string
+  /** Hero image for the detail page (e.g. company photo/logo). Falls back to a
+   *  branded monogram when absent. Path under /public or a /media URL. */
+  heroImage?: string
   projects?: Project[]
   highlights?: string[]
   skills?: string[]
+}
+
+/** Stable URL slug for an experience detail page. Role + company keeps
+ *  same-titled roles at different companies distinct. */
+export function experienceSlug(e: Experience): string {
+  return slugify(`${e.role}-${e.company}`)
+}
+
+export function getExperienceBySlug(slug: string): Experience | undefined {
+  return experiences.find((e) => experienceSlug(e) === slug)
 }
 
 export const experiences: Experience[] = [
@@ -20,6 +38,8 @@ export const experiences: Experience[] = [
     company: "SFU Cybersecurity",
     date: "May 2026 - Present",
     location: "Burnaby, BC",
+    headline:
+      "Owning end-to-end runs of an LLM security pipeline across 120 Java projects for a CCS submission.",
     highlights: [
       "Contributing to an agentic security pipeline that autonomously detects, exploits, patches, and verifies vulnerabilities using LLMs.",
       "Primary owner of end-to-end pipeline runs across 120 Java projects from CWE-Bench-Java, producing the scans, exploits, and patches behind the paper's evaluation.",
@@ -34,6 +54,8 @@ export const experiences: Experience[] = [
     company: "SKC Engineering Ltd",
     date: "Jan 2026 - May 2026",
     location: "Surrey, BC",
+    headline:
+      "Classified 15,639 SharePoint files and migrated 29,000+ rows across 87 tables with 100% parity.",
     projects: [
       {
         title: "SharePoint File Classification Pipeline",
@@ -71,6 +93,8 @@ export const experiences: Experience[] = [
     company: "SKC Engineering Ltd",
     date: "Sept 2025 - Jan 2026",
     location: "Surrey, BC",
+    headline:
+      "Built WeldCost, an AI cost-estimation platform on GPT-4o mini + LangGraph with sub-300ms APIs.",
     projects: [
       {
         title: "WeldCost - AI-Powered Cost Estimation Platform",
@@ -101,6 +125,8 @@ export const experiences: Experience[] = [
     company: "SFU CS ARCH Group",
     date: "Jan 2025 - Present",
     location: "Burnaby, BC",
+    headline:
+      "Optimized CUDA matrix-multiply kernels to 93.7% of cuBLAS and authored a GPU kernel guide.",
     highlights: [
       "Researched attention mechanisms and transformer architectures, focusing on how large-scale matrix multiplications dominate training and inference of LLMs.",
       "Authored a 'read-along guide' on GPU-accelerated matrix multiplication kernel optimizations in CUDA, outlining concepts based on GPU multi-threading and execution models (thread blocks, warps, SM scheduling).",
@@ -114,6 +140,8 @@ export const experiences: Experience[] = [
     company: "Zebra Robotics Surrey",
     date: "Jan 2025 - Jun 2025",
     location: "Surrey, BC",
+    headline:
+      "Taught Python, Arduino, and microcontroller robotics, guiding students to working robot prototypes.",
     highlights: [
       "Taught programming and robotics fundamentals using Python, Arduino, and microcontroller labs, enabling students to successfully program motors and sensors and complete functional robot prototypes.",
       "Led student robotics projects from concept design through testing, guiding teams in mechanical iteration and debugging with programmable hardware, resulting in completed robots that met project goals and were showcased in a school exhibition.",
@@ -126,6 +154,7 @@ export const experiences: Experience[] = [
     company: "Simon Fraser University",
     date: "Jan 2025 - Apr 2025",
     location: "Burnaby, BC",
+    headline: "Led weekly peer-led calculus sessions, fostering collaborative learning and academic growth.",
     highlights: [
       "Led weekly peer-led sessions for a dedicated group of students, fostering collaborative learning and long-term academic growth.",
       "Explained key concepts through interactive discussions and guided problem-solving sessions.",
@@ -139,6 +168,7 @@ export const experiences: Experience[] = [
     company: "Simon Fraser University",
     date: "Aug 2024 - Sep 2024",
     location: "Burnaby, BC",
+    headline: "Led orientation events welcoming and mentoring incoming students.",
     highlights: [
       "Organized and led events to welcome and engage new students.",
       "Collaborated with other Hive Leaders to plan and execute group activities.",
@@ -153,6 +183,7 @@ export const experiences: Experience[] = [
     company: "SFU Recreation",
     date: "Apr 2024 - Aug 2024",
     location: "Burnaby, BC",
+    headline: "Ran front-desk operations, fitness classes, and an intramural soccer league.",
     highlights: [
       "Front Desk Reception: Managed check-ins, answered inquiries, and kept daily operations running smoothly.",
       "Customer Service: Built relationships with clients, addressed concerns, and made sure every member felt welcomed.",

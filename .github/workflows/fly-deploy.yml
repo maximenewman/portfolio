@@ -63,6 +63,8 @@ jobs:
           cp fly.toml.example fly.toml
           sed -i "s/YOUR_APP_NAME/${{ secrets.FLY_APP_NAME }}/" fly.toml
           sed -i "s/YOUR_APP_REGION/${{ secrets.FLY_APP_REGION }}/" fly.toml
-      - run: flyctl deploy --remote-only
+      - run: >
+          flyctl deploy --remote-only
+          --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

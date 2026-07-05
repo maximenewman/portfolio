@@ -57,11 +57,11 @@ export default function Footer() {
               Site
             </h3>
             <nav className="flex flex-col items-center gap-3 sm:items-start">
-              <Link 
-                href="/experiences" 
+              <Link
+                href="/#journey"
                 className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
               >
-                Experiences
+                Experience
               </Link>
               <Link 
                 href="/projects" 
