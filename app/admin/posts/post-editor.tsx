@@ -45,6 +45,7 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
   const [publishedAt, setPublishedAt] = useState(initial.publishedAt)
 
   const [preview, setPreview] = useState(false)
+  const [insertSize, setInsertSize] = useState("medium")
   const [picker, setPicker] = useState<null | "cover" | "body">(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -84,7 +85,8 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
       setCoverAssetId(asset.id)
     } else if (picker === "body") {
       const alt = (asset.originalName ?? "media").replace(/\.[^.]+$/, "")
-      insertIntoBody(`\n![${alt}](${asset.publicUrl})\n`)
+      const token = insertSize === "full" ? "" : ` "${insertSize}"`
+      insertIntoBody(`\n![${alt}](${asset.publicUrl}${token})\n`)
     }
     setPicker(null)
   }
@@ -237,7 +239,18 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-muted-foreground">Body (Markdown)</span>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <select
+              value={insertSize}
+              onChange={(e) => setInsertSize(e.target.value)}
+              title="Size for inserted media"
+              className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-foreground outline-none focus:border-primary"
+            >
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="full">Full width</option>
+            </select>
             <button
               onClick={() => setPicker("body")}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
