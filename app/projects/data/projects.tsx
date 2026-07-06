@@ -37,10 +37,9 @@ export const projects: Project[] = [
   {
     title: "GreenLeaf Lending Analytics",
     description: [
-      `Built an interactive loan-readiness dashboard for the RBC × BCCAI × SFU Beedie Agribusiness Analytics Hackathon, turning a full season of greenhouse sensor data (120 plots across 8 farms, 25,200 daily readings) into a financing case a farmer can hand to a credit officer.`,
-      `Designed three views: a payoff-ranked operations work order, a Proof of Value report isolating $47,034 of season benefit from just 4.6% of input spend, and a 0-100 Loan Readiness Score with a what-if slider showing the score crossing the 75-point approval band.`,
-      `Engineered a live aggregation engine that recomputes every chart, KPI, and the loan score in the browser when filtering by farm, crop, treatment, or climate zone.`,
-      `Grounded the scoring in defensible statistics — median precision ROI (2.25×) over the outlier-inflated mean, penalizing only downside variance.`,
+      `Built an interactive dashboard scoring loan readiness 0-100 from 25K+ sensor readings across 8 B.C. farms, letting RBC lenders stress-test approval scenarios live.`,
+      `Quantified a $47K seasonal return on 4.6% of input spend, giving lenders a concrete margin-of-safety figure to underwrite against.`,
+      `Linked same-day alert response to 4.2× more crop stress relieved, tying operational discipline to measurable loan risk.`,
     ],
     tech: ["React", "JavaScript", "SVG", "CSS", "Data Analysis"],
     link: "https://github.com/maximenewman/GreenLeaf-Lending-Analytics",
