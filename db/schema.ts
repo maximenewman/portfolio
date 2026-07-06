@@ -40,6 +40,9 @@ export const posts = pgTable(
     kind: text("kind").notNull().default("note"), // idea|in-progress|shipped|success|failure|note
     tags: text("tags").array().notNull().default([]),
     coverAssetId: uuid("cover_asset_id").references(() => assets.id, { onDelete: "set null" }),
+    // CSS object-position ("x% y%") for the cover's focal point within its
+    // cropped frame — set by dragging in the editor.
+    coverPosition: text("cover_position").notNull().default("50% 50%"),
     // draft = owner-only in admin, private = on /blog but only when signed in,
     // public = visible to everyone.
     visibility: text("visibility").notNull().default("draft"),

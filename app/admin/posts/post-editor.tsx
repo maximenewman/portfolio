@@ -6,8 +6,8 @@ import { ImagePlus, Eye, Pencil, X, Trash2, Loader2 } from "lucide-react"
 import type { Asset } from "@/db/schema"
 import { POST_KINDS, VISIBILITIES, visibilityMeta, slugify } from "@/lib/posts"
 import { Markdown } from "@/app/components/markdown"
-import { AssetThumb } from "../components/asset-thumb"
 import { MediaPicker } from "../components/media-picker"
+import { CoverPositioner } from "./cover-positioner"
 import { createPostAction, updatePostAction, deletePostAction, type PostInput } from "./actions"
 
 export type EditorInitial = {
@@ -18,6 +18,7 @@ export type EditorInitial = {
   kind: string
   tags: string[]
   coverAssetId: string | null
+  coverPosition: string // CSS object-position "x% y%"
   visibility: string // draft | private | public
   publishedAt: string // yyyy-mm-dd
 }
@@ -40,6 +41,7 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
   const [tags, setTags] = useState<string[]>(initial.tags)
   const [tagDraft, setTagDraft] = useState("")
   const [coverAssetId, setCoverAssetId] = useState(initial.coverAssetId)
+  const [coverPosition, setCoverPosition] = useState(initial.coverPosition)
   const [cover, setCover] = useState<Asset | null>(initialCover ?? null)
   const [visibility, setVisibility] = useState(initial.visibility)
   const [publishedAt, setPublishedAt] = useState(initial.publishedAt)
@@ -83,6 +85,7 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
     if (picker === "cover") {
       setCover(asset)
       setCoverAssetId(asset.id)
+      setCoverPosition("50% 50%") // reset focal point for the new image
     } else if (picker === "body") {
       const alt = (asset.originalName ?? "media").replace(/\.[^.]+$/, "")
       const token = insertSize === "full" ? "" : ` "${insertSize}"`
@@ -94,7 +97,7 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
   async function save() {
     setSaving(true)
     setError(null)
-    const input: PostInput = { title, slug, summary, body, kind, tags, coverAssetId, visibility, publishedAt }
+    const input: PostInput = { title, slug, summary, body, kind, tags, coverAssetId, coverPosition, visibility, publishedAt }
     const res = mode === "create" ? await createPostAction(input) : await updatePostAction(postId!, input)
     if (res.ok) {
       router.push("/admin/posts")
@@ -205,10 +208,8 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
       <div className="flex flex-col gap-1">
         <span className="text-xs font-medium text-muted-foreground">Cover image</span>
         {cover ? (
-          <div className="flex items-center gap-3">
-            <div className="relative h-20 w-32 overflow-hidden rounded-lg border border-border bg-muted">
-              <AssetThumb asset={cover} />
-            </div>
+          <div className="flex flex-col gap-3">
+            <CoverPositioner asset={cover} position={coverPosition} onChange={setCoverPosition} />
             <div className="flex gap-2">
               <button onClick={() => setPicker("cover")} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted">
                 Change

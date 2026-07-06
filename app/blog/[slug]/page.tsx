@@ -78,6 +78,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             fill
             sizes="(max-width: 768px) 100vw, 768px"
             priority
+            style={{ objectPosition: post.coverPosition }}
             className="object-cover"
             unoptimized={cover.mime === "image/svg+xml" || cover.mime === "image/gif"}
           />

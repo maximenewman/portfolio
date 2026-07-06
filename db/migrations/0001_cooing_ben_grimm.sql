@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ADD COLUMN "cover_position" text DEFAULT '50% 50%' NOT NULL;

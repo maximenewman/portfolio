@@ -20,6 +20,7 @@ export type PostInput = {
   kind: string
   tags: string[]
   coverAssetId: string | null
+  coverPosition: string // CSS object-position "x% y%"
   visibility: string // draft | private | public
   publishedAt: string // yyyy-mm-dd
 }
@@ -45,6 +46,10 @@ function normalize(input: PostInput) {
   const tags = (input.tags ?? []).map((t) => t.trim()).filter(Boolean).slice(0, 12)
   const publishedAt = input.publishedAt ? new Date(input.publishedAt) : new Date()
   if (isNaN(publishedAt.getTime())) throw new Error("Invalid date")
+  // Only accept a well-formed "x% y%" — it's interpolated into an inline style.
+  const coverPosition = /^\d{1,3}% \d{1,3}%$/.test(input.coverPosition ?? "")
+    ? input.coverPosition
+    : "50% 50%"
   return {
     title,
     summary: input.summary?.trim() || null,
@@ -52,6 +57,7 @@ function normalize(input: PostInput) {
     kind,
     tags,
     coverAssetId: input.coverAssetId || null,
+    coverPosition,
     visibility,
     publishedAt,
   }

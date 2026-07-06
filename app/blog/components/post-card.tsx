@@ -21,6 +21,7 @@ export function PostCard({ post, cover, showVisibility }: { post: Post; cover?: 
             alt={cover.originalName ?? post.title}
             fill
             sizes="(max-width: 768px) 100vw, 400px"
+            style={{ objectPosition: post.coverPosition }}
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             unoptimized={cover.mime === "image/svg+xml" || cover.mime === "image/gif"}
           />

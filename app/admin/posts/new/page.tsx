@@ -17,6 +17,7 @@ export default function NewPostPage() {
     kind: "note",
     tags: [],
     coverAssetId: null,
+    coverPosition: "50% 50%",
     visibility: "draft",
     publishedAt: today,
   }
