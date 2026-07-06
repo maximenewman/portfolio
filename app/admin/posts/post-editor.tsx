@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ImagePlus, Eye, Pencil, X, Trash2, Loader2 } from "lucide-react"
 import type { Asset } from "@/db/schema"
@@ -20,7 +20,14 @@ export type EditorInitial = {
   coverAssetId: string | null
   coverPosition: string // CSS object-position "x% y%"
   visibility: string // draft | private | public
-  publishedAt: string // yyyy-mm-dd
+  publishedAt: string // UTC ISO instant ("" = now)
+}
+
+/** ISO instant → datetime-local input value in the browser's timezone. */
+function toLocalInput(iso: string): string {
+  const d = iso ? new Date(iso) : new Date()
+  const pad = (n: number) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 type Props = {
@@ -44,7 +51,13 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
   const [coverPosition, setCoverPosition] = useState(initial.coverPosition)
   const [cover, setCover] = useState<Asset | null>(initialCover ?? null)
   const [visibility, setVisibility] = useState(initial.visibility)
-  const [publishedAt, setPublishedAt] = useState(initial.publishedAt)
+  // Converted to the browser's local time on mount — the server can't know the
+  // user's timezone, so SSR renders it empty and the client fills it in.
+  const [publishedAt, setPublishedAt] = useState("")
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional client-only init: timezone conversion needs the browser
+    setPublishedAt(toLocalInput(initial.publishedAt))
+  }, [initial.publishedAt])
 
   const [preview, setPreview] = useState(false)
   const [insertSize, setInsertSize] = useState("medium")
@@ -97,7 +110,11 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
   async function save() {
     setSaving(true)
     setError(null)
-    const input: PostInput = { title, slug, summary, body, kind, tags, coverAssetId, coverPosition, visibility, publishedAt }
+    // Convert the naive local datetime to a UTC instant HERE, in the browser —
+    // the browser knows the user's timezone; the server (UTC in prod, local in
+    // dev) would guess wrong and dev/prod would disagree.
+    const publishedAtIso = publishedAt ? new Date(publishedAt).toISOString() : new Date().toISOString()
+    const input: PostInput = { title, slug, summary, body, kind, tags, coverAssetId, coverPosition, visibility, publishedAt: publishedAtIso }
     const res = mode === "create" ? await createPostAction(input) : await updatePostAction(postId!, input)
     if (res.ok) {
       router.push("/admin/posts")
@@ -142,8 +159,13 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
       {/* Meta row */}
       <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-muted-foreground">Date</span>
-          <input type="date" value={publishedAt} onChange={(e) => setPublishedAt(e.target.value)} className={inputCls} />
+          <span className="text-xs font-medium text-muted-foreground">Date &amp; time</span>
+          <input
+            type="datetime-local"
+            value={publishedAt}
+            onChange={(e) => setPublishedAt(e.target.value)}
+            className={inputCls}
+          />
         </label>
         <label className="flex flex-col gap-1">
           <span className="text-xs font-medium text-muted-foreground">Type</span>

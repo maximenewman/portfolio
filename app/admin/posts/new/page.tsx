@@ -8,7 +8,6 @@ export const metadata = {
 }
 
 export default function NewPostPage() {
-  const today = new Date().toISOString().slice(0, 10)
   const initial: EditorInitial = {
     title: "",
     slug: "",
@@ -19,7 +18,7 @@ export default function NewPostPage() {
     coverAssetId: null,
     coverPosition: "50% 50%",
     visibility: "draft",
-    publishedAt: today,
+    publishedAt: "", // editor fills in "now" in the user's local time
   }
 
   return (

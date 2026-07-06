@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import type { Asset, Post } from "@/db/schema"
-import { kindMeta, visibilityMeta, formatDate } from "@/lib/posts"
+import { kindMeta, visibilityMeta, formatDateTime } from "@/lib/posts"
 
 /** Card for the blog index. Shows a visibility badge only for non-public posts
  *  (the owner sees these; the public never receives them). */
@@ -33,7 +33,7 @@ export function PostCard({ post, cover, showVisibility }: { post: Post; cover?: 
           {showVisibility && post.visibility !== "public" && (
             <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${vis.badge}`}>{vis.label}</span>
           )}
-          <span className="text-xs text-muted-foreground">{formatDate(post.publishedAt)}</span>
+          <span className="text-xs text-muted-foreground">{formatDateTime(post.publishedAt)}</span>
         </div>
 
         <h2 className="text-lg font-bold text-card-foreground transition-colors group-hover:text-primary">

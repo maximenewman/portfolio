@@ -38,8 +38,42 @@ export function slugify(input: string): string {
     .slice(0, 80)
 }
 
+/**
+ * All dates render in this fixed zone so server-side output is identical in
+ * dev (local tz) and production (UTC) — without it, the same instant can show
+ * as different days depending on where the server runs.
+ */
+export const DISPLAY_TIME_ZONE = "America/Vancouver"
+
 /** Format an entry date for display (e.g. "Jul 4, 2026"). */
 export function formatDate(d: Date | string): string {
   const date = typeof d === "string" ? new Date(d) : d
-  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: DISPLAY_TIME_ZONE,
+  })
+}
+
+/** Full timestamp for journal entries (e.g. "Jul 4, 2026, 3:42 PM"). */
+export function formatDateTime(d: Date | string): string {
+  const date = typeof d === "string" ? new Date(d) : d
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: DISPLAY_TIME_ZONE,
+  })
+}
+
+/** Year of an instant in the display zone (keeps filters consistent with what's shown). */
+export function yearOf(d: Date | string): number {
+  return Number(
+    new Intl.DateTimeFormat("en-US", { year: "numeric", timeZone: DISPLAY_TIME_ZONE }).format(
+      typeof d === "string" ? new Date(d) : d,
+    ),
+  )
 }

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ChevronLeft, Plus, Pencil } from "lucide-react"
 import { listPosts } from "@/lib/queries"
-import { kindMeta, visibilityMeta, formatDate } from "@/lib/posts"
+import { kindMeta, visibilityMeta, formatDateTime } from "@/lib/posts"
 
 export const metadata = {
   title: "Posts | Admin",
@@ -51,7 +51,7 @@ export default async function AdminPostsPage() {
                     <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${vis.badge}`}>{vis.label}</span>
                   </div>
                   <h2 className="mt-1.5 truncate font-semibold text-card-foreground">{post.title}</h2>
-                  <p className="text-xs text-muted-foreground">{formatDate(post.publishedAt)}</p>
+                  <p className="text-xs text-muted-foreground">{formatDateTime(post.publishedAt)}</p>
                 </div>
                 <Pencil className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
               </Link>

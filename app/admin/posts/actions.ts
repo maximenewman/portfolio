@@ -22,7 +22,7 @@ export type PostInput = {
   coverAssetId: string | null
   coverPosition: string // CSS object-position "x% y%"
   visibility: string // draft | private | public
-  publishedAt: string // yyyy-mm-dd
+  publishedAt: string // UTC ISO instant (converted client-side from the user's local time)
 }
 
 export type ActionResult = { ok: true; id: string; slug: string } | { ok: false; error: string }

@@ -26,7 +26,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     coverAssetId: post.coverAssetId,
     coverPosition: post.coverPosition,
     visibility: post.visibility,
-    publishedAt: new Date(post.publishedAt).toISOString().slice(0, 10),
+    publishedAt: new Date(post.publishedAt).toISOString(),
   }
 
   return (

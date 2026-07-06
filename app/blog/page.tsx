@@ -1,6 +1,7 @@
+import type { Asset } from "@/db/schema"
 import { isCurrentUserAdmin } from "@/lib/admin"
 import { listPosts, getAssetsByIds } from "@/lib/queries"
-import { PostCard } from "./components/post-card"
+import { BlogList } from "./components/blog-list"
 
 // Depends on who's viewing (the owner sees private posts) and on live data.
 export const dynamic = "force-dynamic"
@@ -13,7 +14,8 @@ export const metadata = {
 export default async function BlogPage() {
   const admin = await isCurrentUserAdmin()
   const posts = await listPosts({ visibilities: admin ? ["public", "private"] : ["public"] })
-  const covers = await getAssetsByIds(posts.map((p) => p.coverAssetId).filter((x): x is string => !!x))
+  const coverMap = await getAssetsByIds(posts.map((p) => p.coverAssetId).filter((x): x is string => !!x))
+  const covers: Record<string, Asset> = Object.fromEntries(coverMap)
 
   return (
     <div className="min-h-screen">
@@ -33,16 +35,7 @@ export default async function BlogPage() {
         {posts.length === 0 ? (
           <p className="py-12 text-center text-muted-foreground">No entries yet — check back soon.</p>
         ) : (
-          <div className="stagger-children grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                cover={post.coverAssetId ? covers.get(post.coverAssetId) : undefined}
-                showVisibility={admin}
-              />
-            ))}
-          </div>
+          <BlogList posts={posts} covers={covers} isAdmin={admin} />
         )}
       </main>
     </div>

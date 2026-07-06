@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import { ChevronLeft, Eye, Pencil } from "lucide-react"
 import { isCurrentUserAdmin } from "@/lib/admin"
 import { getPostBySlug, getAsset } from "@/lib/queries"
-import { kindMeta, visibilityMeta, formatDate } from "@/lib/posts"
+import { kindMeta, visibilityMeta, formatDateTime } from "@/lib/posts"
 import { Markdown } from "@/app/components/markdown"
 
 export const dynamic = "force-dynamic"
@@ -64,7 +64,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {admin && post.visibility !== "public" && (
             <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${vis.badge}`}>{vis.label}</span>
           )}
-          <time className="text-sm text-muted-foreground">{formatDate(post.publishedAt)}</time>
+          <time className="text-sm text-muted-foreground">{formatDateTime(post.publishedAt)}</time>
         </div>
         <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">{post.title}</h1>
         {post.summary && <p className="mt-3 text-lg text-muted-foreground">{post.summary}</p>}
