@@ -2,10 +2,8 @@
 
 import { useEffect, useRef } from "react"
 import Link from "next/link"
-import { ArrowRight, BadgeCheck, Briefcase, MapPin } from "lucide-react"
+import { ArrowRight, Briefcase, MapPin } from "lucide-react"
 import type { Experience } from "@/lib/experiences"
-
-const ccrPath = "/Maxime_CCR.pdf"
 
 const typeLabels: Record<Experience["type"], string> = {
   tech: "Engineering",
@@ -105,19 +103,6 @@ export default function HomeTimeline({ experiences }: { experiences: Experience[
           </div>
         </div>
 
-        {/* Verification — these roles are backed by SFU's official record */}
-        <div className="reveal mx-auto mt-14 max-w-2xl text-center md:mt-20">
-          <a
-            href={ccrPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
-          >
-            <BadgeCheck className="h-4 w-4 text-primary" />
-            Verified on my official SFU Co-Curricular Record
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </a>
-        </div>
       </div>
     </section>
   )

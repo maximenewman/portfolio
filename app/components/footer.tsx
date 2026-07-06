@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { bioData } from "./bio"
-import { Mail, FileText, BadgeCheck } from "lucide-react"
+import { Mail, FileText } from "lucide-react"
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -46,7 +46,6 @@ function TiktokIcon({ className }: { className?: string }) {
 
 export default function Footer() {
   const resumePath = "/resume/Maxime_resume.pdf"
-  const ccrPath = "/Maxime_CCR.pdf"
 
   return (
     <footer className="border-t border-border bg-card">
@@ -157,17 +156,7 @@ export default function Footer() {
             >
               <FileText className="h-4 w-4" />
               View Resume
-            </button>
-            <a
-              href={ccrPath}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-hover mt-3 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-2.5 text-sm font-medium text-card-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-primary"
-            >
-              <BadgeCheck className="h-4 w-4" />
-              Co-Curricular Record
-            </a>
-          </div>
+            </button>          </div>
         </div>
 
         <hr className="my-8 border-border" />
