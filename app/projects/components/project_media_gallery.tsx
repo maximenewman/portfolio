@@ -16,6 +16,11 @@ function previewSrc(item: ProjectMedia): string | null {
   return item.thumbnailSrc ?? null
 }
 
+// Embed players (YouTube etc.) need an iframe; direct video files play natively.
+function isEmbedUrl(src: string): boolean {
+  return src.includes("youtube.com/embed") || src.includes("player.vimeo.com")
+}
+
 export function ProjectMediaGallery({ media, title, priority = false }: ProjectMediaGalleryProps) {
   const [active, setActive] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -151,7 +156,7 @@ export function ProjectMediaGallery({ media, title, priority = false }: ProjectM
                   sizes="(max-width: 768px) 100vw, 896px"
                   className="object-contain"
                 />
-              ) : (
+              ) : isEmbedUrl(media[selectedIndex].src) ? (
                 <iframe
                   src={media[selectedIndex].src}
                   title={media[selectedIndex].alt || `${title} video`}
@@ -160,6 +165,16 @@ export function ProjectMediaGallery({ media, title, priority = false }: ProjectM
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="strict-origin-when-cross-origin"
+                />
+              ) : (
+                <video
+                  src={media[selectedIndex].src}
+                  title={media[selectedIndex].alt || `${title} video`}
+                  className="h-full w-full"
+                  controls
+                  autoPlay
+                  playsInline
+                  poster={media[selectedIndex].thumbnailSrc}
                 />
               )}
             </div>

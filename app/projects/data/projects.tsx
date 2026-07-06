@@ -35,6 +35,25 @@ export const projects: Project[] = [
     ],
   },
   {
+    title: "GreenLeaf Lending Analytics",
+    description: [
+      `Built an interactive loan-readiness dashboard for the RBC × BCCAI × SFU Beedie Agribusiness Analytics Hackathon, turning a full season of greenhouse sensor data (120 plots across 8 farms, 25,200 daily readings) into a financing case a farmer can hand to a credit officer.`,
+      `Designed three views: a payoff-ranked operations work order, a Proof of Value report isolating $47,034 of season benefit from just 4.6% of input spend, and a 0-100 Loan Readiness Score with a what-if slider showing the score crossing the 75-point approval band.`,
+      `Engineered a live aggregation engine that recomputes every chart, KPI, and the loan score in the browser when filtering by farm, crop, treatment, or climate zone.`,
+      `Grounded the scoring in defensible statistics — median precision ROI (2.25×) over the outlier-inflated mean, penalizing only downside variance.`,
+    ],
+    tech: ["React", "JavaScript", "SVG", "CSS", "Data Analysis"],
+    link: "https://github.com/maximenewman/GreenLeaf-Lending-Analytics",
+    media: [
+      {
+        type: "video",
+        src: "https://github.com/user-attachments/assets/d302b062-2bf6-46a1-8de8-c222809ae3d4",
+        alt: "GreenLeaf loan-readiness dashboard demo",
+        thumbnailSrc: "/projects/greenleaf/greenleaf-thumbnail.png",
+      },
+    ],
+  },
+  {
     title: "Goblin's Keep",
     description: [
       `Led backend development of a 2D tile-based escape game by architecting game logic and AI systems, coordinating code reviews and integration across a team of developers.`,
