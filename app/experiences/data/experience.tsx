@@ -1,4 +1,4 @@
-import { Project } from "@/app/projects/data/projects"
+import { Project } from "@/lib/projects"
 import { slugify } from "@/lib/posts"
 
 export type ExperienceType = "tech" | "leadership" | "other"

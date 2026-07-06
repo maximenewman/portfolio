@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, timestamp, index } from "drizzle-orm/pg-core"
+import { pgTable, uuid, text, integer, timestamp, index, jsonb } from "drizzle-orm/pg-core"
 
 /**
  * Content-addressed media/assets. `sha256` is the dedup key: the same bytes
@@ -78,8 +78,68 @@ export const postAssets = pgTable(
   (t) => [index("post_assets_post_idx").on(t.postId)],
 )
 
+/**
+ * One gallery item on a project card. `src` is either an embed URL (YouTube),
+ * a direct video/image URL (`/media/...` asset or `/projects/...` public
+ * file), or any absolute URL — the gallery picks iframe vs <video> by URL.
+ */
+export type ProjectMediaItem = {
+  type: "image" | "video"
+  src: string
+  alt?: string
+  thumbnailSrc?: string
+}
+
+/**
+ * Portfolio projects, managed from the admin. `position` orders the public
+ * list (ascending); `visibility` reuses the posts model (draft = admin-only,
+ * private = owner-only on /projects, public = everyone). Media is a jsonb
+ * list rather than a join table because items can point outside the asset
+ * store (YouTube embeds, legacy /projects/ files).
+ */
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    description: text("description").array().notNull().default([]), // bullet points
+    tech: text("tech").array().notNull().default([]),
+    link: text("link"),
+    playUrl: text("play_url"),
+    linkedinPostUrl: text("linkedin_post_url"),
+    media: jsonb("media").$type<ProjectMediaItem[]>().notNull().default([]),
+    visibility: text("visibility").notNull().default("draft"),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("projects_visibility_idx").on(t.visibility, t.position)],
+)
+
+/**
+ * Which assets a project's media uses — mirrors `postAssets` so
+ * `assetRefCount` can guard the media library against deleting something a
+ * project still displays. Only `/media/...` srcs resolve to rows here.
+ */
+export const projectAssets = pgTable(
+  "project_assets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    assetId: uuid("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+  },
+  (t) => [index("project_assets_project_idx").on(t.projectId)],
+)
+
 export type Asset = typeof assets.$inferSelect
 export type NewAsset = typeof assets.$inferInsert
 export type Post = typeof posts.$inferSelect
 export type NewPost = typeof posts.$inferInsert
 export type PostAsset = typeof postAssets.$inferSelect
+export type ProjectRow = typeof projects.$inferSelect
+export type NewProject = typeof projects.$inferInsert

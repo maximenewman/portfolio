@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { ProjectMedia } from "@/app/projects/data/projects"
+import { ProjectMedia } from "@/lib/projects"
 import { ChevronLeft, ChevronRight, Maximize2, Play, X } from "lucide-react"
 
 interface ProjectMediaGalleryProps {

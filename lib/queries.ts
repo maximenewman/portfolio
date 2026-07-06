@@ -1,6 +1,19 @@
 import { getDb } from "./db"
-import { assets, posts, postAssets, type Asset, type NewAsset, type Post, type NewPost } from "@/db/schema"
-import { eq, ne, and, desc, inArray } from "drizzle-orm"
+import {
+  assets,
+  posts,
+  postAssets,
+  projects,
+  projectAssets,
+  type Asset,
+  type NewAsset,
+  type Post,
+  type NewPost,
+  type ProjectRow,
+  type NewProject,
+  type ProjectMediaItem,
+} from "@/db/schema"
+import { eq, ne, and, asc, desc, inArray, sql } from "drizzle-orm"
 
 /** Look up an asset by its content hash — the dedup check. */
 export async function findAssetBySha(sha256: string): Promise<Asset | undefined> {
@@ -41,10 +54,12 @@ export async function listAssets(kind?: string): Promise<Asset[]> {
   return db.select().from(assets).orderBy(desc(assets.createdAt))
 }
 
-/** How many posts reference this asset — guards deletion of in-use media. */
+/** How many posts/projects reference this asset — guards deletion of in-use media. */
 export async function assetRefCount(id: string): Promise<number> {
-  const rows = await getDb().select({ id: postAssets.id }).from(postAssets).where(eq(postAssets.assetId, id))
-  return rows.length
+  const db = getDb()
+  const postRefs = await db.select({ id: postAssets.id }).from(postAssets).where(eq(postAssets.assetId, id))
+  const projectRefs = await db.select({ id: projectAssets.id }).from(projectAssets).where(eq(projectAssets.assetId, id))
+  return postRefs.length + projectRefs.length
 }
 
 export async function deleteAssetRow(id: string): Promise<void> {
@@ -109,6 +124,88 @@ export async function getPostAssets(postId: string): Promise<Asset[]> {
   if (!links.length) return []
   const ids = links.map((l) => l.assetId)
   return db.select().from(assets).where(inArray(assets.id, ids))
+}
+
+// ---- Projects ----
+
+/**
+ * List projects in display order. Same visibility contract as `listPosts`:
+ * the public page passes ["public"] (or ["public","private"] for the owner),
+ * the admin list passes nothing.
+ */
+export async function listProjects(opts: { visibilities?: string[] } = {}): Promise<ProjectRow[]> {
+  const db = getDb()
+  if (opts.visibilities && opts.visibilities.length) {
+    return db
+      .select()
+      .from(projects)
+      .where(inArray(projects.visibility, opts.visibilities))
+      .orderBy(asc(projects.position), desc(projects.createdAt))
+  }
+  return db.select().from(projects).orderBy(asc(projects.position), desc(projects.createdAt))
+}
+
+export async function getProjectById(id: string): Promise<ProjectRow | undefined> {
+  const rows = await getDb().select().from(projects).where(eq(projects.id, id)).limit(1)
+  return rows[0]
+}
+
+/** Insert at the end of the display order. */
+export async function createProject(data: Omit<NewProject, "position">): Promise<ProjectRow> {
+  const db = getDb()
+  const [{ max }] = await db.select({ max: sql<number | null>`max(${projects.position})` }).from(projects)
+  const rows = await db
+    .insert(projects)
+    .values({ ...data, position: (max ?? -1) + 1 })
+    .returning()
+  return rows[0]
+}
+
+export async function updateProject(id: string, data: Partial<NewProject>): Promise<ProjectRow | undefined> {
+  const rows = await getDb()
+    .update(projects)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(projects.id, id))
+    .returning()
+  return rows[0]
+}
+
+export async function deleteProject(id: string): Promise<void> {
+  await getDb().delete(projects).where(eq(projects.id, id))
+}
+
+/** Swap a project with its neighbor in display order. No-op at the edges. */
+export async function moveProject(id: string, direction: "up" | "down"): Promise<void> {
+  const db = getDb()
+  const all = await db.select({ id: projects.id, position: projects.position }).from(projects).orderBy(asc(projects.position), desc(projects.createdAt))
+  const i = all.findIndex((p) => p.id === id)
+  const j = direction === "up" ? i - 1 : i + 1
+  if (i < 0 || j < 0 || j >= all.length) return
+  // Positions can collide (legacy rows default to 0), so write back clean
+  // sequential positions with the two entries swapped.
+  ;[all[i], all[j]] = [all[j], all[i]]
+  for (let k = 0; k < all.length; k++) {
+    if (all[k].position !== k) await db.update(projects).set({ position: k }).where(eq(projects.id, all[k].id))
+  }
+}
+
+/**
+ * Rebuild a project's asset links from its media list — the project-side
+ * mirror of `syncPostAssets`, so `assetRefCount` stays accurate. Only
+ * `/media/...` srcs (and video thumbnails) resolve to assets.
+ */
+export async function syncProjectAssets(projectId: string, media: ProjectMediaItem[]): Promise<void> {
+  const db = getDb()
+  await db.delete(projectAssets).where(eq(projectAssets.projectId, projectId))
+
+  const urls = media.flatMap((m) => [m.src, m.thumbnailSrc ?? ""])
+  const keys = [...new Set(urls.flatMap((u) => Array.from(u.matchAll(MEDIA_KEY_RE), (m) => m[1])))]
+  if (!keys.length) return
+
+  const found = await db.select().from(assets).where(inArray(assets.key, keys))
+  if (found.length) {
+    await db.insert(projectAssets).values(found.map((a, i) => ({ projectId, assetId: a.id, position: i })))
+  }
 }
 
 const MEDIA_KEY_RE = /\/media\/(assets\/[a-f0-9]{64}\.[a-z0-9]+)/g

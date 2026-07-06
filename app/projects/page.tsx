@@ -1,7 +1,16 @@
-import { projects } from "./data/projects"
+import { isCurrentUserAdmin } from "@/lib/admin"
+import { listProjects } from "@/lib/queries"
+import { toCardProject } from "@/lib/projects"
 import { ProjectCard } from "./components/project_display"
 
-export default function ProjectsPage() {
+// Depends on who's viewing (the owner sees private projects) and on live data.
+export const dynamic = "force-dynamic"
+
+export default async function ProjectsPage() {
+  const admin = await isCurrentUserAdmin()
+  const rows = await listProjects({ visibilities: admin ? ["public", "private"] : ["public"] })
+  const projects = rows.map(toCardProject)
+
   return (
     <div className="min-h-screen">
       {/* Hero Header */}
@@ -14,7 +23,7 @@ export default function ProjectsPage() {
             Projects & Creations
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            A showcase of personal and professional projects spanning web development, 
+            A showcase of personal and professional projects spanning web development,
             machine learning, and embedded systems.
           </p>
         </div>

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Project } from "@/app/projects/data/projects"
+import { Project } from "@/lib/projects"
 import { ExternalLink, Gamepad2, Linkedin } from "lucide-react"
 import { ProjectMediaGallery } from "./project_media_gallery"
 
