@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import Image from "next/image"
-import type { Passion } from "@/app/passions/data/passions"
+import type { Passion } from "@/lib/passions"
 import { X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
 
 interface PassionModalProps {

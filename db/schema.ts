@@ -136,6 +136,56 @@ export const projectAssets = pgTable(
   (t) => [index("project_assets_project_idx").on(t.projectId)],
 )
 
+/** External link shown in a passion's modal (e.g. Chess.com profile). */
+export type PassionMediaLink = { label: string; url: string }
+
+/** One milestone entry in a passion's timeline (chronological, oldest first). */
+export type PassionTimelineEntry = { date: string; items: string[] }
+
+/**
+ * "Beyond code" passions, managed from the admin like `projects`. Images stay
+ * parallel arrays (`images` / `imageAlts`) because that's the shape the cards
+ * and modal already render; the editor pairs them up per row.
+ */
+export const passions = pgTable(
+  "passions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull().unique(), // stable key, e.g. "football"
+    title: text("title").notNull(),
+    description: text("description").notNull().default(""), // card blurb
+    icon: text("icon").notNull().default("code"), // key into the card's icon map
+    details: text("details").array().notNull().default([]), // modal paragraphs
+    mediaLinks: jsonb("media_links").$type<PassionMediaLink[]>().notNull().default([]),
+    images: text("images").array().notNull().default([]),
+    imageAlts: text("image_alts").array().notNull().default([]),
+    videoEmbed: text("video_embed"),
+    timeline: jsonb("timeline").$type<PassionTimelineEntry[]>().notNull().default([]),
+    imagePosition: text("image_position").notNull().default("center"), // center | top
+    visibility: text("visibility").notNull().default("draft"),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("passions_visibility_idx").on(t.visibility, t.position)],
+)
+
+/** Asset links for passion images — same ref-count guard as post/project assets. */
+export const passionAssets = pgTable(
+  "passion_assets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    passionId: uuid("passion_id")
+      .notNull()
+      .references(() => passions.id, { onDelete: "cascade" }),
+    assetId: uuid("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+  },
+  (t) => [index("passion_assets_passion_idx").on(t.passionId)],
+)
+
 export type Asset = typeof assets.$inferSelect
 export type NewAsset = typeof assets.$inferInsert
 export type Post = typeof posts.$inferSelect
@@ -143,3 +193,5 @@ export type NewPost = typeof posts.$inferInsert
 export type PostAsset = typeof postAssets.$inferSelect
 export type ProjectRow = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
+export type PassionRow = typeof passions.$inferSelect
+export type NewPassion = typeof passions.$inferInsert

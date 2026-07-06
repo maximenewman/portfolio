@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { passions, type Passion } from "@/app/passions/data/passions"
+import type { Passion } from "@/lib/passions"
 import { PassionCard } from "./passions_card"
 import { PassionModal } from "./passion_modal"
 
-export function PassionsDisplay() {
+export function PassionsDisplay({ passions }: { passions: Passion[] }) {
   const [selectedPassion, setSelectedPassion] = useState<Passion | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 

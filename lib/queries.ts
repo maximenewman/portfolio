@@ -5,6 +5,8 @@ import {
   postAssets,
   projects,
   projectAssets,
+  passions,
+  passionAssets,
   type Asset,
   type NewAsset,
   type Post,
@@ -12,6 +14,8 @@ import {
   type ProjectRow,
   type NewProject,
   type ProjectMediaItem,
+  type PassionRow,
+  type NewPassion,
 } from "@/db/schema"
 import { eq, ne, and, asc, desc, inArray, sql } from "drizzle-orm"
 
@@ -54,12 +58,13 @@ export async function listAssets(kind?: string): Promise<Asset[]> {
   return db.select().from(assets).orderBy(desc(assets.createdAt))
 }
 
-/** How many posts/projects reference this asset — guards deletion of in-use media. */
+/** How many posts/projects/passions reference this asset — guards deletion of in-use media. */
 export async function assetRefCount(id: string): Promise<number> {
   const db = getDb()
   const postRefs = await db.select({ id: postAssets.id }).from(postAssets).where(eq(postAssets.assetId, id))
   const projectRefs = await db.select({ id: projectAssets.id }).from(projectAssets).where(eq(projectAssets.assetId, id))
-  return postRefs.length + projectRefs.length
+  const passionRefs = await db.select({ id: passionAssets.id }).from(passionAssets).where(eq(passionAssets.assetId, id))
+  return postRefs.length + projectRefs.length + passionRefs.length
 }
 
 export async function deleteAssetRow(id: string): Promise<void> {
@@ -205,6 +210,85 @@ export async function syncProjectAssets(projectId: string, media: ProjectMediaIt
   const found = await db.select().from(assets).where(inArray(assets.key, keys))
   if (found.length) {
     await db.insert(projectAssets).values(found.map((a, i) => ({ projectId, assetId: a.id, position: i })))
+  }
+}
+
+// ---- Passions ----
+
+/** List passions in display order; same visibility contract as `listProjects`. */
+export async function listPassions(opts: { visibilities?: string[] } = {}): Promise<PassionRow[]> {
+  const db = getDb()
+  if (opts.visibilities && opts.visibilities.length) {
+    return db
+      .select()
+      .from(passions)
+      .where(inArray(passions.visibility, opts.visibilities))
+      .orderBy(asc(passions.position), desc(passions.createdAt))
+  }
+  return db.select().from(passions).orderBy(asc(passions.position), desc(passions.createdAt))
+}
+
+export async function getPassionById(id: string): Promise<PassionRow | undefined> {
+  const rows = await getDb().select().from(passions).where(eq(passions.id, id)).limit(1)
+  return rows[0]
+}
+
+/** True if a passion already owns this slug (optionally ignoring one row's id). */
+export async function passionSlugExists(slug: string, exceptId?: string): Promise<boolean> {
+  const db = getDb()
+  const where = exceptId ? and(eq(passions.slug, slug), ne(passions.id, exceptId)) : eq(passions.slug, slug)
+  const rows = await db.select({ id: passions.id }).from(passions).where(where).limit(1)
+  return rows.length > 0
+}
+
+/** Insert at the end of the display order. */
+export async function createPassion(data: Omit<NewPassion, "position">): Promise<PassionRow> {
+  const db = getDb()
+  const [{ max }] = await db.select({ max: sql<number | null>`max(${passions.position})` }).from(passions)
+  const rows = await db
+    .insert(passions)
+    .values({ ...data, position: (max ?? -1) + 1 })
+    .returning()
+  return rows[0]
+}
+
+export async function updatePassion(id: string, data: Partial<NewPassion>): Promise<PassionRow | undefined> {
+  const rows = await getDb()
+    .update(passions)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(passions.id, id))
+    .returning()
+  return rows[0]
+}
+
+export async function deletePassion(id: string): Promise<void> {
+  await getDb().delete(passions).where(eq(passions.id, id))
+}
+
+/** Swap a passion with its neighbor in display order. No-op at the edges. */
+export async function movePassion(id: string, direction: "up" | "down"): Promise<void> {
+  const db = getDb()
+  const all = await db.select({ id: passions.id, position: passions.position }).from(passions).orderBy(asc(passions.position), desc(passions.createdAt))
+  const i = all.findIndex((p) => p.id === id)
+  const j = direction === "up" ? i - 1 : i + 1
+  if (i < 0 || j < 0 || j >= all.length) return
+  ;[all[i], all[j]] = [all[j], all[i]]
+  for (let k = 0; k < all.length; k++) {
+    if (all[k].position !== k) await db.update(passions).set({ position: k }).where(eq(passions.id, all[k].id))
+  }
+}
+
+/** Rebuild a passion's asset links from its image list — see `syncProjectAssets`. */
+export async function syncPassionAssets(passionId: string, images: string[]): Promise<void> {
+  const db = getDb()
+  await db.delete(passionAssets).where(eq(passionAssets.passionId, passionId))
+
+  const keys = [...new Set(images.flatMap((u) => Array.from(u.matchAll(MEDIA_KEY_RE), (m) => m[1])))]
+  if (!keys.length) return
+
+  const found = await db.select().from(assets).where(inArray(assets.key, keys))
+  if (found.length) {
+    await db.insert(passionAssets).values(found.map((a, i) => ({ passionId, assetId: a.id, position: i })))
   }
 }
 

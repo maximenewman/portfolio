@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import type { Passion } from "@/app/passions/data/passions"
+import type { Passion } from "@/lib/passions"
 
 // Icon components
 function CodeIcon({ className }: { className?: string }) {
