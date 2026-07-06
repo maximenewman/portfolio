@@ -201,6 +201,9 @@ export type ExperienceProjectItem = {
   media?: ProjectMediaItem[]
 }
 
+/** External link shown on an experience's detail page (repo, live project, …). */
+export type ExperienceLink = { label: string; url: string }
+
 /**
  * Resume-style experiences: the home timeline + per-experience detail pages.
  * `slug` is the detail-page URL (defaults to role-company). Detail content is
@@ -222,6 +225,7 @@ export const experiences = pgTable(
     projects: jsonb("projects").$type<ExperienceProjectItem[]>().notNull().default([]),
     highlights: text("highlights").array().notNull().default([]),
     skills: text("skills").array().notNull().default([]),
+    links: jsonb("links").$type<ExperienceLink[]>().notNull().default([]),
     visibility: text("visibility").notNull().default("draft"),
     position: integer("position").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

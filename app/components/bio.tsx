@@ -42,7 +42,7 @@ export default function MyBio({ experiences }: { experiences: Experience[] }) {
           <div className="stagger-children mb-8 flex flex-col items-center md:mb-0">
             <div className="relative">
               {/* Decorative ring */}
-              <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 blur-sm" />
+              <div className="absolute -inset-2 rounded-full bg-linear-to-br from-primary/40 to-primary/10 blur-sm" />
               <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-card shadow-xl md:h-64 md:w-64 lg:h-72 lg:w-72">
                 <Image
                   src={bioData.picture}

@@ -21,6 +21,7 @@ export default function NewExperiencePage() {
     projects: [],
     highlights: [],
     skills: [],
+    links: [],
     visibility: "draft",
   }
 

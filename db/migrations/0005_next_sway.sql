@@ -1,0 +1,1 @@
+ALTER TABLE "experiences" ADD COLUMN "links" jsonb DEFAULT '[]'::jsonb NOT NULL;

@@ -35,6 +35,7 @@ export default async function EditExperiencePage({ params }: { params: Promise<{
     })),
     highlights: experience.highlights,
     skills: experience.skills,
+    links: experience.links,
     visibility: experience.visibility,
   }
 

@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Calendar, MapPin, Wrench } from "lucide-react"
+import { Calendar, ExternalLink, Link2, MapPin, Wrench } from "lucide-react"
 import { Experience } from "@/lib/experiences"
 
 /** Brand color for the hero, keyed off the company name. */
@@ -115,6 +115,17 @@ export function ExperienceDetail({ experience }: { experience: Experience }) {
                         </p>
                       ))}
                     </div>
+                    {project.link && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        View project
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>
@@ -147,6 +158,27 @@ export function ExperienceDetail({ experience }: { experience: Experience }) {
               </h3>
               <p className="mt-1.5 text-sm text-card-foreground">{experience.location}</p>
             </div>
+            {(experience.links?.length ?? 0) > 0 && (
+              <div>
+                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Link2 className="h-3.5 w-3.5" />
+                  Links
+                </h3>
+                <div className="mt-2 flex flex-col gap-1.5">
+                  {experience.links!.map((l) => (
+                    <a
+                      key={l.url}
+                      href={l.url}
+                      {...(l.url.startsWith("/") ? {} : { target: "_blank", rel: "noopener noreferrer" })}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                      {l.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
             {tools.length > 0 && (
               <div>
                 <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">

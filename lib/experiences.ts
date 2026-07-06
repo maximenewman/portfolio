@@ -1,7 +1,9 @@
 // Shared experience shapes — safe to import from both server and client.
 
-import type { ExperienceRow } from "@/db/schema"
+import type { ExperienceRow, ExperienceLink } from "@/db/schema"
 import type { Project } from "@/lib/projects"
+
+export type { ExperienceLink }
 
 export type ExperienceType = "tech" | "leadership" | "other"
 
@@ -29,6 +31,8 @@ export interface Experience {
   projects?: Project[]
   highlights?: string[]
   skills?: string[]
+  /** External links (repos, live projects) shown in the detail sidebar. */
+  links?: ExperienceLink[]
 }
 
 /** DB row → render props (empty collections become absent, matching the old data file). */
@@ -46,5 +50,6 @@ export function toCardExperience(row: ExperienceRow): Experience {
     projects: row.projects.length ? row.projects : undefined,
     highlights: row.highlights.length ? row.highlights : undefined,
     skills: row.skills.length ? row.skills : undefined,
+    links: row.links.length ? row.links : undefined,
   }
 }

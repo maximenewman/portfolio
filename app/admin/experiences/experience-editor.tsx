@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronUp, ChevronDown, ImagePlus, Loader2, Plus, Trash2, X } from "lucide-react"
-import type { Asset, ProjectMediaItem } from "@/db/schema"
+import type { Asset, ProjectMediaItem, ExperienceLink } from "@/db/schema"
 import { EXPERIENCE_TYPES } from "@/lib/experiences"
 import { VISIBILITIES, visibilityMeta, slugify } from "@/lib/posts"
 import { MediaPicker } from "../components/media-picker"
@@ -34,6 +34,7 @@ export type ExperienceEditorInitial = {
   projects: ProjectDraft[]
   highlights: string[]
   skills: string[]
+  links: ExperienceLink[]
   visibility: string
 }
 
@@ -60,6 +61,7 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
   const [highlights, setHighlights] = useState(initial.highlights.join("\n"))
   const [skills, setSkills] = useState<string[]>(initial.skills)
   const [skillDraft, setSkillDraft] = useState("")
+  const [links, setLinks] = useState<ExperienceLink[]>(initial.links)
   const [visibility, setVisibility] = useState(initial.visibility)
 
   const [pickingHero, setPickingHero] = useState(false)
@@ -115,6 +117,7 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
       })),
       highlights: highlights.split("\n").map((h) => h.trim()).filter(Boolean),
       skills,
+      links,
       visibility,
     }
     const res = mode === "create" ? await createExperienceAction(input) : await updateExperienceAction(experienceId!, input)
@@ -276,6 +279,43 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
             className="min-w-[100px] flex-1 bg-transparent text-sm text-foreground outline-none"
           />
         </div>
+      </div>
+
+      {/* Links */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground">Links — repos or related pages, shown in the detail sidebar</span>
+          <button
+            onClick={() => setLinks((prev) => [...prev, { label: "", url: "" }])}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add link
+          </button>
+        </div>
+        {links.map((l, index) => (
+          <div key={index} className="flex gap-2">
+            <input
+              value={l.label}
+              onChange={(e) => setLinks((prev) => prev.map((x, i) => (i === index ? { ...x, label: e.target.value } : x)))}
+              placeholder="Label"
+              className={`${inputCls} max-w-[220px]`}
+            />
+            <input
+              value={l.url}
+              onChange={(e) => setLinks((prev) => prev.map((x, i) => (i === index ? { ...x, url: e.target.value } : x)))}
+              placeholder="https://github.com/… or /projects"
+              className={`${inputCls} font-mono text-xs`}
+            />
+            <button
+              onClick={() => setLinks((prev) => prev.filter((_, i) => i !== index))}
+              className="rounded p-1 text-red-600 hover:bg-muted dark:text-red-400"
+              aria-label="Remove link"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
       </div>
 
       {/* Embedded projects */}

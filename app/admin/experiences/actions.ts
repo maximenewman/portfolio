@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { requireAdmin } from "@/lib/admin"
 import { VISIBILITIES, slugify } from "@/lib/posts"
-import type { ExperienceProjectItem } from "@/db/schema"
+import type { ExperienceProjectItem, ExperienceLink } from "@/db/schema"
 import {
   createExperience,
   updateExperience,
@@ -27,6 +27,7 @@ export type ExperienceInput = {
   projects: ExperienceProjectItem[]
   highlights: string[]
   skills: string[]
+  links: ExperienceLink[]
   visibility: string // draft | private | public
 }
 
@@ -70,6 +71,9 @@ function normalize(input: ExperienceInput) {
       .filter((p) => p.title),
     highlights: (input.highlights ?? []).map((h) => h.trim()).filter(Boolean),
     skills: (input.skills ?? []).map((s) => s.trim()).filter(Boolean).slice(0, 20),
+    links: (input.links ?? [])
+      .map((l) => ({ label: l.label?.trim() ?? "", url: l.url?.trim() ?? "" }))
+      .filter((l) => l.label && l.url),
     visibility: VALID_VISIBILITIES.has(input.visibility) ? input.visibility : "draft",
   }
 }
