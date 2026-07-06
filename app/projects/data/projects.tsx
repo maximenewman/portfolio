@@ -35,7 +35,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: "GreenLeaf Lending Analytics",
+    title: "GreenLeaf Lending Analytics - RBC Business Analysis Hackathon",
     description: [
       `Built an interactive dashboard scoring loan readiness 0-100 from 25K+ sensor readings across 8 B.C. farms, letting RBC lenders stress-test approval scenarios live.`,
       `Quantified a $47K seasonal return on 4.6% of input spend, giving lenders a concrete margin-of-safety figure to underwrite against.`,
@@ -79,7 +79,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: "SFU DSSS ML Hackathon - 1st Place",
+    title: "FraudLens - SFU DSSS ML Hackathon 1st Place",
     description: [
       `Won the first ML Hackathon hosted by the SFU Data Science Student Society by building a multi-class fraud detection pipeline for fraud detection.`,
       `Designed a validation and cleaning pipeline enforcing consistent data types and value ranges, applying constraint-based reasoning to flag real-world transaction impossibilities.`,
