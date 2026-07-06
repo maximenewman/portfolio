@@ -7,6 +7,8 @@ import {
   projectAssets,
   passions,
   passionAssets,
+  experiences,
+  experienceAssets,
   type Asset,
   type NewAsset,
   type Post,
@@ -16,6 +18,9 @@ import {
   type ProjectMediaItem,
   type PassionRow,
   type NewPassion,
+  type ExperienceRow,
+  type NewExperience,
+  type ExperienceProjectItem,
 } from "@/db/schema"
 import { eq, ne, and, asc, desc, inArray, sql } from "drizzle-orm"
 
@@ -58,13 +63,17 @@ export async function listAssets(kind?: string): Promise<Asset[]> {
   return db.select().from(assets).orderBy(desc(assets.createdAt))
 }
 
-/** How many posts/projects/passions reference this asset — guards deletion of in-use media. */
+/** How many posts/projects/passions/experiences reference this asset — guards deletion of in-use media. */
 export async function assetRefCount(id: string): Promise<number> {
   const db = getDb()
   const postRefs = await db.select({ id: postAssets.id }).from(postAssets).where(eq(postAssets.assetId, id))
   const projectRefs = await db.select({ id: projectAssets.id }).from(projectAssets).where(eq(projectAssets.assetId, id))
   const passionRefs = await db.select({ id: passionAssets.id }).from(passionAssets).where(eq(passionAssets.assetId, id))
-  return postRefs.length + projectRefs.length + passionRefs.length
+  const experienceRefs = await db
+    .select({ id: experienceAssets.id })
+    .from(experienceAssets)
+    .where(eq(experienceAssets.assetId, id))
+  return postRefs.length + projectRefs.length + passionRefs.length + experienceRefs.length
 }
 
 export async function deleteAssetRow(id: string): Promise<void> {
@@ -289,6 +298,98 @@ export async function syncPassionAssets(passionId: string, images: string[]): Pr
   const found = await db.select().from(assets).where(inArray(assets.key, keys))
   if (found.length) {
     await db.insert(passionAssets).values(found.map((a, i) => ({ passionId, assetId: a.id, position: i })))
+  }
+}
+
+// ---- Experiences ----
+
+/** List experiences in display order; same visibility contract as `listProjects`. */
+export async function listExperiences(opts: { visibilities?: string[] } = {}): Promise<ExperienceRow[]> {
+  const db = getDb()
+  if (opts.visibilities && opts.visibilities.length) {
+    return db
+      .select()
+      .from(experiences)
+      .where(inArray(experiences.visibility, opts.visibilities))
+      .orderBy(asc(experiences.position), desc(experiences.createdAt))
+  }
+  return db.select().from(experiences).orderBy(asc(experiences.position), desc(experiences.createdAt))
+}
+
+export async function getExperienceById(id: string): Promise<ExperienceRow | undefined> {
+  const rows = await getDb().select().from(experiences).where(eq(experiences.id, id)).limit(1)
+  return rows[0]
+}
+
+export async function getExperienceBySlug(slug: string): Promise<ExperienceRow | undefined> {
+  const rows = await getDb().select().from(experiences).where(eq(experiences.slug, slug)).limit(1)
+  return rows[0]
+}
+
+/** True if an experience already owns this slug (optionally ignoring one row's id). */
+export async function experienceSlugExists(slug: string, exceptId?: string): Promise<boolean> {
+  const db = getDb()
+  const where = exceptId ? and(eq(experiences.slug, slug), ne(experiences.id, exceptId)) : eq(experiences.slug, slug)
+  const rows = await db.select({ id: experiences.id }).from(experiences).where(where).limit(1)
+  return rows.length > 0
+}
+
+/** Insert at the end of the display order. */
+export async function createExperience(data: Omit<NewExperience, "position">): Promise<ExperienceRow> {
+  const db = getDb()
+  const [{ max }] = await db.select({ max: sql<number | null>`max(${experiences.position})` }).from(experiences)
+  const rows = await db
+    .insert(experiences)
+    .values({ ...data, position: (max ?? -1) + 1 })
+    .returning()
+  return rows[0]
+}
+
+export async function updateExperience(id: string, data: Partial<NewExperience>): Promise<ExperienceRow | undefined> {
+  const rows = await getDb()
+    .update(experiences)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(experiences.id, id))
+    .returning()
+  return rows[0]
+}
+
+export async function deleteExperience(id: string): Promise<void> {
+  await getDb().delete(experiences).where(eq(experiences.id, id))
+}
+
+/** Swap an experience with its neighbor in display order. No-op at the edges. */
+export async function moveExperience(id: string, direction: "up" | "down"): Promise<void> {
+  const db = getDb()
+  const all = await db.select({ id: experiences.id, position: experiences.position }).from(experiences).orderBy(asc(experiences.position), desc(experiences.createdAt))
+  const i = all.findIndex((p) => p.id === id)
+  const j = direction === "up" ? i - 1 : i + 1
+  if (i < 0 || j < 0 || j >= all.length) return
+  ;[all[i], all[j]] = [all[j], all[i]]
+  for (let k = 0; k < all.length; k++) {
+    if (all[k].position !== k) await db.update(experiences).set({ position: k }).where(eq(experiences.id, all[k].id))
+  }
+}
+
+/** Rebuild an experience's asset links from its hero + embedded project media. */
+export async function syncExperienceAssets(
+  experienceId: string,
+  heroImage: string | null,
+  projects: ExperienceProjectItem[],
+): Promise<void> {
+  const db = getDb()
+  await db.delete(experienceAssets).where(eq(experienceAssets.experienceId, experienceId))
+
+  const urls = [
+    heroImage ?? "",
+    ...projects.flatMap((p) => (p.media ?? []).flatMap((m) => [m.src, m.thumbnailSrc ?? ""])),
+  ]
+  const keys = [...new Set(urls.flatMap((u) => Array.from(u.matchAll(MEDIA_KEY_RE), (m) => m[1])))]
+  if (!keys.length) return
+
+  const found = await db.select().from(assets).where(inArray(assets.key, keys))
+  if (found.length) {
+    await db.insert(experienceAssets).values(found.map((a, i) => ({ experienceId, assetId: a.id, position: i })))
   }
 }
 

@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { ChevronDown, FileText, Github, Linkedin, Mail } from "lucide-react"
 import HomeTimeline from "./home-timeline"
+import type { Experience } from "@/lib/experiences"
 
 export const bioData = {
   name: "Maxime Newman Nereyabagabo",
@@ -21,7 +22,7 @@ export const bioData = {
   },
 }
 
-export default function MyBio() {
+export default function MyBio({ experiences }: { experiences: Experience[] }) {
   const openResume = () => {
     window.open(bioData.resumePath, "_blank", "noopener,noreferrer")
   }
@@ -133,7 +134,7 @@ export default function MyBio() {
       </div>
 
       {/* Experience Timeline - resume-style, revealed on scroll */}
-      <HomeTimeline />
+      <HomeTimeline experiences={experiences} />
 
       {/* About Section - Below the fold */}
       <div className="border-t border-border bg-card/50">

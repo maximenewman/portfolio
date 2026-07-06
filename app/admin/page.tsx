@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { currentUser } from "@clerk/nextjs/server"
-import { FileText, FolderKanban, Heart, ImageIcon } from "lucide-react"
+import { Briefcase, FileText, FolderKanban, Heart, ImageIcon } from "lucide-react"
 
 export const metadata = {
   title: "Admin | Maxime Newman",
@@ -49,6 +49,19 @@ export default async function AdminHome() {
             <h2 className="font-semibold text-card-foreground">Projects</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Add, edit, and reorder portfolio projects.
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/experiences"
+          className="card-hover flex items-start gap-4 rounded-2xl border border-border bg-card p-6"
+        >
+          <Briefcase className="h-6 w-6 shrink-0 text-primary" />
+          <div>
+            <h2 className="font-semibold text-card-foreground">Experiences</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Manage the home timeline and detail pages.
             </p>
           </div>
         </Link>

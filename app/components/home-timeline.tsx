@@ -2,8 +2,10 @@
 
 import { useEffect, useRef } from "react"
 import Link from "next/link"
-import { ArrowRight, Briefcase, MapPin } from "lucide-react"
-import { experiences, experienceSlug, type Experience } from "@/app/experiences/data/experience"
+import { ArrowRight, BadgeCheck, Briefcase, MapPin } from "lucide-react"
+import type { Experience } from "@/lib/experiences"
+
+const ccrPath = "/Maxime_CCR.pdf"
 
 const typeLabels: Record<Experience["type"], string> = {
   tech: "Engineering",
@@ -14,7 +16,7 @@ const typeLabels: Record<Experience["type"], string> = {
 /** The landing-page experience timeline. Each role shows a one-line headline;
  *  click through (arrow-indicated) to its full detail page. This is the only
  *  experiences surface — there's no separate /experiences index. */
-export default function HomeTimeline() {
+export default function HomeTimeline({ experiences }: { experiences: Experience[] }) {
   const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function HomeTimeline() {
           <div className="space-y-6">
             {experiences.map((experience, index) => (
               <div
-                key={experienceSlug(experience)}
+                key={experience.slug}
                 className="reveal relative"
                 style={{ transitionDelay: `${(index % 3) * 60}ms` }}
               >
@@ -66,7 +68,7 @@ export default function HomeTimeline() {
                 <span className="timeline-dot absolute left-4 top-6 z-10 h-3 w-3 -translate-x-1/2 rounded-full bg-primary" />
 
                 <Link
-                  href={`/experiences/${experienceSlug(experience)}`}
+                  href={`/experiences/${experience.slug}`}
                   className="card-hover group ml-10 block rounded-xl border border-border bg-card p-5 shadow-sm md:p-6"
                 >
                   <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -101,6 +103,20 @@ export default function HomeTimeline() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Verification — these roles are backed by SFU's official record */}
+        <div className="reveal mx-auto mt-14 max-w-2xl text-center md:mt-20">
+          <a
+            href={ccrPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:border-primary/40 hover:text-primary"
+          >
+            <BadgeCheck className="h-4 w-4 text-primary" />
+            Verified on my official SFU Co-Curricular Record
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </a>
         </div>
       </div>
     </section>

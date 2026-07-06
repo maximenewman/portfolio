@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { Calendar, MapPin, Wrench } from "lucide-react"
-import { Experience } from "../data/experience"
+import { Experience } from "@/lib/experiences"
 
 /** Brand color for the hero, keyed off the company name. */
 function brandColor(company: string): string {

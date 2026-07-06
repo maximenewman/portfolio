@@ -1,16 +1,17 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ChevronLeft } from "lucide-react"
-import { experiences, experienceSlug, getExperienceBySlug } from "../data/experience"
+import { isCurrentUserAdmin } from "@/lib/admin"
+import { getExperienceBySlug } from "@/lib/queries"
+import { toCardExperience } from "@/lib/experiences"
 import { ExperienceDetail } from "../components/experience_detail"
 
-export function generateStaticParams() {
-  return experiences.map((e) => ({ slug: experienceSlug(e) }))
-}
+// Depends on who's viewing (the owner sees private experiences) and on live data.
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const experience = getExperienceBySlug(slug)
+  const experience = await getExperienceBySlug(slug)
   if (!experience) return { title: "Experience | Maxime Newman" }
   return {
     title: `${experience.role} · ${experience.company} | Maxime Newman`,
@@ -20,8 +21,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ExperienceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const experience = getExperienceBySlug(slug)
+  const experience = await getExperienceBySlug(slug)
   if (!experience) notFound()
+  if (experience.visibility !== "public" && !(await isCurrentUserAdmin())) notFound()
 
   return (
     <div className="min-h-screen">
@@ -34,7 +36,7 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
           Back to timeline
         </Link>
 
-        <ExperienceDetail experience={experience} />
+        <ExperienceDetail experience={toCardExperience(experience)} />
       </div>
     </div>
   )

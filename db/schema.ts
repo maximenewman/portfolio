@@ -186,6 +186,69 @@ export const passionAssets = pgTable(
   (t) => [index("passion_assets_passion_idx").on(t.passionId)],
 )
 
+/**
+ * A project embedded inside an experience (work done in that role). Same shape
+ * the project cards render, but stored inline — these aren't rows in
+ * `projects`, they only exist on the experience's detail page.
+ */
+export type ExperienceProjectItem = {
+  title: string
+  description: string[]
+  tech: string[]
+  link?: string
+  playUrl?: string
+  linkedinPostUrl?: string
+  media?: ProjectMediaItem[]
+}
+
+/**
+ * Resume-style experiences: the home timeline + per-experience detail pages.
+ * `slug` is the detail-page URL (defaults to role-company). Detail content is
+ * either `highlights` paragraphs, embedded `projects`, or both.
+ */
+export const experiences = pgTable(
+  "experiences",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull().unique(),
+    type: text("type").notNull().default("tech"), // tech | leadership | other
+    role: text("role").notNull(),
+    company: text("company").notNull(),
+    date: text("date").notNull().default(""), // display string, e.g. "Jan 2025 - Present"
+    location: text("location").notNull().default(""),
+    headline: text("headline").notNull().default(""), // one-liner on the timeline
+    overview: text("overview"), // detail-page intro (falls back to headline)
+    heroImage: text("hero_image"), // detail-page hero; company-keyed fallback when absent
+    projects: jsonb("projects").$type<ExperienceProjectItem[]>().notNull().default([]),
+    highlights: text("highlights").array().notNull().default([]),
+    skills: text("skills").array().notNull().default([]),
+    visibility: text("visibility").notNull().default("draft"),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("experiences_visibility_idx").on(t.visibility, t.position),
+    index("experiences_slug_idx").on(t.slug),
+  ],
+)
+
+/** Asset links for hero + embedded project media — same ref-count guard as the others. */
+export const experienceAssets = pgTable(
+  "experience_assets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    experienceId: uuid("experience_id")
+      .notNull()
+      .references(() => experiences.id, { onDelete: "cascade" }),
+    assetId: uuid("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+  },
+  (t) => [index("experience_assets_experience_idx").on(t.experienceId)],
+)
+
 export type Asset = typeof assets.$inferSelect
 export type NewAsset = typeof assets.$inferInsert
 export type Post = typeof posts.$inferSelect
@@ -195,3 +258,5 @@ export type ProjectRow = typeof projects.$inferSelect
 export type NewProject = typeof projects.$inferInsert
 export type PassionRow = typeof passions.$inferSelect
 export type NewPassion = typeof passions.$inferInsert
+export type ExperienceRow = typeof experiences.$inferSelect
+export type NewExperience = typeof experiences.$inferInsert
