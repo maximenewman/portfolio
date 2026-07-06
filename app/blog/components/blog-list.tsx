@@ -12,6 +12,15 @@ type Props = {
   isAdmin: boolean
 }
 
+const FILTER_LABELS: Record<string, string> = {
+  idea: "Ideas",
+  note: "Notes",
+  "in-progress": "In progress",
+  shipped: "Shipped",
+  success: "Successes",
+  failure: "Failures",
+}
+
 /** Client-side filtered blog index: narrow by kind and year, sort by date. */
 export function BlogList({ posts, covers, isAdmin }: Props) {
   const [kind, setKind] = useState<string>("all")
@@ -29,6 +38,15 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
     const set = new Set(posts.map((p) => yearOf(p.publishedAt)))
     return Array.from(set).sort((a, b) => b - a)
   }, [posts])
+
+  // Plural labels read better as filter categories ("Ideas") than the singular
+  // post badges ("Idea").
+  const chipItems = useMemo(
+    () => [{ value: "all", label: "All" }, ...kindsPresent.map((k) => ({ value: k.value, label: FILTER_LABELS[k.value] ?? k.label }))],
+    [kindsPresent],
+  )
+  // Uniform distance for every chip; grows slightly with count so labels clear.
+  const chipRadius = 54 + chipItems.length * 4
 
   const visible = useMemo(() => {
     const filtered = posts.filter((p) => {
@@ -49,10 +67,8 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         {/* Brain: click to pop the kind filters out above it, like thoughts */}
         <div className="flex flex-wrap items-end gap-2">
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Filter
-            </span>
+          {/* Shifted right so the "All" chip has room on the brain's left */}
+          <div className="flex flex-col items-center gap-1" style={{ marginLeft: chipRadius }}>
             <div className="relative">
               <button
                 onClick={() => setBrainOpen((o) => !o)}
@@ -74,50 +90,55 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
                 )}
               </button>
 
-              {/* Thought-bubble dots rising from the brain */}
-              <span
-                aria-hidden
-                className={`absolute -top-2 right-0 h-1.5 w-1.5 rounded-full bg-primary/50 transition-all duration-300 ${
-                  brainOpen ? "opacity-100" : "opacity-0"
-                }`}
-              />
-              <span
-                aria-hidden
-                className={`absolute -top-4 -right-1.5 h-2 w-2 rounded-full bg-primary/35 transition-all duration-500 ${
-                  brainOpen ? "opacity-100" : "opacity-0"
-                }`}
-              />
-
-              {/* Popout thoughts — float above the brain */}
-              <div className="absolute bottom-full left-0 z-20 mb-5 flex w-max max-w-[min(80vw,28rem)] flex-wrap items-end gap-1.5">
-                {[{ value: "all", label: "All" }, ...kindsPresent].map((k, i) => (
-                  <button
-                    key={k.value}
-                    onClick={() => setKind(k.value)}
-                    tabIndex={brainOpen ? 0 : -1}
-                    aria-hidden={!brainOpen}
-                    style={{ transitionDelay: brainOpen ? `${i * 45}ms` : `${(kindsPresent.length - i) * 25}ms` }}
-                    className={`rounded-full border px-3 py-1 text-sm font-medium shadow-sm transition-all duration-300 ${
-                      brainOpen
-                        ? "translate-y-0 scale-100 opacity-100"
-                        : "pointer-events-none translate-y-3 scale-75 opacity-0"
-                    } ${
-                      kind === k.value
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-card text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {k.label}
-                  </button>
-                ))}
+              {/* Popout thoughts — bloom out of the brain along an arch and
+                  collapse as soon as one is picked */}
+              <div className="pointer-events-none absolute left-1/2 top-1/2 z-20">
+                {chipItems.map((k, i) => {
+                  // Full arch around the brain at one uniform radius:
+                  // first chip at 180° (left), last at 0° (right).
+                  const t = chipItems.length === 1 ? 0.5 : i / (chipItems.length - 1)
+                  const deg = 180 - 180 * t
+                  const rad = (deg * Math.PI) / 180
+                  const x = Math.round(Math.cos(rad) * chipRadius)
+                  const y = Math.round(-Math.sin(rad) * chipRadius)
+                  return (
+                    <button
+                      key={k.value}
+                      onClick={() => {
+                        setKind(k.value)
+                        setBrainOpen(false)
+                      }}
+                      tabIndex={brainOpen ? 0 : -1}
+                      aria-hidden={!brainOpen}
+                      style={{
+                        transitionDelay: brainOpen ? `${i * 40}ms` : `${(chipItems.length - 1 - i) * 20}ms`,
+                        transform: brainOpen
+                          ? `translate(-50%, -50%) translate(${x}px, ${y}px)`
+                          : "translate(-50%, -50%) scale(0.3)",
+                      }}
+                      className={`absolute whitespace-nowrap rounded-full border px-3 py-1 text-sm font-medium shadow-md transition-all duration-300 ${
+                        brainOpen ? "pointer-events-auto opacity-100" : "opacity-0"
+                      } ${
+                        kind === k.value
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                      }`}
+                    >
+                      {k.label}
+                    </button>
+                  )
+                })}
               </div>
             </div>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Filter
+            </span>
           </div>
 
           {/* Collapsed summary of the active filter */}
           {!brainOpen && kind !== "all" && (
             <span className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-              {kindMeta(kind).label}
+              {FILTER_LABELS[kind] ?? kindMeta(kind).label}
               <button onClick={() => setKind("all")} aria-label="Clear type filter" className="hover:opacity-70">
                 <X className="h-3.5 w-3.5" />
               </button>

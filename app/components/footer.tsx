@@ -63,14 +63,20 @@ export default function Footer() {
               >
                 Experience
               </Link>
-              <Link 
-                href="/projects" 
+              <Link
+                href="/projects"
                 className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
               >
                 Projects
               </Link>
-              <Link 
-                href="/passions" 
+              <Link
+                href="/blog"
+                className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
+              >
+                Blog
+              </Link>
+              <Link
+                href="/passions"
                 className="link-underline text-sm text-muted-foreground transition-colors hover:text-primary"
               >
                 Passions
