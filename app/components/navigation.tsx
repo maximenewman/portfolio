@@ -2,134 +2,177 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
-import { Menu, X, Sun, Moon } from "lucide-react"
+import { Menu, Moon, Sun, X } from "lucide-react"
 import { Show, UserButton } from "@clerk/nextjs"
+import { Container } from "./page-shell"
+import { MotionToggle } from "./motion-toggle"
 import { useTheme } from "./theme-provider"
 
-const pageRoutes = [
-  { name: "Home", link: "/" },
-  { name: "Projects", link: "/projects" },
-  { name: "Blog", link: "/blog" },
-  { name: "Passions", link: "/passions" },
+const routes = [
+  { name: "Home", href: "/" },
+  { name: "Projects", href: "/projects" },
+  { name: "Blog", href: "/blog" },
+  { name: "Passions", href: "/passions" },
 ]
 
+const LIST_ID = "site-nav-links"
+
+/**
+ * The site's primary navigation.
+ *
+ * There is exactly ONE route list in the DOM. The previous version rendered the
+ * routes twice — a centred desktop `<ul>` and a second `<nav>` inside a
+ * `{open && …}` branch — which meant two sets of markup, two sets of active-state
+ * classes, and two copies of every link in the accessibility tree.
+ *
+ * Now the same `<ul>` is:
+ *   - a full-width column that the disclosure button reveals below the bar
+ *     (the bar itself grows, because the list is in normal flow), and
+ *   - an inline row beside the logo at `md` and above.
+ *
+ * Only `display`, `flex-direction`, `flex-basis` and spacing change. That is the
+ * single justified divergence in this file: four uppercase labels laid side by
+ * side do not survive a 320px viewport without either wrapping into an unreadable
+ * ragged block or shrinking below a usable touch target, so below `md` they stack
+ * behind a disclosure. Content, order and behaviour are identical either way.
+ */
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
   const pathname = usePathname()
   const { theme, toggleTheme } = useTheme()
+  const [open, setOpen] = useState(false)
+  const toggleRef = useRef<HTMLButtonElement>(null)
 
-  const isActive = (link: string) => {
-    if (link === "/") {
-      return pathname === "/"
-    }
-    return pathname.startsWith(link)
+  // Close the panel whenever the route changes. Done as a render-phase state
+  // adjustment rather than an effect: `react-hooks/set-state-in-effect` rejects
+  // a setState in an effect body, and an effect would also paint one stale frame
+  // with the panel still open. Unlike an onClick handler this also covers
+  // browser back/forward and any programmatic navigation.
+  const [lastPath, setLastPath] = useState(pathname)
+  if (lastPath !== pathname) {
+    setLastPath(pathname)
+    if (open) setOpen(false)
   }
 
-  return (
-    <nav className="sticky top-0 z-50 border-b border-border/50 bg-card/80 backdrop-blur-md">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center md:h-20">
-          {/* Logo - Far Left with circle border */}
-          <Link 
-            href="/" 
-            className="mr-auto flex items-center transition-transform hover:scale-105"
-          >
-            <div className="rounded-full border-2 border-primary/30 p-1 transition-colors hover:border-primary/60">
-              <Image
-                src="/logo.png"
-                alt="Logo of Maxime"
-                width={64}
-                height={64}
-                loading="eager"
-                className="h-10 w-10 rounded-full md:h-12 md:w-12"
-              />
-            </div>
-          </Link>
+  // Escape closes the panel and returns focus to the control that opened it, so
+  // a keyboard user is never dropped at the top of the document.
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setOpen(false)
+      toggleRef.current?.focus()
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [open])
 
-          {/* Desktop Navigation - Centered */}
-          <ul className="absolute left-1/2 hidden -translate-x-1/2 gap-1 md:flex">
-            {pageRoutes.map((page) => (
-              <li key={page.link}>
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href)
+
+  return (
+    <nav
+      aria-label="Primary"
+      className="sticky top-0 z-50 border-b border-border/70 bg-card/80 backdrop-blur"
+    >
+      <Container className="flex flex-wrap items-center gap-x-4 py-3 md:py-4">
+        <Link
+          href="/"
+          aria-label="Maxime Newman — home"
+          className="btn-hover order-1 flex items-center rounded-full"
+        >
+          <span className="rounded-full border border-border p-1 transition-colors fine:hover:border-primary">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={64}
+              height={64}
+              loading="eager"
+              className="h-10 w-10 rounded-full md:h-11 md:w-11"
+            />
+          </span>
+        </Link>
+
+        {/* The disclosure sits immediately before the list in the DOM so that
+            opening it puts the revealed links next in reading and tab order —
+            the `order-*` classes below are what move it to the right end of the
+            bar visually without breaking that relationship. */}
+        <button
+          ref={toggleRef}
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-controls={LIST_ID}
+          aria-label={open ? "Close menu" : "Open menu"}
+          className="btn-hover order-3 inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+
+        {/* The one route list. `hidden`/`flex` is toggled by the disclosure below
+            `md`; from `md` up it is always an inline row. */}
+        <ul
+          id={LIST_ID}
+          className={`order-4 w-full basis-full flex-col border-t border-border/70 pt-2
+            md:order-2 md:mt-0 md:w-auto md:basis-auto md:flex-row md:items-center md:border-0 md:pt-0
+            ${open ? "mt-3 flex" : "hidden"} md:flex`}
+        >
+          {routes.map((route) => {
+            const active = isActive(route.href)
+            return (
+              <li key={route.href}>
                 <Link
-                  href={page.link}
-                  className={`relative rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                    isActive(page.link)
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                  href={route.href}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                  // 44px tall wherever the pointer is coarse; a mouse can afford
+                  // the tighter bar, so the shrink is keyed to input capability
+                  // rather than to viewport width.
+                  className={`link-underline flex min-h-11 items-center gap-2.5 px-3 font-mono text-eyebrow uppercase transition-colors fine:min-h-0 fine:py-2 ${
+                    active ? "text-primary" : "text-muted-foreground fine:hover:text-foreground"
                   }`}
                 >
-                  {page.name}
-                  {/* Active indicator */}
-                  {isActive(page.link) && (
-                    <span className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full bg-primary" />
-                  )}
+                  {/* Marker, not decoration-only state: `aria-current` carries the
+                      meaning, this just makes it visible in both orientations. */}
+                  <span
+                    aria-hidden="true"
+                    className={`h-1.5 w-1.5 shrink-0 rounded-full transition-colors ${
+                      active ? "bg-primary" : "bg-transparent"
+                    }`}
+                  />
+                  {route.name}
                 </Link>
               </li>
-            ))}
-          </ul>
+            )
+          })}
+        </ul>
 
-          {/* Right side - Theme toggle */}
-          <div className="flex items-center gap-2">
-            {/* Owner-only controls (only render when signed in) */}
-            <Show when="signed-in">
-              <Link
-                href="/admin"
-                className="hidden rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
-              >
-                Admin
-              </Link>
-              <UserButton
-                appearance={{ elements: { avatarBox: "h-8 w-8" } }}
-              />
-            </Show>
-
-            <button
-              onClick={toggleTheme}
-              className="btn-hover rounded-full p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+        <div className="order-2 ml-auto flex items-center gap-1 md:order-3">
+          <Show when="signed-in">
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="link-underline flex min-h-11 items-center px-3 font-mono text-eyebrow uppercase text-muted-foreground transition-colors fine:min-h-0 fine:py-2 fine:hover:text-foreground"
             >
-              {theme === "light" ? (
-                <Moon className="h-5 w-5" />
-              ) : (
-                <Sun className="h-5 w-5" />
-              )}
-            </button>
+              Admin
+            </Link>
+            <UserButton appearance={{ elements: { avatarBox: "h-8 w-8" } }} />
+          </Show>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setOpen(!open)}
-              className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
-              aria-label="Toggle menu"
-            >
-              {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            className="btn-hover inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground fine:h-9 fine:w-9"
+          >
+            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </button>
+
+          <MotionToggle />
         </div>
-
-        {/* Mobile Navigation */}
-        {open && (
-          <div className="animate-fade-in border-t border-border pb-4 md:hidden">
-            <nav className="flex flex-col gap-1 pt-4">
-              {pageRoutes.map((page) => (
-                <Link
-                  key={page.link}
-                  href={page.link}
-                  onClick={() => setOpen(false)}
-                  className={`rounded-md px-4 py-3 text-sm font-medium transition-colors ${
-                    isActive(page.link)
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  {page.name}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        )}
-      </div>
+      </Container>
     </nav>
   )
 }

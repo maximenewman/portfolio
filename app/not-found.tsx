@@ -1,23 +1,24 @@
 import Link from "next/link"
-import { Home } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { Container } from "./components/page-shell"
 
 export default function NotFound() {
   return (
-    <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
-      <div className="max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-sm">
-        <h1 className="text-6xl font-bold text-primary">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-card-foreground">Page Not Found</h2>
-        <p className="mt-2 text-muted-foreground">
-          Could not find the requested resource
-        </p>
+    <Container className="flex min-h-[60svh] flex-col justify-center py-[clamp(4rem,12vw,8rem)]">
+      <p className="font-mono text-eyebrow uppercase text-primary">Not found</p>
+      <h1 className="mt-6 font-display text-display text-foreground">404</h1>
+      <p className="mt-6 max-w-[30ch] font-serif text-deck text-pretty text-muted-foreground">
+        This page was never set in type — or it has since been taken out of print.
+      </p>
+      <div className="mt-10 border-t border-border/70 pt-6">
         <Link
           href="/"
-          className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 font-mono text-eyebrow uppercase text-primary-foreground transition-colors hover:bg-primary/90"
         >
-          <Home className="h-4 w-4" />
-          Back to Home
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to home
         </Link>
       </div>
-    </div>
+    </Container>
   )
 }
