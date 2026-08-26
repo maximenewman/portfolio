@@ -1,6 +1,7 @@
 import type { Asset } from "@/db/schema"
 import { isCurrentUserAdmin } from "@/lib/admin"
 import { listPosts, getAssetsByIds } from "@/lib/queries"
+import { Container, PageHeader } from "@/app/components/page-shell"
 import { BlogList } from "./components/blog-list"
 
 // Depends on who's viewing (the owner sees private posts) and on live data.
@@ -19,25 +20,22 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-border bg-card/50 py-16 md:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <p className="mb-2 text-sm font-medium uppercase tracking-widest text-primary">Journal</p>
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
-            What I&apos;m Doing. Recap
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            A running log of ideas, progress, wins, and the occasional failure — documented as I go.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Journal"
+        title="What I'm doing. Recap"
+        deck="A running log of ideas, progress, wins, and the occasional failure — documented as I go."
+      />
 
-      <main className="container mx-auto px-4 py-12 md:py-16">
+      {/* The root layout already owns <main>, so this is a plain section. */}
+      <Container as="section" className="py-[clamp(2.5rem,7vw,4.5rem)]">
         {posts.length === 0 ? (
-          <p className="py-12 text-center text-muted-foreground">No entries yet — check back soon.</p>
+          <p className="max-w-[46ch] text-lede text-muted-foreground">
+            No entries yet — check back soon.
+          </p>
         ) : (
           <BlogList posts={posts} covers={covers} isAdmin={admin} />
         )}
-      </main>
+      </Container>
     </div>
   )
 }

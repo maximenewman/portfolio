@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react"
 import { isCurrentUserAdmin } from "@/lib/admin"
 import { getExperienceBySlug } from "@/lib/queries"
 import { toCardExperience } from "@/lib/experiences"
+import { Container } from "@/app/components/page-shell"
 import { ExperienceDetail } from "../components/experience_detail"
 
 // Depends on who's viewing (the owner sees private experiences) and on live data.
@@ -26,18 +27,18 @@ export default async function ExperienceDetailPage({ params }: { params: Promise
   if (experience.visibility !== "public" && !(await isCurrentUserAdmin())) notFound()
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto max-w-4xl px-4 py-10 md:py-14">
+    <Container as="section" className="py-[clamp(2.5rem,6vw,4.5rem)]">
+      <div className="mx-auto max-w-[74rem]">
         <Link
           href="/#journey"
-          className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="link-underline inline-flex items-center gap-1.5 font-mono text-eyebrow uppercase text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-3.5 w-3.5" aria-hidden />
           Back to timeline
         </Link>
 
         <ExperienceDetail experience={toCardExperience(experience)} />
       </div>
-    </div>
+    </Container>
   )
 }
