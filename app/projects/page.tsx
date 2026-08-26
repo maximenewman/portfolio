@@ -1,6 +1,7 @@
 import { isCurrentUserAdmin } from "@/lib/admin"
 import { listProjects } from "@/lib/queries"
 import { toCardProject } from "@/lib/projects"
+import { Container, PageHeader } from "@/app/components/page-shell"
 import { ProjectCard } from "./components/project_display"
 
 // Depends on who's viewing (the owner sees private projects) and on live data.
@@ -12,31 +13,29 @@ export default async function ProjectsPage() {
   const projects = rows.map(toCardProject)
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Header */}
-      <header className="border-b border-border bg-card/50 py-16 md:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <p className="mb-2 text-sm font-medium uppercase tracking-widest text-primary">
-            My Work
-          </p>
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
-            Projects & Creations
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            A showcase of personal and professional projects spanning web development,
-            machine learning, and embedded systems.
-          </p>
-        </div>
-      </header>
+    <div>
+      <PageHeader
+        eyebrow="Selected work"
+        title="Projects & Creations"
+        deck="Things I built end to end — web apps, machine learning, and the embedded systems in between."
+      />
 
-      {/* Content */}
-      <main className="container mx-auto px-4 py-12 md:py-16">
-        <div className="stagger-children flex flex-col gap-10">
-          {projects.map((project, index) => (
-            <ProjectCard key={index} project={project} priority={index === 0} />
-          ))}
-        </div>
-      </main>
+      {/* The root layout already owns <main>, so this is a plain section. */}
+      <Container as="section" className="py-[clamp(3rem,8vw,5.5rem)]">
+        {projects.length === 0 ? (
+          <p className="font-mono text-eyebrow uppercase text-muted-foreground">
+            Nothing published here yet.
+          </p>
+        ) : (
+          <ol className="flex flex-col gap-[clamp(2rem,5vw,4rem)]">
+            {projects.map((project, index) => (
+              <li key={`${project.title}-${index}`} className="reveal">
+                <ProjectCard project={project} index={index} priority={index === 0} />
+              </li>
+            ))}
+          </ol>
+        )}
+      </Container>
     </div>
   )
 }

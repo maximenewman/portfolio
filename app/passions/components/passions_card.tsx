@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import type { Passion } from "@/lib/passions"
+import { Panel } from "@/app/components/page-shell"
 
 // Icon components
 function CodeIcon({ className }: { className?: string }) {
@@ -113,114 +114,123 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 interface PassionCardProps {
   passion: Passion
   index: number
+  /** The first card is given the wide slot; everything else sits in the grid. */
   featured?: boolean
+  /** Receives the trigger element so focus can be handed back on close. */
+  onOpen: (passion: Passion, trigger: HTMLButtonElement) => void
 }
 
-export function PassionCard({ passion, featured = false }: PassionCardProps) {
+/**
+ * How the featured card's image mosaic tiles a 2x2 grid. Small counts stretch
+ * to fill so the mosaic never leaves a hole.
+ */
+function mosaicSpan(count: number, i: number): string {
+  if (count === 1) return "col-span-2 row-span-2"
+  if (count === 2) return "row-span-2"
+  if (count === 3 && i === 2) return "col-span-2"
+  return ""
+}
+
+export function PassionCard({ passion, index, featured = false, onOpen }: PassionCardProps) {
   const IconComponent = iconMap[passion.icon] || CodeIcon
   const objectPosition = passion.imagePosition === "top" ? "object-top" : "object-center"
 
-  if (featured) {
-    return (
-      <div className="group">
-        <div className="flex flex-col lg:flex-row">
-          {/* Image Gallery - Featured */}
-          {passion.images && passion.images.length > 0 && (
-            <div className="relative aspect-[4/3] w-full lg:aspect-auto lg:min-h-[500px] lg:w-3/5">
-              <div className="grid h-full grid-cols-2 gap-1">
-                {passion.images.slice(0, 4).map((src, i) => (
-                  <div
-                    key={i}
-                    className={`relative overflow-hidden ${
-                      passion.images!.length === 1 ? "col-span-2 row-span-2" : ""
-                    } ${passion.images!.length === 2 ? "row-span-2" : ""}`}
-                  >
-                    <Image
-                      src={src}
-                      alt={passion.imageAlts?.[i] || `${passion.title} photo ${i + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 60vw"
-                      className={`object-cover ${objectPosition} transition-transform duration-500 group-hover:scale-105`}
-                    />
-                  </div>
-                ))}
-              </div>
-              {/* Click to expand hint */}
-              <div className="absolute bottom-4 right-4 rounded-full bg-background/80 px-3 py-1.5 text-xs font-medium backdrop-blur-sm transition-opacity group-hover:opacity-100 md:opacity-0">
-                Click to view gallery
-              </div>
-            </div>
-          )}
+  const images = passion.images?.filter((src) => src && src.trim() !== "") ?? []
+  // The wide card can show a mosaic; the narrow ones show a single frame. This
+  // is a content decision, not a form-factor one — both render the same tree.
+  const shown = featured ? images.slice(0, 4) : images.slice(0, 1)
+  const remaining = images.length - shown.length
 
-          {/* Content - Featured */}
-          <div className="flex flex-1 flex-col p-6 lg:p-8">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <IconComponent className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Featured
-                </span>
-                <h3 className="text-2xl font-bold text-card-foreground md:text-3xl">
-                  {passion.title}
-                </h3>
-              </div>
-            </div>
-
-            <p className="mb-4 leading-relaxed text-muted-foreground">
-              {passion.description}
-            </p>
-
-            <span className="mt-auto text-sm font-medium text-primary">Click to explore →</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const titleId = `passion-${passion.id}-title`
+  const hintId = `passion-${passion.id}-hint`
 
   return (
-    <div className="group flex h-full flex-col">
-      {/* Image Preview - Full prominent display */}
-      {passion.images && passion.images.length > 0 && (
-        <div className="relative aspect-[4/3] w-full overflow-hidden">
-          <Image
-            src={passion.images[0]}
-            alt={passion.imageAlts?.[0] || `${passion.title} preview`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={`object-cover ${objectPosition} transition-transform duration-500 group-hover:scale-105`}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
-          {/* Image count badge */}
-          {passion.images.length > 1 && (
-            <div className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
-              +{passion.images.length - 1} photos
+    // `@container`, so the split into two columns is decided by the card's own
+    // width: the featured card is wide enough to split, the grid cards are not,
+    // and on a phone neither is. No breakpoint duplicates this markup.
+    <Panel className="card-hover group @container relative h-full overflow-hidden">
+      <div
+        className={`grid h-full ${shown.length > 0 ? "@3xl:grid-cols-[1.15fr_1fr]" : ""}`}
+      >
+        {shown.length > 0 && (
+          <div className="relative aspect-[4/3] w-full @3xl:aspect-auto @3xl:min-h-[24rem]">
+            <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
+              {shown.map((src, i) => (
+                <div key={i} className={`relative overflow-hidden ${mosaicSpan(shown.length, i)}`}>
+                  <Image
+                    src={src}
+                    alt={passion.imageAlts?.[i] || `${passion.title} photo ${i + 1}`}
+                    fill
+                    sizes={
+                      featured
+                        ? "(max-width: 768px) 100vw, 55vw"
+                        : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    }
+                    priority={index === 0 && i === 0}
+                    className={`object-cover ${objectPosition} transition-transform duration-500 fine:group-hover:scale-105`}
+                  />
+                </div>
+              ))}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20">
-            <IconComponent className="h-5 w-5 text-primary" />
+            {/* Always-on count badge — no hover required to learn there is more. */}
+            {remaining > 0 && (
+              <span className="absolute right-3 top-3 rounded-full bg-background/85 px-2.5 py-1 font-mono text-eyebrow uppercase text-foreground backdrop-blur-sm">
+                +{remaining} {remaining === 1 ? "photo" : "photos"}
+              </span>
+            )}
           </div>
-          <h3 className="text-lg font-semibold text-card-foreground">
-            {passion.title}
-          </h3>
+        )}
+
+        <div className="flex flex-col gap-4 p-[clamp(1.25rem,4cqi,2.25rem)]">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors fine:group-hover:bg-primary/20">
+              <IconComponent className="h-5 w-5 text-primary" />
+            </span>
+            <div className="min-w-0">
+              <p className="font-mono text-eyebrow uppercase text-muted-foreground tabular-nums">
+                {String(index + 1).padStart(2, "0")}
+                {featured && <span className="text-primary"> · Featured</span>}
+              </p>
+              <h2 id={titleId} className="mt-2 font-display text-h3 text-balance text-card-foreground">
+                {passion.title}
+              </h2>
+            </div>
+          </div>
+
+          <p className="text-pretty text-[0.95rem] leading-relaxed text-muted-foreground">
+            {passion.description}
+          </p>
+
+          {/* The affordance is plain text that is always rendered — the old
+              "Click to view gallery" hint was `md:opacity-0`, so on a desktop
+              it only existed on hover and on a phone it named an input the
+              visitor does not have. */}
+          <span
+            id={hintId}
+            className="mt-auto inline-flex items-center gap-2 font-mono text-eyebrow uppercase text-primary"
+          >
+            View gallery
+            <span aria-hidden className="transition-transform fine:group-hover:translate-x-1">
+              &rarr;
+            </span>
+          </span>
         </div>
-
-        <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-          {passion.description}
-        </p>
-
-        {/* Click hint */}
-        <span className="text-xs font-medium text-primary transition-colors group-hover:text-primary/80">
-          Click to explore
-        </span>
       </div>
-    </div>
+
+      {/* The whole card is one action, so the hit area is one button laid over
+          it. Nesting the heading and copy *inside* a <button> would be invalid
+          HTML (flow content in a phrasing-only element) and would flatten the
+          heading out of the document outline; this keeps both the semantics and
+          the full-card target, which is far larger than the 44px minimum.
+          The card clips its children (rounded images), which would clip an
+          outset focus ring too — hence the inset outline offset. */}
+      <button
+        type="button"
+        aria-labelledby={`${titleId} ${hintId}`}
+        aria-haspopup="dialog"
+        onClick={(event) => onOpen(passion, event.currentTarget)}
+        className="absolute inset-0 z-10 cursor-pointer rounded-2xl focus-visible:rounded-2xl focus-visible:-outline-offset-4"
+      />
+    </Panel>
   )
 }

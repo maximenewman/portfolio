@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useCallback, useEffect, useId, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import Image from "next/image"
 import type { Passion } from "@/lib/passions"
 import { X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
@@ -16,9 +17,14 @@ interface PassionModalContentProps {
   onClose: () => void
 }
 
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input,select,textarea,iframe,video[controls],[tabindex]:not([tabindex="-1"])'
+
 function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
+  const dialogRef = useRef<HTMLDivElement | null>(null)
+  const titleId = useId()
 
   const validImages = passion.images?.filter((img) => img && img.trim() !== "") || []
   const imageCount = validImages.length
@@ -35,20 +41,60 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
     }
   }, [imageCount])
 
+  // Mount-only, because this component only exists while the dialog is open:
+  // move focus in, lock the background scroll. Kept separate from the key
+  // handler so a changing handler identity never re-steals focus mid-session.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-      if (e.key === "ArrowRight") nextImage()
-      if (e.key === "ArrowLeft") prevImage()
+    dialogRef.current?.focus()
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
+
+  // Escape closes, arrows page the gallery, Tab is trapped inside the dialog.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose()
+        return
+      }
+      if (event.key === "ArrowRight") {
+        nextImage()
+        return
+      }
+      if (event.key === "ArrowLeft") {
+        prevImage()
+        return
+      }
+      if (event.key !== "Tab") return
+
+      const node = dialogRef.current
+      if (!node) return
+      const focusable = Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (el) => el.getClientRects().length > 0,
+      )
+      if (focusable.length === 0) {
+        event.preventDefault()
+        node.focus()
+        return
+      }
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const current = document.activeElement
+      const outside = current === node || !node.contains(current)
+      if (event.shiftKey && (outside || current === first)) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && (outside || current === last)) {
+        event.preventDefault()
+        first.focus()
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown)
-    document.body.style.overflow = "hidden"
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
-    }
+    return () => document.removeEventListener("keydown", handleKeyDown)
   }, [onClose, nextImage, prevImage])
 
   const hasImages = validImages.length > 0
@@ -67,46 +113,65 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
   const thumbEnd = Math.min(validImages.length, thumbStart + MAX_THUMBS)
   const moreAfter = validImages.length - thumbEnd
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6"
-      onClick={onClose}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+  // Portalled to <body> so no ancestor transform or query container can turn
+  // itself into the containing block for this `position: fixed` layer. Only
+  // ever rendered after a click, so there is no server pass to guard against.
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-[clamp(1rem,3vw,1.5rem)]">
+      {/* Backdrop dismiss as a real button rather than a click handler on a
+          div. Untabbable and hidden from assistive tech on purpose: it is a
+          pointer shortcut, and the labelled Close control below is the
+          keyboard/screen-reader route out (as is Escape). */}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden="true"
+        onClick={onClose}
+        className="absolute inset-0 cursor-default bg-background/80 backdrop-blur-sm"
+      />
 
-      {/* Modal Container */}
       <div
-        className="relative z-10 flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="@container relative z-10 flex max-h-[90dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl outline-none"
       >
-        {/* Close Button */}
+        {/* 44px square: the close control is the one thing that must never be
+            fiddly, on either input. */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
-          aria-label="Close modal"
+          className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
+          aria-label="Close gallery"
         >
-          <X className="h-5 w-5" />
+          <X className="h-5 w-5" aria-hidden />
         </button>
 
-        <div className="flex flex-1 flex-col overflow-y-auto md:flex-row">
+        {/* Container query, not a viewport breakpoint: the dialog splits when
+            the dialog is wide, which is the thing that actually decides
+            whether two columns fit. */}
+        <div className="flex flex-1 flex-col overflow-y-auto @3xl:flex-row">
           {/* Image / Video Section */}
           {hasImages && currentImage && (
-            <div className="relative flex h-96 w-full flex-shrink-0 flex-col bg-muted md:h-[500px] md:w-1/2">
+            <div className="relative flex h-80 w-full flex-shrink-0 flex-col bg-muted @3xl:h-[32rem] @3xl:w-1/2">
               {showVideo && passion.videoEmbed ? (
                 <div className="relative flex-1">
                   <iframe
                     src={passion.videoEmbed}
+                    title={`${passion.title} video`}
                     className="h-full w-full"
                     allowFullScreen
                     allow="autoplay"
                   />
                   <button
+                    type="button"
                     onClick={() => setShowVideo(false)}
-                    className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
-                    aria-label="Back to image"
+                    className="absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
+                    aria-label="Back to photos"
                   >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="h-5 w-5" aria-hidden />
                   </button>
                 </div>
               ) : (
@@ -121,33 +186,37 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                   {/* Play button overlay */}
                   {passion.videoEmbed && (
                     <button
+                      type="button"
                       onClick={() => setShowVideo(true)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors hover:bg-black/40"
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors fine:hover:bg-black/40"
                       aria-label="Play video"
                     >
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
                         <svg className="h-7 w-7 translate-x-0.5 text-black" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
                         </svg>
-                      </div>
+                      </span>
                     </button>
                   )}
-                  {/* Image Navigation */}
+                  {/* Image Navigation — 44px targets, so the same control works
+                      for a thumb and a cursor. */}
                   {hasMultipleImages && (
                     <>
                       <button
+                        type="button"
                         onClick={prevImage}
-                        className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
+                        className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
                         aria-label="Previous image"
                       >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="h-5 w-5" aria-hidden />
                       </button>
                       <button
+                        type="button"
                         onClick={nextImage}
-                        className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
+                        className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
                         aria-label="Next image"
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="h-5 w-5" aria-hidden />
                       </button>
                     </>
                   )}
@@ -163,14 +232,18 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                     return (
                       <button
                         key={index}
+                        type="button"
                         onClick={() =>
                           setCurrentImageIndex(showMoreBadge ? thumbEnd : index)
                         }
                         className={`relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
                           currentImageIndex === index && !showMoreBadge
                             ? "border-primary"
-                            : "border-transparent opacity-60 hover:opacity-100"
+                            : "border-transparent opacity-60 fine:hover:opacity-100"
                         }`}
+                        aria-current={
+                          currentImageIndex === index && !showMoreBadge ? "true" : undefined
+                        }
                         aria-label={
                           showMoreBadge
                             ? `View ${moreAfter} more images`
@@ -179,7 +252,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                       >
                         <Image
                           src={src}
-                          alt={passion.imageAlts?.[index] || `${passion.title} thumbnail ${index + 1}`}
+                          alt=""
                           fill
                           className={`object-cover ${objectPosition}`}
                           sizes="48px"
@@ -197,31 +270,35 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
 
               {/* Image Counter */}
               {hasMultipleImages && !showVideo && (
-                <div className="absolute bottom-16 right-3 rounded-full bg-background/80 px-3 py-1 text-sm font-medium backdrop-blur-sm">
+                <p className="absolute bottom-[4.5rem] right-3 rounded-full bg-background/80 px-3 py-1 font-mono text-eyebrow tabular-nums backdrop-blur-sm">
                   {currentImageIndex + 1} / {validImages.length}
-                </div>
+                </p>
               )}
             </div>
           )}
 
           {/* Content Section */}
-          <div className="flex flex-1 flex-col overflow-y-auto p-6 md:p-8">
-            <h2 className="mb-4 text-2xl font-bold text-card-foreground md:text-3xl">
+          <div className="flex flex-1 flex-col overflow-y-auto p-[clamp(1.5rem,4cqi,2.5rem)]">
+            {/* pr-14 clears the close button, which is pinned to this corner. */}
+            <h2
+              id={titleId}
+              className="pr-14 font-display text-h3 text-balance text-card-foreground"
+            >
               {passion.title}
             </h2>
-            <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-4 font-serif text-deck text-pretty text-muted-foreground">
               {passion.description}
             </p>
-            <div className="space-y-4">
+            <div className="mt-6 space-y-4">
               {passion.details.map((detail, i) => (
-                <p key={i} className="leading-relaxed text-card-foreground">
+                <p key={i} className="text-pretty leading-relaxed text-card-foreground">
                   {detail}
                 </p>
               ))}
             </div>
             {passion.timeline && passion.timeline.length > 0 && (
               <div className="mt-8 border-t border-border pt-6">
-                <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                <h3 className="mb-5 font-mono text-eyebrow uppercase text-muted-foreground">
                   Progress Log
                 </h3>
                 <div className="relative space-y-6 pl-6">
@@ -231,7 +308,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                     <div key={i} className="relative">
                       {/* Node */}
                       <span className="absolute -left-6 top-1.5 h-[9px] w-[9px] rounded-full bg-primary ring-4 ring-card" />
-                      <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      <p className="font-mono text-eyebrow uppercase text-primary">
                         {entry.date}
                       </p>
                       <ul className="mt-2 space-y-1.5">
@@ -251,7 +328,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
             )}
             {passion.media && passion.media.length > 0 && (
               <div className="mt-8 border-t border-border pt-6">
-                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                <h3 className="mb-4 font-mono text-eyebrow uppercase text-muted-foreground">
                   Links
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -261,9 +338,9 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
+                      className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground transition-colors fine:hover:bg-muted"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <ExternalLink className="h-4 w-4" aria-hidden />
                       {link.label}
                     </a>
                   ))}
@@ -273,7 +350,8 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
