@@ -1,37 +1,53 @@
 @import "tailwindcss";
 
+/* Tailwind v4 dropped `darkMode: 'class'` along with the JS config. Without
+   this the built-in `dark:` variant compiles to @media (prefers-color-scheme),
+   which silently ignores the `.dark` class the theme toggle writes onto <html>
+   — so a visitor whose OS is light would toggle the site dark and every
+   `dark:` utility would keep rendering its light value. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Input-capability variants. Used for affordances, never for layout: the two
+   form factors share one tree, and only touch-specific ergonomics branch. */
+@custom-variant touch (@media (hover: none) and (pointer: coarse));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
 :root {
-  /* Light mode colors */
-  --background: #faf9f6;
-  --foreground: #1a1a1a;
+  /* Paper + ink. Warm neutrals rather than pure grey — the warmth is what
+     reads as "printed" instead of "default Tailwind". */
+  --background: #f7f6f0;
+  --foreground: #14140f;
   --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --primary: #16a34a;
+  --card-foreground: #14140f;
+  --primary: #15803d;
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #1a1a1a;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #dcfce7;
-  --accent-foreground: #166534;
-  --border: #e5e7eb;
+  --secondary: #edece4;
+  --secondary-foreground: #14140f;
+  --muted: #edece4;
+  --muted-foreground: #6b6b5e;
+  --accent: #dcf0e3;
+  --accent-foreground: #14532d;
+  --border: #dedcd1;
+  /* Second accent, used by the WebGL field and nowhere in the text palette —
+     it exists to keep the lattice from reading as a flat green wash. */
+  --spark: #5433eb;
 }
 
 .dark {
-  /* Night sky inspired palette - deep blue-black */
-  --background: #0c1222;
-  --foreground: #f0f4f8;
-  --card: #141d2f;
-  --card-foreground: #f0f4f8;
+  --background: #0b0e0d;
+  --foreground: #f2f1e9;
+  --card: #141817;
+  --card-foreground: #f2f1e9;
   --primary: #4ade80;
-  --primary-foreground: #0c1222;
-  --secondary: #1e293b;
-  --secondary-foreground: #f0f4f8;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1a3a2a;
+  --primary-foreground: #0b0e0d;
+  --secondary: #1d2321;
+  --secondary-foreground: #f2f1e9;
+  --muted: #1d2321;
+  --muted-foreground: #9a9a8c;
+  --accent: #16301f;
   --accent-foreground: #bbf7d0;
-  --border: #334155;
+  --border: #2a312e;
+  --spark: #8051ff;
 }
 
 @theme inline {
@@ -48,35 +64,113 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
+  --color-spark: var(--spark);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-archivo);
+  --font-serif: var(--font-instrument-serif);
   --font-mono: var(--font-geist-mono);
+
+  /* Fluid type. Every clamp keeps a rem term in the middle value so text still
+     scales with the user's font-size setting — a pure-vw middle term fails
+     WCAG 1.4.4 (Resize text). Tight leading + negative tracking that grows
+     with size is what makes large type read as typeset rather than blown up. */
+  --text-display: clamp(3rem, 1rem + 9vw, 8.5rem);
+  --text-display--line-height: 0.9;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(2.25rem, 1.35rem + 3.6vw, 4.5rem);
+  --text-h1--line-height: 0.95;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.75rem, 1.25rem + 2vw, 3rem);
+  --text-h2--line-height: 1;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+  --text-h3--line-height: 1.15;
+  --text-h3--letter-spacing: -0.02em;
+  --text-h3--font-weight: 600;
+
+  /* Serif deck — the one high-contrast sentence per section. */
+  --text-deck: clamp(1.3rem, 0.95rem + 1.5vw, 2.35rem);
+  --text-deck--line-height: 1.1;
+  --text-deck--letter-spacing: -0.02em;
+
+  --text-lede: clamp(1.02rem, 0.97rem + 0.25vw, 1.2rem);
+  --text-lede--line-height: 1.6;
+
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.16em;
+  --text-eyebrow--font-weight: 500;
+
+  /* Two house easings, mirroring the reference: an overshoot for anything the
+     user directly caused, and a decelerating curve for entrances. */
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-entrance: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --container-page: 105rem;
 }
 
+/* `smooth` is opt-in per-element below rather than global, so in-page anchors
+   glide but programmatic scrolls (route changes) don't fight the router. */
 html {
   scroll-behavior: smooth;
+  /* The chapter rail is sticky; this keeps anchored headings clear of the nav. */
+  scroll-padding-top: 6rem;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Smooth transitions for theme changes */
-* {
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+/* Theme-change transition scoped to the properties that actually change.
+   The previous `* { transition: ... }` applied two transitions to every node
+   in the document, which makes every hover and layout change pay for a
+   compositor update it never needed. */
+body,
+.themed {
+  transition: background-color 0.3s var(--ease-entrance), color 0.3s var(--ease-entrance);
 }
 
-/* Animation utilities */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Consistent focus ring. Keyboard-only, so pointer users never see it, but it
+   is always visible for tab navigation. */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* --- Motion primitives ---------------------------------------------------
+   Scroll reveal is driven by an IntersectionObserver adding `.is-visible`.
+   Both the reduced-motion query and the `[data-motion="paused"]` attribute
+   (the user-facing Pause control) neutralise it, so the two switches are
+   interchangeable and content is never left invisible. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.52s var(--ease-entrance),
+    transform 0.52s var(--ease-entrance);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s var(--ease-entrance) forwards;
 }
 
 @keyframes fade-in {
@@ -88,162 +182,131 @@ body {
   }
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
-}
-
-/* Stagger animations for children */
 .stagger-children > * {
   opacity: 0;
-  animation: fade-in-up 0.5s ease-out forwards;
+  animation: fade-in-up 0.52s var(--ease-entrance) forwards;
 }
 
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-/* Button hover effects */
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.19s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.26s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.33s; }
+
+/* Interaction affordances. Transform-only so they stay on the compositor. */
 .btn-hover {
-  transition: all 0.2s ease;
+  transition: transform 0.2s var(--ease-pop), background-color 0.15s linear, border-color 0.15s linear;
 }
 
-.btn-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+@media (hover: hover) and (pointer: fine) {
+  .btn-hover:hover {
+    transform: translateY(-2px);
+  }
+  .card-hover:hover {
+    transform: translateY(-3px);
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+  }
 }
 
 .btn-hover:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.985);
 }
 
-/* Card hover effects */
 .card-hover {
-  transition: all 0.3s ease;
+  transition: transform 0.3s var(--ease-pop), border-color 0.2s linear;
 }
 
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* Scroll-reveal — used by the landing timeline */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Timeline vertical rail + node markers */
-.timeline-rail {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    var(--color-primary) 8%,
-    var(--color-primary) 92%,
-    transparent
-  );
-  opacity: 0.35;
-}
-
-.timeline-dot {
-  box-shadow: 0 0 0 4px var(--background), 0 0 0 5px var(--color-primary);
-}
-
-.timeline-dot::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: 9999px;
-  background: var(--color-primary);
-  opacity: 0.18;
-  animation: timeline-pulse 2.4s ease-in-out infinite;
-}
-
-@keyframes timeline-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.18;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-/* Bouncing scroll-down cue on the hero */
-@keyframes scroll-bounce {
-  0%, 100% {
-    transform: translateY(0);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateY(6px);
-    opacity: 1;
-  }
-}
-
-.scroll-cue {
-  animation: scroll-bounce 1.8s ease-in-out infinite;
-}
-
-/* Subtle brand gradient text accent */
-.gradient-text {
-  background: linear-gradient(
-    120deg,
-    var(--color-foreground),
-    var(--color-primary)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .timeline-dot::after,
-  .scroll-cue {
-    animation: none;
-  }
-}
-
-/* Link hover underline animation */
 .link-underline {
   position: relative;
 }
 
 .link-underline::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
-  width: 0;
-  height: 2px;
-  background-color: var(--color-primary);
-  transition: width 0.3s ease;
-}
-
-.link-underline:hover::after {
   width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  /* scaleX beats animating `width`: no layout pass per frame. */
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease-entrance);
 }
 
-/* Markdown / journal body typography (used by <Markdown>) */
+/* Dotted leader used by the chapter rail — the line that runs from a chapter
+   name out to its number, like a printed table of contents. */
+.leader {
+  flex: 1 1 auto;
+  margin: 0 0.6rem 0.28em;
+  border-bottom: 1px dotted currentColor;
+  opacity: 0.35;
+}
+
+/* Timeline rail + node markers on the journey section. */
+.timeline-rail {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-border) 6%,
+    var(--color-border) 94%,
+    transparent
+  );
+}
+
+.timeline-dot {
+  box-shadow: 0 0 0 4px var(--background);
+  transition: box-shadow 0.3s var(--ease-pop), background-color 0.3s linear;
+}
+
+/* --- Motion opt-out ------------------------------------------------------
+   Two switches, one behaviour. `prefers-reduced-motion` is the OS setting;
+   `[data-motion="paused"]` is the in-page Pause control, which exists because
+   WCAG 2.2.2 (Level A) requires a pause/stop/hide mechanism for motion that
+   starts automatically, runs over five seconds and sits alongside other
+   content — an ambient WebGL backdrop is exactly that, regardless of OS
+   preference. Content must always end up in its final, visible state. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal,
+  .stagger-children > * {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-motion="paused"] .reveal,
+[data-motion="paused"] .stagger-children > * {
+  opacity: 1;
+  transform: none;
+  animation: none;
+  transition: none;
+}
+
+/* --- Markdown / journal body typography (used by <Markdown>) ------------- */
 .md {
   color: var(--foreground);
   line-height: 1.75;
@@ -256,16 +319,18 @@ body {
 .md h2,
 .md h3,
 .md h4 {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--foreground);
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   text-wrap: balance;
 }
-.md h1 { font-size: 1.75rem; }
-.md h2 { font-size: 1.4rem; }
-.md h3 { font-size: 1.18rem; }
+.md h1 { font-size: 1.85rem; }
+.md h2 { font-size: 1.45rem; }
+.md h3 { font-size: 1.2rem; }
 .md p { margin: 0.9rem 0; }
 .md a {
   color: var(--primary);
@@ -281,7 +346,7 @@ body {
 .md ol { list-style: decimal; }
 .md li { margin: 0.35rem 0; }
 .md blockquote {
-  border-left: 3px solid var(--primary);
+  border-left: 2px solid var(--primary);
   padding-left: 1rem;
   margin: 1.2rem 0;
   color: var(--muted-foreground);
