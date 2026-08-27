@@ -69,8 +69,8 @@ export default async function Home() {
         id="journey"
         index={1}
         eyebrow="Experience"
-        title="The journey so far"
-        deck="Research labs, engineering teams, classrooms and clubs. These roles taught me how systems behave once real people use them."
+        title="Moving up the pitch"
+        deck="Every role is a position in the same run. It starts deep in my own half and pushes toward today."
       >
         <HomeTimeline experiences={experiences} />
       </Section>

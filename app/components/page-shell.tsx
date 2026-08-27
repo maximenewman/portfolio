@@ -161,16 +161,22 @@ export function RowList({
 /**
  * One row. `relative` is load-bearing: it is the containing block the
  * stretched `.row-link` resolves against.
+ *
+ * Rest props are forwarded to the <li> — TypeScript exempts `data-*`
+ * attributes from excess-prop checks, so a component that silently drops them
+ * fails without a compile error (the journey pitch found this the hard way:
+ * its `data-journey-row` markers never reached the DOM).
  */
 export function Row({
   children,
   className = "",
+  ...rest
 }: {
   children: ReactNode
   className?: string
-}) {
+} & React.LiHTMLAttributes<HTMLLIElement>) {
   return (
-    <li className={`group relative border-b border-border/60 ${className}`}>
+    <li {...rest} className={`group relative border-b border-border/60 ${className}`}>
       {children}
     </li>
   )

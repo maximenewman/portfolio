@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Row, RowList } from "./page-shell"
+import { PitchJourney } from "./pitch-journey"
 import type { Experience } from "@/lib/experiences"
 
 const typeLabels: Record<Experience["type"], string> = {
@@ -42,9 +43,13 @@ function Dot() {
  * plus a bordered panel per item is decoration standing in for hierarchy; the
  * year gutter does the same work with type, and it survives 320px unchanged.
  *
- * A plain server component: the reveal animation is the site-wide `.reveal`
- * class, driven by the one IntersectionObserver in the root layout, so nothing
- * here ships to the browser.
+ * Beside the list, the same chronology is plotted as a run up a football
+ * pitch (see pitch-journey.tsx): oldest role deepest in our own half, current
+ * role in the attacking third, a ball tracking whichever row is being read.
+ * The rows stay the single source of facts and links; the pitch is the
+ * spatial index of the same journey.
+ *
+ * The list itself stays a server component; only the pitch is a client island.
  */
 export default function HomeTimeline({ experiences }: { experiences: Experience[] }) {
   if (experiences.length === 0) {
@@ -56,7 +61,13 @@ export default function HomeTimeline({ experiences }: { experiences: Experience[
   }
 
   return (
-    <RowList className="max-w-[86ch]">
+    // At lg+ the pitch takes a sticky right-hand column and the ball walks the
+    // run as the roles scroll past; below lg the same run renders once above
+    // the list, because a phone has no width to spare for a side column.
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(15rem,19rem)] lg:items-start lg:gap-[clamp(2rem,4vw,4rem)]">
+      <PitchJourney items={experiences.map((e) => ({ slug: e.slug, role: e.role }))} />
+
+      <RowList className="max-w-[86ch] lg:col-start-1 lg:row-start-1">
       {experiences.map((experience, index) => {
         const year = startYear(experience.date)
         // Compared against the previous row rather than against every year seen
@@ -71,7 +82,10 @@ export default function HomeTimeline({ experiences }: { experiences: Experience[
         return (
           <Row
             key={experience.slug}
-            className={`reveal ${isLead ? "py-7 sm:py-9" : "py-5 sm:py-6"}`}
+            id={`xp-${experience.slug}`}
+            data-journey-row={index}
+            // scroll-mt clears the sticky nav when a pitch node links here.
+            className={`reveal scroll-mt-28 ${isLead ? "py-7 sm:py-9" : "py-5 sm:py-6"}`}
           >
             <div className="flex items-baseline gap-4 sm:gap-6">
               {/* Fixed-width gutter. Rows that continue a year leave it empty
@@ -129,6 +143,7 @@ export default function HomeTimeline({ experiences }: { experiences: Experience[
           </Row>
         )
       })}
-    </RowList>
+      </RowList>
+    </div>
   )
 }

@@ -195,6 +195,37 @@ body,
   stroke-dashoffset: 0;
 }
 
+/* The ball on the journey pitch. It slides to the role being read with the
+   house overshoot ease; the reduced-motion block collapses the transition and
+   the pause switch removes it, so the ball simply appears at its position. */
+.pitch-ball {
+  transition: transform 0.7s var(--ease-pop);
+}
+
+/* A position on the journey pitch: a real anchor wrapping a small dot and a
+   large transparent hit circle. Hover and keyboard focus get the same
+   response, and the focus ring is drawn by the dot itself because a UA
+   outline around an SVG bounding box is inconsistent across engines. */
+.pitch-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.pitch-node .pitch-node-dot {
+  transition: stroke 0.2s linear, stroke-width 0.2s var(--ease-pop), r 0.2s var(--ease-pop);
+}
+
+.pitch-node:hover .pitch-node-dot,
+.pitch-node:focus-visible .pitch-node-dot {
+  stroke: var(--primary);
+  stroke-width: 5;
+  r: 13;
+}
+
+[data-motion="paused"] .pitch-ball {
+  transition: none;
+}
+
 [data-motion="paused"] .line-draw :is(path, circle, rect, line) {
   transition: none;
   stroke-dashoffset: 0;

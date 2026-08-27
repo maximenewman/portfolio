@@ -17,21 +17,40 @@
 export function PitchPlan({
   className = "",
   title = "Plan of a football pitch at true proportions",
+  orientation = "horizontal",
+  children,
 }: {
   className?: string
-  title?: string
+  /** Pass null when the SVG hosts interactive children: role="img" makes the
+   *  whole subtree presentational to assistive tech, which would hide any
+   *  links inside it. With null, the markings group carries aria-hidden and
+   *  the children speak for themselves. */
+  title?: string | null
+  /** "vertical" stands the pitch on end: own goal at the bottom, the goal you
+   *  are attacking at the top. Implemented as a pure SVG rotation
+   *  (translate(0 1050) rotate(-90) maps (x, y) to (y, 1050 - x)), so the arc
+   *  geometry cannot drift from the horizontal drawing. */
+  orientation?: "horizontal" | "vertical"
+  /** Overlays (nodes, a ball) drawn in the FINAL frame's coordinates — they
+   *  are rendered outside the rotation so callers can position and animate
+   *  them without thinking about the transform. */
+  children?: React.ReactNode
 }) {
+  const vertical = orientation === "vertical"
   return (
     <svg
-      viewBox="-8 -8 1066 696"
-      role="img"
-      aria-label={title}
+      viewBox={vertical ? "-8 -8 696 1066" : "-8 -8 1066 696"}
+      role={title === null ? undefined : "img"}
+      aria-label={title ?? undefined}
       fill="none"
       stroke="currentColor"
       strokeWidth="3"
-      vectorEffect="non-scaling-stroke"
       className={className}
     >
+      <g
+        aria-hidden={title === null ? "true" : undefined}
+        transform={vertical ? "translate(0 1050) rotate(-90)" : undefined}
+      >
       {/* Perimeter and halfway line draw first. */}
       <rect x="0" y="0" width="1050" height="680" pathLength="1" />
       <line x1="525" y1="0" x2="525" y2="680" pathLength="1" />
@@ -60,6 +79,8 @@ export function PitchPlan({
         <path d="M 0 670 A 10 10 0 0 1 10 680" pathLength="1" />
         <path d="M 1050 670 A 10 10 0 0 0 1040 680" pathLength="1" />
       </g>
+      </g>
+      {children}
     </svg>
   )
 }
