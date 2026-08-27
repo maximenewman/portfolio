@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Mail } from "lucide-react"
 import { bio } from "@/lib/bio"
 import { Container } from "./page-shell"
+import { PitchPlan } from "./pitch-lines"
 
 /* Inline marks rather than an icon dependency: five brand glyphs are cheaper as
    paths than as another package, and they inherit `currentColor` so both themes
@@ -93,6 +94,13 @@ export default function Footer() {
             >
               {bio.email}
             </a>
+
+            {/* The one standing football mark on the site: a pitch plan at the
+                real IFAB proportions, chalk-drawn as the footer scrolls into
+                view. Quiet on purpose. */}
+            <div className="reveal mt-8 max-w-[13rem]">
+              <PitchPlan className="line-draw w-full text-muted-foreground/50" />
+            </div>
           </div>
 
           {/* Site */}
