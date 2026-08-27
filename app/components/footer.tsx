@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
 import { bio } from "@/lib/bio"
 import { Container } from "./page-shell"
 
@@ -80,12 +80,12 @@ export default function Footer() {
   return (
     <footer className="mt-auto border-t border-border/70">
       <Container className="py-[clamp(3rem,7vw,5rem)]">
-        <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr]">
           {/* Identity */}
           <div>
             <p className="font-display text-h3 text-foreground">{bio.shortName}</p>
             <p className="mt-3 max-w-[26ch] font-serif text-deck text-pretty text-muted-foreground">
-              Building at the seam where machine learning meets systems that have to hold up.
+              I build AI systems and the infrastructure they run on.
             </p>
             <a
               href={`mailto:${bio.email}`}
@@ -142,24 +142,6 @@ export default function Footer() {
             </ul>
           </nav>
 
-          {/* Documents */}
-          <div>
-            <h2 className="font-mono text-eyebrow uppercase text-foreground">Documents</h2>
-            <div className="mt-4 border-t border-border/70 pt-4">
-              <a
-                href={bio.resumePath}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 font-mono text-eyebrow uppercase text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                <FileText className="h-4 w-4" aria-hidden="true" />
-                Resume
-              </a>
-              <p className="mt-4 max-w-[26ch] text-sm text-muted-foreground">
-                PDF — opens in a new tab. {bio.education.degree}, {bio.education.school}.
-              </p>
-            </div>
-          </div>
         </div>
 
         <div className="mt-[clamp(2.5rem,6vw,4rem)] flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border/70 pt-6 font-mono text-eyebrow uppercase text-muted-foreground">

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useEffect, useRef } from "react"
-import { FileText, Github, Instagram, Linkedin, Mail, Youtube } from "lucide-react"
+import { Github, Instagram, Linkedin, Mail, Youtube } from "lucide-react"
 import { bio } from "@/lib/bio"
 import { Container, Panel } from "./page-shell"
 import { useMotion } from "./motion-provider"
@@ -185,18 +185,8 @@ export default function Hero() {
                 a pointer user loses nothing by the buttons being comfortable. */}
             <div className="mt-[clamp(2rem,4vw,2.75rem)] flex flex-wrap items-center gap-3">
               <a
-                href={bio.resumePath}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 font-mono text-eyebrow uppercase text-primary-foreground"
-              >
-                <FileText className="h-4 w-4 shrink-0" aria-hidden="true" />
-                View Resume
-                <span className="sr-only">(opens in a new tab)</span>
-              </a>
-              <a
                 href={`mailto:${bio.email}`}
-                className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card/80 px-6 font-mono text-eyebrow uppercase text-foreground backdrop-blur-sm"
+                className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 font-mono text-eyebrow uppercase text-primary-foreground"
               >
                 <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
                 Email

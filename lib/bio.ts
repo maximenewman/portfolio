@@ -4,16 +4,16 @@
  * Extracted out of `app/components/bio.tsx` so the footer no longer imports a
  * client component just to read a constant.
  *
- * Deliberately excludes the phone number that appears on the resume — this
- * file is rendered into every public page, and a personal number does not
- * belong in crawlable HTML.
+ * Deliberately excludes the phone number from the resume: this file is
+ * rendered into every public page, and a personal number does not belong in
+ * crawlable HTML. The resume itself is no longer served from the site at all.
  */
 export const bio = {
   name: "Maxime Newman Nereyabagabo",
   shortName: "Maxime Newman",
   role: "Software Engineer",
   /** The one-line positioning statement under the name. */
-  tagline: "AI security, systems, and the parts of machine learning that touch real hardware.",
+  tagline: "I work on AI security, backends, and GPU performance.",
   location: "Vancouver, BC",
   email: "maximenewman05@gmail.com",
   education: {
@@ -21,8 +21,7 @@ export const bio = {
     degree: "BSc Computer Science & Statistics",
     graduation: "Expected August 2027",
   },
-  picture: "/LinkedInpp.JPG",
-  resumePath: "/resume/Maxime_resume.pdf",
+  picture: "/IMG_4311.jpg",
   socials: {
     github: "https://github.com/maximenewman",
     linkedin: "https://www.linkedin.com/in/maxime-newman-nereyabagabo-a546b42b5/",
@@ -35,9 +34,9 @@ export const bio = {
    * on the site that is not resume-speak, and it should stay that way.
    */
   about: [
-    `Hello, welcome to my universe. I'm Max, studying Computer Science and Statistics at Simon Fraser University, and most of my time goes to the seam where machine learning meets systems that have to actually hold up — security pipelines, GPU kernels, backends that cannot afford to be slow.`,
-    `I don't think there's one purpose to programming. It's a toolbox for complex problems, and generative AI is the tool that has grown fastest. Some people worry about how much we lean on it; I read it as the same move we've always made — we stopped scavenging for food, and now we're clearing away the mundane work so there's more room for the interesting kind. What I care about is building AI into products so that the person using them spends less time fighting the tool.`,
-    `Outside of that I'm an athlete. Football, running, hiking, snowboarding. I've played competitively in both FVSL and VMSL Prem, so if your team needs someone, I'm available.`,
+    `Hello, welcome to my universe. I'm Max. I study Computer Science and Statistics at Simon Fraser University. Most of my time goes into security pipelines, GPU kernels, and backends that need to be fast.`,
+    `I don't think programming has one purpose. It's a toolbox for hard problems, and generative AI is the newest tool in it. Some people worry about how much we lean on it. I see it as progress. We automate the boring work to make room for the interesting work. I like building AI into products so people spend less time fighting their tools.`,
+    `Outside of that I'm an athlete. Football, running, hiking, snowboarding. I've played competitively in the FVSL and VMSL Prem, so if your team needs a player, I'm available.`,
   ],
   /** Grouped from the resume's Technical Skills section. */
   skills: {
