@@ -2,7 +2,7 @@ import Image from "next/image"
 import { FileText, Film } from "lucide-react"
 import type { Asset } from "@/db/schema"
 
-/** Square thumbnail for an asset — image preview, muted video poster, or a
+/** Square thumbnail for an asset: image preview, muted video poster, or a
  *  document icon. Used across the media library and post editor. */
 export function AssetThumb({ asset, className = "" }: { asset: Asset; className?: string }) {
   if (asset.kind === "image") {

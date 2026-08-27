@@ -17,7 +17,7 @@ export default async function ProjectsPage() {
       <PageHeader
         eyebrow="Selected work"
         title="Projects & Creations"
-        deck="Things I built end to end — web apps, machine learning, and the embedded systems in between."
+        deck="Things I built end to end. Web apps, machine learning tools, and a game."
       />
 
       {/* The root layout already owns <main>, so this is a plain section. It is

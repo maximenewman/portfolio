@@ -75,7 +75,7 @@ export function MediaLibrary({ initialAssets }: { initialAssets: Asset[] }) {
       >
         <Upload className="h-8 w-8 text-muted-foreground" />
         <p className="text-sm font-medium text-foreground">Drop files or click to upload</p>
-        <p className="text-xs text-muted-foreground">Images, videos, and PDFs — identical files are deduped automatically.</p>
+        <p className="text-xs text-muted-foreground">Images, videos, and PDFs. Identical files are deduped automatically.</p>
         <input
           ref={inputRef}
           type="file"

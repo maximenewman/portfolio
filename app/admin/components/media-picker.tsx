@@ -79,7 +79,7 @@ export function MediaPicker({ open, onClose, onSelect, title = "Select media" }:
           {loading ? (
             <p className="py-10 text-center text-sm text-muted-foreground">Loading…</p>
           ) : assets.length === 0 ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">No media yet — upload something.</p>
+            <p className="py-10 text-center text-sm text-muted-foreground">No media yet. Upload something.</p>
           ) : (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {assets.map((asset) => (

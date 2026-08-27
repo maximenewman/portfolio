@@ -22,25 +22,25 @@ const elsewhere = [
     href: "/projects",
     kicker: "Work",
     title: "Projects",
-    blurb: "Shipped things — security tooling, GPU work, full-stack products, and the write-ups behind them.",
+    blurb: "Security tooling, GPU work, and full-stack products I have shipped.",
   },
   {
     href: "/blog",
     kicker: "Writing",
     title: "Blog",
-    blurb: "Notes from the build: what broke, what I read, and what I would do differently next time.",
+    blurb: "Notes on what I am building. What broke, and what I learned.",
   },
   {
     href: "/passions",
     kicker: "Off the clock",
     title: "Passions",
-    blurb: "Football, mountains and long runs — the part of the week that happens away from a keyboard.",
+    blurb: "Football, mountains, and long runs.",
   },
   {
     href: "/goblinskeep",
     kicker: "Play",
     title: "Goblin's Keep",
-    blurb: "A pixel-art dungeon crawler I wrote in TypeScript, running right here in the page.",
+    blurb: "A pixel-art dungeon crawler I wrote in TypeScript. It runs right here in the browser.",
   },
 ]
 
@@ -70,7 +70,7 @@ export default async function Home() {
         index={1}
         eyebrow="Experience"
         title="The journey so far"
-        deck="Research labs, engineering teams, classrooms and clubs — the roles that taught me how systems behave once real people are using them."
+        deck="Research labs, engineering teams, classrooms and clubs. These roles taught me how systems behave once real people use them."
       >
         <HomeTimeline experiences={experiences} />
       </Section>
@@ -79,8 +79,8 @@ export default async function Home() {
         id="about"
         index={2}
         eyebrow="About"
-        title="Who is doing the building"
-        deck="A short account of what I work on, why I work on it, and what I do when the laptop is shut."
+        title="About me"
+        deck="What I work on, why I work on it, and what I do away from the keyboard."
       >
         <div className="grid gap-[clamp(2.5rem,6vw,4rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start">
           <div className="reveal max-w-[62ch] space-y-6">
@@ -122,7 +122,7 @@ export default async function Home() {
         index={3}
         eyebrow="Elsewhere"
         title="The rest of the site"
-        deck="Four more rooms, if you want to keep reading."
+        deck="Where to go next."
       >
         {/* This is navigation, not content: four destinations. A grid of
             identical tiles dressed it up as four articles, which is the shape
@@ -146,7 +146,7 @@ export default async function Home() {
                       </Link>
                     </h3>
                     <span aria-hidden="true" className="text-muted-foreground/50">
-                      —
+                      ·
                     </span>
                     <span className="font-mono text-eyebrow uppercase text-muted-foreground">
                       {item.kicker}

@@ -173,13 +173,13 @@ export function PassionEditor({ mode, passionId, initial }: Props) {
 
       {/* Description */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Description — short blurb shown on the card</span>
+        <span className="text-xs font-medium text-muted-foreground">Description: short blurb shown on the card</span>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className={inputCls} />
       </label>
 
       {/* Details */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Details — one paragraph per line, shown in the modal</span>
+        <span className="text-xs font-medium text-muted-foreground">Details: one paragraph per line, shown in the modal</span>
         <textarea
           value={details}
           onChange={(e) => setDetails(e.target.value)}
@@ -191,7 +191,7 @@ export function PassionEditor({ mode, passionId, initial }: Props) {
       {/* Media links */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">Links — external profiles shown in the modal</span>
+          <span className="text-xs font-medium text-muted-foreground">Links: external profiles shown in the modal</span>
           <button
             onClick={() => setMediaLinks((prev) => [...prev, { label: "", url: "" }])}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
@@ -239,7 +239,7 @@ export function PassionEditor({ mode, passionId, initial }: Props) {
       {/* Images */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">Photos — first four show on the featured card</span>
+          <span className="text-xs font-medium text-muted-foreground">Photos: first four show on the featured card</span>
           <button
             onClick={() => setImages((prev) => [...prev, { src: "", alt: "" }])}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
@@ -310,7 +310,7 @@ export function PassionEditor({ mode, passionId, initial }: Props) {
       {/* Timeline */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">Timeline — milestones, oldest first (optional)</span>
+          <span className="text-xs font-medium text-muted-foreground">Timeline: milestones, oldest first (optional)</span>
           <button
             onClick={() => setTimeline((prev) => [...prev, { date: "", items: "" }])}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"

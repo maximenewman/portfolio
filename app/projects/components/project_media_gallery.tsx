@@ -286,7 +286,7 @@ function MediaLightbox({
         <div className="flex items-center justify-between gap-3">
           <h2 id={labelId} className="font-mono text-eyebrow uppercase text-white/80">
             {title}
-            {media.length > 1 ? ` — ${index + 1} of ${media.length}` : ""}
+            {media.length > 1 ? ` · ${index + 1} of ${media.length}` : ""}
           </h2>
           <button
             type="button"

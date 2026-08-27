@@ -8,7 +8,7 @@ export default function NotFound() {
       <p className="font-mono text-eyebrow uppercase text-primary">Not found</p>
       <h1 className="mt-6 font-display text-display text-foreground">404</h1>
       <p className="mt-6 max-w-[30ch] font-serif text-deck text-pretty text-muted-foreground">
-        This page was never set in type — or it has since been taken out of print.
+        This page does not exist, or it moved.
       </p>
       <div className="mt-10 border-t border-border/70 pt-6">
         <Link

@@ -210,19 +210,19 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
 
       {/* Headline */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Headline — one-liner shown on the home timeline</span>
+        <span className="text-xs font-medium text-muted-foreground">Headline: one-liner shown on the home timeline</span>
         <textarea value={headline} onChange={(e) => setHeadline(e.target.value)} rows={2} className={inputCls} />
       </label>
 
       {/* Overview */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Overview — detail-page intro (falls back to headline)</span>
+        <span className="text-xs font-medium text-muted-foreground">Overview: detail-page intro (falls back to headline)</span>
         <textarea value={overview} onChange={(e) => setOverview(e.target.value)} rows={3} className={inputCls} />
       </label>
 
       {/* Hero image */}
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Hero image (optional — company logo/banner fallback when empty)</span>
+        <span className="text-xs font-medium text-muted-foreground">Hero image (optional: company logo/banner fallback when empty)</span>
         <div className="flex gap-2">
           <input
             value={heroImage}
@@ -242,7 +242,7 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
 
       {/* Highlights */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Highlights — one paragraph per line, shown as the detail story</span>
+        <span className="text-xs font-medium text-muted-foreground">Highlights: one paragraph per line, shown as the detail story</span>
         <textarea
           value={highlights}
           onChange={(e) => setHighlights(e.target.value)}
@@ -253,7 +253,7 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
 
       {/* Skills */}
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Skills — sidebar tools (falls back to project tech)</span>
+        <span className="text-xs font-medium text-muted-foreground">Skills: sidebar tools (falls back to project tech)</span>
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
           {skills.map((s) => (
             <span key={s} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
@@ -284,7 +284,7 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
       {/* Links */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">Links — repos or related pages, shown in the detail sidebar</span>
+          <span className="text-xs font-medium text-muted-foreground">Links: repos or related pages, shown in the detail sidebar</span>
           <button
             onClick={() => setLinks((prev) => [...prev, { label: "", url: "" }])}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
@@ -321,7 +321,7 @@ export function ExperienceEditor({ mode, experienceId, initial }: Props) {
       {/* Embedded projects */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">Projects — work done in this role, shown on the detail page</span>
+          <span className="text-xs font-medium text-muted-foreground">Projects: work done in this role, shown on the detail page</span>
           <button
             onClick={() => setProjects((prev) => [...prev, { title: "", description: "", tech: "", link: "" }])}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"

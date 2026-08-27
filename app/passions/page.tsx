@@ -17,7 +17,7 @@ export default async function PassionsPage() {
       <PageHeader
         eyebrow="Beyond code"
         title="My Passions"
-        deck="The pursuits that keep me curious, competitive, and a long way from a screen."
+        deck="What I do away from a screen."
       />
 
       {/* The root layout already owns <main>, so this is a plain section. */}

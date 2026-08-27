@@ -53,7 +53,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <Panel className="mt-6 flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
             <Eye className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
             <span className="text-foreground">
-              {post.visibility === "private" ? "Private — only you can see this." : "Draft — not shown on the blog."}
+              {post.visibility === "private" ? "Private. Only you can see this." : "Draft. Not shown on the blog."}
             </span>
             <Link
               href={`/admin/posts/${post.id}/edit`}

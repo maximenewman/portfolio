@@ -44,7 +44,7 @@ export default async function AdminPassionsPage() {
                 key={passion.id}
                 className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
               >
-                {/* Reorder — forms so the row link stays a plain server page */}
+                {/* Reorder: forms so the row link stays a plain server page */}
                 <div className="flex flex-col">
                   <form action={movePassionAction.bind(null, passion.id, "up")}>
                     <button

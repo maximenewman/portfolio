@@ -31,7 +31,7 @@ type PickTarget = { index: number; field: "src" | "thumbnailSrc" } | null
 export function ProjectEditor({ mode, projectId, initial }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initial.title)
-  // One bullet per line — bullets are sentences, so a single textarea beats
+  // One bullet per line: bullets are sentences, so a single textarea beats
   // managing a list of inputs.
   const [description, setDescription] = useState(initial.description.join("\n"))
   const [tech, setTech] = useState<string[]>(initial.tech)
@@ -137,7 +137,7 @@ export function ProjectEditor({ mode, projectId, initial }: Props) {
 
       {/* Description bullets */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Description — one bullet point per line</span>
+        <span className="text-xs font-medium text-muted-foreground">Description: one bullet point per line</span>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -196,7 +196,7 @@ export function ProjectEditor({ mode, projectId, initial }: Props) {
       {/* Media */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground">Media — images, YouTube embeds, or video files</span>
+          <span className="text-xs font-medium text-muted-foreground">Media: images, YouTube embeds, or video files</span>
           <button
             onClick={() => setMedia((prev) => [...prev, { type: "image", src: "" }])}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"

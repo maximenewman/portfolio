@@ -158,7 +158,7 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
           <button
             type="button"
             onClick={() => setOrder((o) => (o === "newest" ? "oldest" : "newest"))}
-            aria-label={`Sort by date — ${order} first. Activate to switch.`}
+            aria-label={`Sort by date, ${order} first. Activate to switch.`}
             className="btn-hover inline-flex min-h-9 touch:min-h-11 items-center gap-2 rounded-full border border-border bg-card/70 px-3.5 text-sm font-medium text-foreground"
           >
             <ArrowDownUp className="h-3.5 w-3.5 shrink-0" aria-hidden />

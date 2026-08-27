@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 
 export const metadata = {
   title: "Journal | Maxime Newman",
-  description: "Notes on what I'm building — ideas, progress, wins, and failures.",
+  description: "Notes on what I'm building. Ideas, progress, wins, and failures.",
 }
 
 export default async function BlogPage() {
@@ -23,14 +23,14 @@ export default async function BlogPage() {
       <PageHeader
         eyebrow="Journal"
         title="What I'm doing. Recap"
-        deck="A running log of ideas, progress, wins, and the occasional failure — documented as I go."
+        deck="A running log of ideas, progress, wins, and failures."
       />
 
       {/* The root layout already owns <main>, so this is a plain section. */}
       <Container as="section" className="py-[clamp(2.5rem,7vw,4.5rem)]">
         {posts.length === 0 ? (
           <p className="max-w-[46ch] text-lede text-muted-foreground">
-            No entries yet — check back soon.
+            No entries yet. Check back soon.
           </p>
         ) : (
           <BlogList posts={posts} covers={covers} isAdmin={admin} />

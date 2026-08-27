@@ -51,7 +51,7 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
   const [coverPosition, setCoverPosition] = useState(initial.coverPosition)
   const [cover, setCover] = useState<Asset | null>(initialCover ?? null)
   const [visibility, setVisibility] = useState(initial.visibility)
-  // Converted to the browser's local time on mount — the server can't know the
+  // Converted to the browser's local time on mount: the server can't know the
   // user's timezone, so SSR renders it empty and the client fills it in.
   const [publishedAt, setPublishedAt] = useState("")
   useEffect(() => {
@@ -222,7 +222,7 @@ export function PostEditor({ mode, postId, initial, initialCover }: Props) {
 
       {/* Summary */}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-medium text-muted-foreground">Summary (optional — shown on the blog index)</span>
+        <span className="text-xs font-medium text-muted-foreground">Summary (optional: shown on the blog index)</span>
         <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={2} className={inputCls} />
       </label>
 
