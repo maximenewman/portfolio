@@ -22,11 +22,15 @@ const VERTEX = /* glsl */ `
   uniform float uSize;
   uniform float uAmp;
   uniform float uReach;
-  uniform float uPulse;     // uTime at the moment the logo was clicked
+  uniform float uPulse;     // uTime at the moment the kick landed
+  uniform vec2  uPulseCenter;
+  uniform vec2  uBall;      // ball position while a kick is in flight
+  uniform float uBallOn;
 
   attribute float aSeed;
 
   varying float vGlow;
+  varying float vEvent;
   varying float vDepth;
 
   void main() {
@@ -49,18 +53,33 @@ const VERTEX = /* glsl */ `
     float influence = 1.0 - smoothstep(0.0, uReach, distance(p.xy, pointerWorld));
     p.z += influence * 2.4;
 
-    // Logo ripple: a ring that expands from the centre of the field and dies
-    // out over about two seconds. uPulse starts far in the past so a fresh
-    // page load has no wave in flight.
-    float age = uTime - uPulse;
-    if (age >= 0.0 && age < 2.5) {
-      float dist = length(p.xy);
-      float ring = exp(-pow(dist - age * 9.0, 2.0) * 0.22) * exp(-age * 1.4);
-      p.z += ring * 3.2;
-      influence = max(influence, ring);
+    // The kicked ball: a tight bright bump travelling along its flight path.
+    // Kick and impact glow live in their own channel (vEvent) so the opacity
+    // boost they get in the fragment shader never applies to the pointer
+    // well, which must stay quiet under text.
+    float eventGlow = 0.0;
+    if (uBallOn > 0.5) {
+      float ballDist = distance(p.xy, uBall);
+      float bump = exp(-ballDist * ballDist * 1.4);
+      p.z += bump * 2.6;
+      eventGlow = max(eventGlow, bump);
     }
 
+    // Impact ripple: a ring that expands from wherever the ball came down and
+    // dies out over about two seconds. uPulse starts far in the past so a
+    // fresh page load has no wave in flight.
+    float age = uTime - uPulse;
+    if (age >= 0.0 && age < 2.5) {
+      float dist = distance(p.xy, uPulseCenter);
+      float ring = exp(-pow(dist - age * 9.0, 2.0) * 0.22) * exp(-age * 1.4);
+      p.z += ring * 3.2;
+      eventGlow = max(eventGlow, ring);
+    }
+
+    influence = max(influence, eventGlow);
+
     vGlow = influence;
+    vEvent = eventGlow;
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     // Fade only the genuinely distant rows. The previous linear ramp peaked
@@ -81,6 +100,7 @@ const FRAGMENT = /* glsl */ `
   uniform float uFold;
 
   varying float vGlow;
+  varying float vEvent;
   varying float vDepth;
 
   void main() {
@@ -105,7 +125,14 @@ const FRAGMENT = /* glsl */ `
     // copy on the longer pages.
     float recede = mix(1.0, 0.28, smoothstep(0.1, 0.85, uFold));
 
-    gl_FragColor = vec4(col, alpha * uOpacity * vDepth * recede);
+    // The ambient field is quiet by design, but the kick is the site's one
+    // hero interaction and has to read at full strength in both themes and at
+    // any scroll depth. Points caught in the ball or its impact ring override
+    // the ambient opacity instead of multiplying into it.
+    float ambient = alpha * uOpacity * vDepth * recede;
+    float event = alpha * clamp(vEvent, 0.0, 1.0) * 0.85;
+
+    gl_FragColor = vec4(col, max(ambient, event));
     #include <colorspace_fragment>
   }
 `
@@ -131,6 +158,15 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
   const scrollCurrent = useRef(0)
   const foldTarget = useRef(0)
   const foldCurrent = useRef(0)
+  // A kick in flight. t0 is null until the frame loop first sees the kick:
+  // the click handler must not need the material or the running loop, so a
+  // kick made while the tab is hidden simply flies when rendering resumes.
+  const kickRef = useRef<{
+    t0: number | null
+    from: [number, number]
+    ctrl: [number, number]
+    to: [number, number]
+  } | null>(null)
 
   const cols = lowPower ? 82 : 148
   const rows = lowPower ? 46 : 82
@@ -167,6 +203,9 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
       uAmp: { value: 1.15 },
       uReach: { value: 6.0 },
       uPulse: { value: -100 },
+      uPulseCenter: { value: [0, 0] as [number, number] },
+      uBall: { value: [0, 0] as [number, number] },
+      uBallOn: { value: 0 },
       // `new Color(hex)` converts sRGB to the linear working space, which is
       // what the shader's trailing `colorspace_fragment` expects. Passing raw
       // triples instead means the conversion lightens them on output — a deep
@@ -200,24 +239,39 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
       foldTarget.current = Math.min(1, window.scrollY / window.innerHeight)
     }
 
-    // The nav logo fires this. Setting the uniform from an event callback is
-    // fine under the compiler lint rules; only render-time mutation is not.
-    const onPulse = () => {
-      const material = materialRef.current
-      if (material) material.uniforms.uPulse.value = material.uniforms.uTime.value
-    }
-
     window.addEventListener("pointermove", onPointer, { passive: true })
     window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("lattice-pulse", onPulse)
     onScroll()
 
     return () => {
       window.removeEventListener("pointermove", onPointer)
       window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("lattice-pulse", onPulse)
     }
   }, [paused])
+
+  // The nav logo fires this. The ball launches from the top-left of the field
+  // (under the logo), bends through a curled arc, and the impact ripple fires
+  // where it lands. Spin bends a football, so the flight is a bezier rather
+  // than a straight line.
+  //
+  // Deliberately NOT gated behind `paused`: attaching a listener is free, and
+  // gating it couples the interaction to visibility timing — a click made
+  // moments after a tab regains focus would race the effect re-run and be
+  // silently lost. The handler only records intent; the frame loop, which is
+  // what the pause actually controls, decides whether anything moves.
+  useEffect(() => {
+    const onPulse = () => {
+      const from: [number, number] = [-20, 12]
+      const to: [number, number] = [-6 + Math.random() * 14, -6 + Math.random() * 11]
+      // Control point off the chord's midpoint, so every kick curls a little
+      // differently.
+      const mid: [number, number] = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2]
+      const ctrl: [number, number] = [mid[0] + 3 + Math.random() * 6, mid[1] + 5 + Math.random() * 4]
+      kickRef.current = { t0: null, from, ctrl, to }
+    }
+    window.addEventListener("lattice-pulse", onPulse)
+    return () => window.removeEventListener("lattice-pulse", onPulse)
+  }, [])
 
   // Paused means "one static frame", not "unmounted" — the composition should
   // still read correctly with motion off.
@@ -242,6 +296,31 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
 
     material.uniforms.uTime.value += dt
     material.uniforms.uPointer.value = pointerCurrent.current
+
+    // Advance a kick in flight. Ease-out, because a struck ball decelerates.
+    const kick = kickRef.current
+    if (kick) {
+      const flight = 0.7
+      // First frame that sees this kick starts the clock.
+      const t0 = kick.t0 ?? material.uniforms.uTime.value
+      kick.t0 = t0
+      const age = material.uniforms.uTime.value - t0
+      if (age >= flight) {
+        material.uniforms.uBallOn.value = 0
+        material.uniforms.uPulseCenter.value = kick.to
+        material.uniforms.uPulse.value = material.uniforms.uTime.value
+        kickRef.current = null
+      } else {
+        const t = age / flight
+        const e = 1 - (1 - t) * (1 - t)
+        const inv = 1 - e
+        material.uniforms.uBall.value = [
+          inv * inv * kick.from[0] + 2 * inv * e * kick.ctrl[0] + e * e * kick.to[0],
+          inv * inv * kick.from[1] + 2 * inv * e * kick.ctrl[1] + e * e * kick.to[1],
+        ]
+        material.uniforms.uBallOn.value = 1
+      }
+    }
     material.uniforms.uScroll.value = scrollCurrent.current
     material.uniforms.uFold.value = foldCurrent.current
 
