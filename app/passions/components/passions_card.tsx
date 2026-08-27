@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import type { Passion } from "@/lib/passions"
-import { Panel } from "@/app/components/page-shell"
 
 // Icon components
 function CodeIcon({ className }: { className?: string }) {
@@ -114,15 +113,42 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 interface PassionCardProps {
   passion: Passion
   index: number
-  /** The first card is given the wide slot; everything else sits in the grid. */
-  featured?: boolean
   /** Receives the trigger element so focus can be handed back on close. */
   onOpen: (passion: Passion, trigger: HTMLButtonElement) => void
 }
 
 /**
- * How the featured card's image mosaic tiles a 2x2 grid. Small counts stretch
- * to fill so the mosaic never leaves a hole.
+ * Where an item sits in the bento.
+ *
+ * Span-based, following magicui's bento: the grid is fixed and every tile is
+ * full width by default, *earning* a wider span further up the scale. Tiles are
+ * widened, never moved, so visual order can never desync from DOM order the way
+ * `grid-template-areas` allows. The cycle repeats every four items and tiles a
+ * three-column grid exactly (2+1 / 1+2), so the rhythm holds for any number of
+ * passions instead of being hand-placed for the six that exist today.
+ */
+export function bentoSlot(index: number) {
+  const step = index % 4
+  const wide = step === 0 || step === 3
+  return {
+    wide,
+    span: wide ? "sm:col-span-2 lg:col-span-2" : "lg:col-span-1",
+    // Aspect variety is what replaces the borders: the grid reads as composed
+    // because the frames are different shapes, not because they are outlined.
+    aspect:
+      step === 0
+        ? "aspect-[16/9]"
+        : step === 1
+          ? "aspect-[4/5]"
+          : step === 2
+            ? "aspect-square"
+            : "aspect-[16/10]",
+  }
+}
+
+/**
+ * How a wide tile's mosaic fills a 2x2 grid. Small counts stretch so the
+ * mosaic never leaves a hole.
  */
 function mosaicSpan(count: number, i: number): string {
   if (count === 1) return "col-span-2 row-span-2"
@@ -131,106 +157,108 @@ function mosaicSpan(count: number, i: number): string {
   return ""
 }
 
-export function PassionCard({ passion, index, featured = false, onOpen }: PassionCardProps) {
+/**
+ * One passion, as a photograph with a caption.
+ *
+ * The panel, the border, the blur, the hover-lift and the rounded icon chip are
+ * gone; what is left is the image at whatever shape its slot calls for, and a
+ * typeset caption under it. Nothing is desaturated at rest: these are personal
+ * photographs and the colour *is* the content, so a `grayscale` resting state
+ * would be a permanent downgrade on a phone, where there is no hover to lift
+ * it. The treatment is a slow zoom on hover instead, which simply never fires
+ * on touch.
+ */
+export function PassionCard({ passion, index, onOpen }: PassionCardProps) {
   const IconComponent = iconMap[passion.icon] || CodeIcon
   const objectPosition = passion.imagePosition === "top" ? "object-top" : "object-center"
+  const { wide, aspect } = bentoSlot(index)
 
   const images = passion.images?.filter((src) => src && src.trim() !== "") ?? []
-  // The wide card can show a mosaic; the narrow ones show a single frame. This
-  // is a content decision, not a form-factor one — both render the same tree.
-  const shown = featured ? images.slice(0, 4) : images.slice(0, 1)
-  const remaining = images.length - shown.length
+  // A wide tile can carry a mosaic; a narrow one shows a single frame. That is
+  // a slot decision, not a form-factor one — both render the same tree.
+  const shown = wide ? images.slice(0, 4) : images.slice(0, 1)
 
   const titleId = `passion-${passion.id}-title`
   const hintId = `passion-${passion.id}-hint`
 
   return (
-    // `@container`, so the split into two columns is decided by the card's own
-    // width: the featured card is wide enough to split, the grid cards are not,
-    // and on a phone neither is. No breakpoint duplicates this markup.
-    <Panel className="card-hover group @container relative h-full overflow-hidden">
-      <div
-        className={`grid h-full ${shown.length > 0 ? "@3xl:grid-cols-[1.15fr_1fr]" : ""}`}
-      >
-        {shown.length > 0 && (
-          <div className="relative aspect-[4/3] w-full @3xl:aspect-auto @3xl:min-h-[24rem]">
-            <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
-              {shown.map((src, i) => (
-                <div key={i} className={`relative overflow-hidden ${mosaicSpan(shown.length, i)}`}>
-                  <Image
-                    src={src}
-                    alt={passion.imageAlts?.[i] || `${passion.title} photo ${i + 1}`}
-                    fill
-                    sizes={
-                      featured
-                        ? "(max-width: 768px) 100vw, 55vw"
-                        : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    }
-                    priority={index === 0 && i === 0}
-                    className={`object-cover ${objectPosition} transition-transform duration-500 fine:group-hover:scale-105`}
-                  />
-                </div>
-              ))}
-            </div>
-            {/* Always-on count badge — no hover required to learn there is more. */}
-            {remaining > 0 && (
-              <span className="absolute right-3 top-3 rounded-full bg-background/85 px-2.5 py-1 font-mono text-eyebrow uppercase text-foreground backdrop-blur-sm">
-                +{remaining} {remaining === 1 ? "photo" : "photos"}
-              </span>
-            )}
+    // `relative` is load-bearing: it is the containing block for the button laid
+    // over the tile. Nothing here may grow a transform or filter.
+    <div className="group relative flex flex-col gap-[clamp(0.875rem,2vw,1.25rem)]">
+      <div className={`relative w-full overflow-hidden bg-muted ${aspect}`}>
+        {shown.length > 0 ? (
+          <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-1">
+            {shown.map((src, i) => (
+              <div key={i} className={`relative overflow-hidden ${mosaicSpan(shown.length, i)}`}>
+                <Image
+                  src={src}
+                  alt={passion.imageAlts?.[i] || `${passion.title} photo ${i + 1}`}
+                  fill
+                  sizes={
+                    wide
+                      ? "(max-width: 1024px) 100vw, 66vw"
+                      : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  }
+                  priority={index === 0 && i === 0}
+                  className={`object-cover ${objectPosition} transition-transform duration-700 ease-entrance group-hover:scale-[1.04]`}
+                />
+              </div>
+            ))}
           </div>
-        )}
-
-        <div className="flex flex-col gap-4 p-[clamp(1.25rem,4cqi,2.25rem)]">
-          <div className="flex items-start gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-colors fine:group-hover:bg-primary/20">
-              <IconComponent className="h-5 w-5 text-primary" />
-            </span>
-            <div className="min-w-0">
-              <p className="font-mono text-eyebrow uppercase text-muted-foreground tabular-nums">
-                {String(index + 1).padStart(2, "0")}
-                {featured && <span className="text-primary"> · Featured</span>}
-              </p>
-              <h2 id={titleId} className="mt-2 font-display text-h3 text-balance text-card-foreground">
-                {passion.title}
-              </h2>
-            </div>
-          </div>
-
-          <p className="text-pretty text-[0.95rem] leading-relaxed text-muted-foreground">
-            {passion.description}
-          </p>
-
-          {/* The affordance is plain text that is always rendered — the old
-              "Click to view gallery" hint was `md:opacity-0`, so on a desktop
-              it only existed on hover and on a phone it named an input the
-              visitor does not have. */}
-          <span
-            id={hintId}
-            className="mt-auto inline-flex items-center gap-2 font-mono text-eyebrow uppercase text-primary"
-          >
-            View gallery
-            <span aria-hidden className="transition-transform fine:group-hover:translate-x-1">
-              &rarr;
-            </span>
+        ) : (
+          // No photographs yet: the icon stands in at size, rather than the
+          // tile collapsing into a text row and breaking the grid's rhythm.
+          <span aria-hidden className="absolute inset-0 flex items-center justify-center">
+            <IconComponent className="h-12 w-12 text-muted-foreground" />
           </span>
-        </div>
+        )}
       </div>
 
-      {/* The whole card is one action, so the hit area is one button laid over
+      <div className="flex flex-col gap-2">
+        <p className="flex flex-wrap items-center gap-2 font-mono text-eyebrow uppercase text-muted-foreground">
+          <span aria-hidden className="flex shrink-0 text-primary">
+            <IconComponent className="h-3.5 w-3.5" />
+          </span>
+          <span className="tabular-nums">{String(index + 1).padStart(2, "0")}</span>
+          {/* The photo count used to be a blurred pill floating over the image.
+              It is information, so it belongs in the caption. */}
+          {images.length > 1 && <span>· {images.length} photos</span>}
+        </p>
+        <h2
+          id={titleId}
+          className="font-display text-h3 text-balance text-foreground transition-colors group-hover:text-primary"
+        >
+          {passion.title}
+        </h2>
+        <p className="text-pretty text-[0.95rem] leading-relaxed text-muted-foreground">
+          {passion.description}
+        </p>
+        {/* The affordance is plain text that is always rendered — the old
+            "Click to view gallery" hint was hover-only on a desktop and named
+            an input a phone does not have. */}
+        <span
+          id={hintId}
+          className="mt-1 inline-flex items-center gap-2 font-mono text-eyebrow uppercase text-primary"
+        >
+          View gallery
+          <span aria-hidden className="transition-transform group-hover:translate-x-1">
+            &rarr;
+          </span>
+        </span>
+      </div>
+
+      {/* The whole tile is one action, so the hit area is one button laid over
           it. Nesting the heading and copy *inside* a <button> would be invalid
           HTML (flow content in a phrasing-only element) and would flatten the
           heading out of the document outline; this keeps both the semantics and
-          the full-card target, which is far larger than the 44px minimum.
-          The card clips its children (rounded images), which would clip an
-          outset focus ring too — hence the inset outline offset. */}
+          the full-tile target, which is far larger than the 44px minimum. */}
       <button
         type="button"
         aria-labelledby={`${titleId} ${hintId}`}
         aria-haspopup="dialog"
         onClick={(event) => onOpen(passion, event.currentTarget)}
-        className="absolute inset-0 z-10 cursor-pointer rounded-2xl focus-visible:rounded-2xl focus-visible:-outline-offset-4"
+        className="absolute inset-0 z-10 cursor-pointer"
       />
-    </Panel>
+    </div>
   )
 }

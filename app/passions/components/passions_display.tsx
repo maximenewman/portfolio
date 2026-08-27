@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react"
 import type { Passion } from "@/lib/passions"
-import { PassionCard } from "./passions_card"
+import { PassionCard, bentoSlot } from "./passions_card"
 import { PassionModal } from "./passion_modal"
 
 export function PassionsDisplay({ passions }: { passions: Passion[] }) {
@@ -31,19 +31,22 @@ export function PassionsDisplay({ passions }: { passions: Passion[] }) {
     )
   }
 
-  const [featured, ...rest] = passions
-
   return (
     <>
-      {/* One grid for every card. The lead card simply spans the full row —
-          there is no second arrangement and no second copy of the markup. */}
-      <ul className="grid grid-cols-1 gap-[clamp(1.25rem,3vw,2rem)] md:grid-cols-2 xl:grid-cols-3">
-        <li className="reveal md:col-span-2 xl:col-span-3">
-          <PassionCard passion={featured} index={0} featured onOpen={handleOpen} />
-        </li>
-        {rest.map((passion, index) => (
-          <li key={passion.id} className="reveal">
-            <PassionCard passion={passion} index={index + 1} onOpen={handleOpen} />
+      {/* A span-based bento: three fixed columns, every tile full width by
+          default, widened at a breakpoint by `bentoSlot`. Because tiles are
+          only ever widened — never repositioned — reading order, tab order and
+          visual order stay locked together, which `grid-template-areas` cannot
+          promise. The vertical gap is much larger than the horizontal one so
+          each caption groups with its own photograph now that no border says
+          where one tile ends and the next begins. */}
+      <ul
+        role="list"
+        className="grid grid-cols-1 gap-x-[clamp(1rem,2vw,1.75rem)] gap-y-[clamp(2.25rem,4vw,3.5rem)] sm:grid-cols-2 lg:grid-cols-3"
+      >
+        {passions.map((passion, index) => (
+          <li key={passion.id} className={`reveal ${bentoSlot(index).span}`}>
+            <PassionCard passion={passion} index={index} onOpen={handleOpen} />
           </li>
         ))}
       </ul>

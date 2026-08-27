@@ -65,7 +65,10 @@ export function ProjectMediaGallery({ media, title, priority = false }: ProjectM
               ? `Open ${title} media viewer (${active + 1} of ${media.length})`
               : `Open ${title} media viewer`
           }
-          className="group relative aspect-video w-full overflow-hidden rounded-xl border border-border bg-muted transition-shadow duration-200 fine:hover:ring-2 fine:hover:ring-primary/50"
+          // No frame and no radius: the hero bleeds to the edge of the page, so
+          // a border would be a line hanging in space. The hover ring is inset
+          // for the same reason — it must not add geometry outside the bleed.
+          className="group relative aspect-video w-full overflow-hidden bg-muted transition-shadow duration-200 hover:ring-2 hover:ring-inset hover:ring-primary/60"
         >
           {activePreview ? (
             <>
@@ -97,23 +100,29 @@ export function ProjectMediaGallery({ media, title, priority = false }: ProjectM
           {/* Video play overlay */}
           {activeItem.type === "video" && (
             <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-transform fine:group-hover:scale-110">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 transition-transform group-hover:scale-110">
                 <Play className="h-6 w-6 translate-x-0.5 fill-white text-white" />
               </span>
             </span>
           )}
 
           {/* Counter / view badge */}
-          <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1.5 font-mono text-eyebrow uppercase text-white backdrop-blur">
+          {/* Opaque rather than blurred: `backdrop-filter` is both the most
+              recognisable marker of the generated-card look and a containing
+              block, which breaks fixed-position descendants. */}
+          <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1.5 font-mono text-eyebrow uppercase text-white">
             <Maximize2 className="h-3.5 w-3.5" aria-hidden />
             {media.length > 1 ? `${active + 1} / ${media.length}` : "View"}
           </span>
         </button>
 
         {/* Thumbnail strip. Real buttons, 48px tall so they clear the 44px touch
-            minimum without a separate mobile control. */}
+            minimum without a separate mobile control. The hero bleeds to the
+            page edge but the strip is inset to the page gutter — same clamp as
+            <Container> — so it reads as a caption under the image rather than
+            as a row of tiles jammed against the viewport. */}
         {media.length > 1 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 px-[clamp(1.25rem,4vw,4rem)]">
             {media.map((item, index) => {
               const thumb = previewSrc(item)
               const isActive = index === active
@@ -125,7 +134,7 @@ export function ProjectMediaGallery({ media, title, priority = false }: ProjectM
                   aria-label={item.alt || `Show ${title} media ${index + 1}`}
                   aria-current={isActive ? "true" : undefined}
                   className={`relative h-12 w-[68px] overflow-hidden rounded-md border border-border bg-muted transition-opacity ${
-                    isActive ? "opacity-100 ring-2 ring-primary" : "opacity-60 fine:hover:opacity-100"
+                    isActive ? "opacity-100 ring-2 ring-primary" : "opacity-60 hover:opacity-100"
                   }`}
                 >
                   {thumb ? (
@@ -174,11 +183,11 @@ export function ProjectMediaGallery({ media, title, priority = false }: ProjectM
  * moves into the dialog, background scroll locks, and key handling installs.
  * Escape closes, arrows page, Tab cycles inside the dialog.
  *
- * Portalled to <body> because the card around it is a query container and grows
- * a transform on hover — both make an ancestor the containing block for
- * `position: fixed`, which would pin this "full screen" layer to the card
- * instead of the viewport. Only ever rendered after a click, so there is no
- * server pass to guard against.
+ * Portalled to <body> because the row around it carries the scroll-reveal
+ * transform, which makes an ancestor the containing block for
+ * `position: fixed` and would pin this "full screen" layer to the row instead
+ * of the viewport. Only ever rendered after a click, so there is no server
+ * pass to guard against.
  */
 function MediaLightbox({
   media,
@@ -263,7 +272,7 @@ function MediaLightbox({
         tabIndex={-1}
         aria-hidden="true"
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-black/85 backdrop-blur-sm"
+        className="absolute inset-0 cursor-default bg-black/90"
       />
 
       <div
@@ -283,7 +292,7 @@ function MediaLightbox({
             type="button"
             onClick={onClose}
             aria-label="Close media viewer"
-            className="btn-hover flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors fine:hover:bg-white/20"
+            className="btn-hover flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
           >
             <X className="h-6 w-6" aria-hidden />
           </button>
@@ -330,7 +339,7 @@ function MediaLightbox({
                 type="button"
                 onClick={onPrev}
                 aria-label="Previous media"
-                className="btn-hover absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black transition-colors fine:hover:bg-white"
+                className="btn-hover absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black transition-colors hover:bg-white"
               >
                 <ChevronLeft className="h-6 w-6" aria-hidden />
               </button>
@@ -338,7 +347,7 @@ function MediaLightbox({
                 type="button"
                 onClick={onNext}
                 aria-label="Next media"
-                className="btn-hover absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black transition-colors fine:hover:bg-white"
+                className="btn-hover absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-black transition-colors hover:bg-white"
               >
                 <ChevronRight className="h-6 w-6" aria-hidden />
               </button>
