@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { PitchPlan } from "./pitch-lines"
 
 /**
@@ -8,10 +9,14 @@ import { PitchPlan } from "./pitch-lines"
  *
  * Chronology maps to depth: the oldest role sits just outside our own penalty
  * area and each later role advances upfield, with the current one in the
- * attacking third. A dotted line traces the run; a ball sits on whichever
- * role you are reading and follows the scroll. The pitch works both ways:
- * every position is a real link that scrolls the list to its role, so you can
- * move through the experiences by clicking through the pitch.
+ * attacking third. A dotted line traces the run.
+ *
+ * The pitch is a navigator. The ball rests on the current role and slides to
+ * whichever position you point at — hovering a node, focusing it with the
+ * keyboard, or hovering the matching row in the list all move it — and a
+ * label names the role under the pointer. Clicking a position opens that
+ * experience's page. On touch there is no hover, so a tap simply navigates,
+ * which is the same promise with one step fewer.
  *
  * The markings and the run line are decorative (the rows carry every fact),
  * but the position nodes are genuine anchors with accessible names, so the
@@ -19,13 +24,11 @@ import { PitchPlan } from "./pitch-lines"
  * its chalk lines aria-hidden.
  *
  * One deliberate divergence between form factors, in presentation only:
- * at lg+ the pitch stands vertically in a sticky side column, so scrolling
- * down the roles visibly walks the ball back down the field; below lg there is
- * no room for a side column, so the same run renders once as the horizontal
- * plan above the list. Both draw from one node list — the coordinates are just
- * projected into each frame. The links exist in both, which double-renders
- * them in the DOM; only one set is ever visible or focusable, because
- * `display: none` on the hidden variant removes it from the tab order too.
+ * at lg+ the pitch stands vertically in a sticky side column; below lg the
+ * same run renders once as the horizontal plan above the list. Both draw from
+ * one node list — the coordinates are just projected into each frame. The
+ * links exist in both, but only one variant is ever displayed, and
+ * `display: none` removes the hidden one from the tab order too.
  */
 
 export type JourneyItem = { slug: string; role: string }
@@ -61,15 +64,25 @@ function toVertical({ x, y }: Node): Node {
 function RunOverlay({
   items,
   nodes,
-  active,
+  hovered,
+  onHover,
+  /** Frame width in viewBox units, for clamping the hover label. */
+  frameWidth,
+  showLabel,
 }: {
   items: JourneyItem[]
   nodes: Node[]
-  active: number
+  hovered: number | null
+  onHover: (index: number | null) => void
+  frameWidth: number
+  showLabel: boolean
 }) {
+  const router = useRouter()
   // The run reads oldest → newest, so the trace is drawn in chronological order.
   const chrono = [...nodes].reverse()
-  const ball = nodes[Math.min(active, nodes.length - 1)] ?? nodes[0]
+  const ballIndex = hovered ?? 0
+  const ball = nodes[Math.min(ballIndex, nodes.length - 1)] ?? nodes[0]
+  const labelled = hovered !== null ? nodes[hovered] : null
 
   return (
     <>
@@ -82,19 +95,36 @@ function RunOverlay({
         stroke="currentColor"
       />
 
-      {/* Positions. Real SVG anchors: clicking one scrolls the list to its
-          role (the rows carry matching ids), keyboard reaches them in list
-          order, and each announces the role it goes to. The visible dot is
-          r=9 in pitch units, far too small to tap, so a transparent r=36 hit
-          circle does the actual catching — about 44px on the mobile map. */}
+      {/* Positions. Real anchors to the experience pages: plain left-click is
+          upgraded to a client-side navigation so the WebGL backdrop survives
+          the transition, while modified clicks and middle-click keep their
+          native meaning through the real href. The visible dot is r=9 in
+          pitch units, far too small to tap, so a transparent r=36 hit circle
+          does the catching — about 44px on the mobile map. */}
       {items.map((item, i) => {
         const n = nodes[i]
+        const href = `/experiences/${item.slug}`
         return (
           <a
             key={item.slug}
-            href={`#xp-${item.slug}`}
-            aria-label={`Go to ${item.role}`}
+            href={href}
+            aria-label={item.role}
             className="pitch-node"
+            onClick={(event) => {
+              if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                return
+              }
+              event.preventDefault()
+              router.push(href)
+            }}
+            onPointerEnter={(event) => {
+              // Touch has no hover: a tap should navigate, not toggle a
+              // preview state that then needs a second tap.
+              if (event.pointerType !== "touch") onHover(i)
+            }}
+            onPointerLeave={() => onHover(null)}
+            onFocus={() => onHover(i)}
+            onBlur={() => onHover(null)}
           >
             <circle cx={n.x} cy={n.y} r="36" fill="transparent" stroke="none" />
             <circle
@@ -110,9 +140,36 @@ function RunOverlay({
         )
       })}
 
-      {/* The ball. Positioned by transform so the move to a newly active role
-          eases with the house overshoot curve (see .pitch-ball in globals).
-          pointer-events none so it never sits between a click and its node. */}
+      {/* The role under the pointer, named. aria-hidden because the anchor
+          already announces the same words; this is the visual echo. Anchored
+          to whichever side of the node has room and grows inward; when even
+          that is not enough for a long role name, textLength compresses the
+          glyphs to the room available. The width estimate is reliable because
+          the label face is monospaced (~0.6em per character). */}
+      {showLabel && labelled && hovered !== null && (() => {
+        const startSide = labelled.x < frameWidth / 2
+        const anchorX = startSide ? labelled.x + 44 : labelled.x - 44
+        const room = (startSide ? frameWidth - anchorX : anchorX) - 16
+        const estimate = items[hovered].role.length * 24 * 0.62
+        const fit = estimate > room ? { textLength: room, lengthAdjust: "spacingAndGlyphs" as const } : {}
+        return (
+          <text
+            aria-hidden="true"
+            x={anchorX}
+            y={labelled.y + 8}
+            textAnchor={startSide ? "start" : "end"}
+            className="pitch-node-label"
+            fill="var(--primary)"
+            {...fit}
+          >
+            {items[hovered].role}
+          </text>
+        )
+      })()}
+
+      {/* The ball. Positioned by transform so it slides between positions with
+          the house overshoot curve (see .pitch-ball in globals). Pointer
+          events off so it never sits between a click and its node. */}
       <g
         aria-hidden="true"
         className="pitch-ball pointer-events-none"
@@ -126,28 +183,29 @@ function RunOverlay({
 }
 
 export function PitchJourney({ items }: { items: JourneyItem[] }) {
-  const [active, setActive] = useState(0)
+  const [hovered, setHovered] = useState<number | null>(null)
 
+  // The other direction of the same mapping: pointing at a role in the list
+  // slides the ball to its position on the pitch. Delegated listeners so the
+  // rows can stay server-rendered.
   useEffect(() => {
     const rows = Array.from(document.querySelectorAll<HTMLElement>("[data-journey-row]"))
     if (!rows.length) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // The row occupying the reading band wins; ties go to the most visible.
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        const top = visible[0]?.target as HTMLElement | undefined
-        if (top?.dataset.journeyRow !== undefined) {
-          setActive(Number(top.dataset.journeyRow))
-        }
-      },
-      { threshold: [0.2, 0.6], rootMargin: "-25% 0px -45% 0px" },
-    )
-
-    rows.forEach((row) => observer.observe(row))
-    return () => observer.disconnect()
+    const cleanups = rows.map((row) => {
+      const index = Number(row.dataset.journeyRow)
+      const enter = (event: PointerEvent) => {
+        if (event.pointerType !== "touch") setHovered(index)
+      }
+      const leave = () => setHovered(null)
+      row.addEventListener("pointerenter", enter)
+      row.addEventListener("pointerleave", leave)
+      return () => {
+        row.removeEventListener("pointerenter", enter)
+        row.removeEventListener("pointerleave", leave)
+      }
+    })
+    return () => cleanups.forEach((cleanup) => cleanup())
   }, [items.length])
 
   if (items.length === 0) return null
@@ -157,22 +215,37 @@ export function PitchJourney({ items }: { items: JourneyItem[] }) {
 
   return (
     <div className="lg:h-full lg:self-stretch">
-      {/* Below lg: the run as a plan, once, above the list. */}
+      {/* Below lg: the run as a plan, once, above the list. No hover label —
+          on touch the pointer never hovers, a tap goes straight through. */}
       <div className="reveal mx-auto max-w-[26rem] pb-8 lg:hidden">
         <PitchPlan title={null} className="line-draw w-full text-muted-foreground/40">
-          <RunOverlay items={items} nodes={nodes} active={active} />
+          <RunOverlay
+            items={items}
+            nodes={nodes}
+            hovered={hovered}
+            onHover={setHovered}
+            frameWidth={1050}
+            showLabel={false}
+          />
         </PitchPlan>
       </div>
 
       {/* lg+: the pitch stands on end beside the list and stays put while the
-          roles scroll past, the ball walking the run as you read. */}
+          roles scroll past. */}
       <div className="reveal sticky top-24 hidden h-[min(calc(100svh-8rem),52rem)] justify-center lg:flex">
         <PitchPlan
           title={null}
           orientation="vertical"
           className="line-draw h-full w-auto text-muted-foreground/40"
         >
-          <RunOverlay items={items} nodes={verticalNodes} active={active} />
+          <RunOverlay
+            items={items}
+            nodes={verticalNodes}
+            hovered={hovered}
+            onHover={setHovered}
+            frameWidth={680}
+            showLabel
+          />
         </PitchPlan>
       </div>
     </div>

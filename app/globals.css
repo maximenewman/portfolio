@@ -222,6 +222,20 @@ body,
   r: 13;
 }
 
+/* The role name that appears beside the hovered position. Sized in viewBox
+   units (the vertical pitch renders ~680 units across ~300px, so 30 units is
+   roughly 13px on screen). */
+.pitch-node-label {
+  font-family: var(--font-geist-mono), monospace;
+  /* viewBox units: the vertical pitch renders ~680 units across ~300px, so 24
+     units is ~11px on screen, and the longest role name (~37 characters)
+     stays inside the frame when side-anchored. */
+  font-size: 24px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
 [data-motion="paused"] .pitch-ball {
   transition: none;
 }
