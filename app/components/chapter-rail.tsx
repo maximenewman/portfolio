@@ -32,6 +32,7 @@ const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
  */
 export function ChapterRail({ chapters }: { chapters: Chapter[] }) {
   const [active, setActive] = useState("")
+  const [footerInView, setFooterInView] = useState(false)
 
   useEffect(() => {
     const sections = chapters
@@ -56,14 +57,31 @@ export function ChapterRail({ chapters }: { chapters: Chapter[] }) {
     return () => observer.disconnect()
   }, [chapters])
 
+  // The rail is position: fixed at lg, and the footer sits outside the page
+  // wrapper that reserves its gutter, so without this the rail prints on top
+  // of the footer's text. It fades out as the footer scrolls in; there is
+  // nothing left for it to index down there anyway.
+  useEffect(() => {
+    const footer = document.querySelector("footer")
+    if (!footer) return
+    const observer = new IntersectionObserver(
+      (entries) => setFooterInView(entries.some((e) => e.isIntersecting)),
+      { threshold: 0 },
+    )
+    observer.observe(footer)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <nav
       aria-label="Sections"
-      className="
+      className={`
         border-b border-border/70 px-[clamp(1.25rem,4vw,4rem)] py-6
         lg:fixed lg:left-[clamp(1.25rem,4vw,4rem)] lg:top-1/2 lg:z-30
         lg:w-[min(20vw,16rem)] lg:-translate-y-1/2 lg:border-0 lg:px-0 lg:py-0
-      "
+        lg:transition-opacity lg:duration-300
+        ${footerInView ? "lg:pointer-events-none lg:opacity-0" : ""}
+      `}
     >
       <p className="mb-3 font-mono text-eyebrow uppercase text-muted-foreground lg:hidden">
         Index
