@@ -4,7 +4,8 @@ import { useId, useMemo, useState } from "react"
 import { ArrowDownUp } from "lucide-react"
 import type { Asset, Post } from "@/db/schema"
 import { POST_KINDS, yearOf } from "@/lib/posts"
-import { PostCard } from "./post-card"
+import { RowList } from "@/app/components/page-shell"
+import { PostRow } from "./post-card"
 
 type Props = {
   posts: Post[]
@@ -63,10 +64,22 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
     return filtered
   }, [posts, kind, year, order])
 
+  // Hold the cover lane open on every row only when at least one visible entry
+  // has a cover. With covers, the reserved lane keeps the text column on one
+  // axis; without any, reserving it would leave a dead column down the page.
+  const reserveCover = useMemo(
+    () => visible.some((p) => p.coverAssetId && covers[p.coverAssetId]),
+    [visible, covers],
+  )
+
   return (
-    // `.reveal` sits on the always-mounted wrapper, never on the filtered
-    // cards: the global observer only re-scans on route change, so a node that
-    // appears later from a filter change would keep `.reveal` and stay hidden.
+    // `.reveal` sits on the always-mounted wrapper, never on the rows. Both
+    // hazards that originally motivated this have since been fixed centrally
+    // — reveal state moved to a `data-revealed` attribute React cannot
+    // overwrite, and `.dim-siblings` now carries the transform transition — so
+    // per-row reveal would work. It stays on the wrapper anyway: rows here are
+    // re-ordered and re-grouped by the filters, and staggering them on every
+    // filter change reads as the list flickering rather than settling.
     <div className="reveal flex flex-col gap-[clamp(2rem,4vw,3rem)]">
       <div className="group/filters flex flex-col gap-4 border-y border-border/70 py-4">
         {/* Kind filter. Every option is a real <button>, rendered at all times,
@@ -84,7 +97,7 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
                 information and no action, and only animates for pointer users. */}
             <span
               aria-hidden
-              className="text-sm transition-transform duration-300 ease-pop fine:group-hover/filters:-rotate-12"
+              className="text-sm transition-transform duration-300 ease-pop group-hover/filters:-rotate-12"
             >
               🧠
             </span>
@@ -105,7 +118,9 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
                   className={`btn-hover inline-flex min-h-9 touch:min-h-11 items-center rounded-full border px-3.5 text-sm font-medium ${
                     active
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card/70 text-muted-foreground fine:hover:border-primary/50 fine:hover:text-foreground"
+                      // Plain `hover:` — Tailwind v4 already compiles it inside
+                      // @media (hover: hover), so it never sticks after a tap.
+                      : "border-border bg-card/70 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                   }`}
                 >
                   {k.label}
@@ -159,20 +174,34 @@ export function BlogList({ posts, covers, isAdmin }: Props) {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* The index. An editorial row list, not a grid of cards: the entries are
+          homogeneous, so a box around each one carries no information and only
+          costs the reader vertical distance between titles. Year is printed
+          once per group in the left gutter; every following row indents by the
+          same gutter, which is what makes the grouping readable without a
+          heading interrupting the run. */}
       {visible.length === 0 ? (
         <p className="max-w-[46ch] text-lede text-muted-foreground">No entries match these filters.</p>
       ) : (
-        <div className="grid gap-[clamp(1rem,2vw,1.5rem)] sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              cover={post.coverAssetId ? covers[post.coverAssetId] : undefined}
-              showVisibility={isAdmin}
-            />
-          ))}
-        </div>
+        <RowList>
+          {visible.map((post, i) => {
+            const entryYear = yearOf(post.publishedAt)
+            return (
+              <PostRow
+                key={post.id}
+                post={post}
+                cover={post.coverAssetId ? covers[post.coverAssetId] : undefined}
+                showVisibility={isAdmin}
+                year={entryYear}
+                // The list is always sorted by date, so entries of the same
+                // year are contiguous — the first one prints the marker.
+                showYear={i === 0 || yearOf(visible[i - 1].publishedAt) !== entryYear}
+                lead={i === 0}
+                reserveCover={reserveCover}
+              />
+            )
+          })}
+        </RowList>
       )}
     </div>
   )
