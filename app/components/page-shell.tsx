@@ -108,9 +108,14 @@ export function Section({
 }
 
 /**
- * Surface used for cards across projects, passions, posts and experiences.
- * Semi-transparent so the WebGL lattice reads through it — that is what keeps
- * the backdrop feeling like part of the page rather than wallpaper behind it.
+ * A genuine surface — for things that really are contained, like a media
+ * frame or a metadata block. NOT the default wrapper for list items; an index
+ * of roles or posts belongs in `RowList` below.
+ *
+ * `backdrop-blur` is deliberately gone. It is the single most recognisable
+ * marker of the generated-portfolio look, and it also establishes a containing
+ * block, which silently breaks both `position: fixed` descendants and the
+ * `.row-link` stretch.
  */
 export function Panel({
   children,
@@ -120,10 +125,69 @@ export function Panel({
   className?: string
 }) {
   return (
-    <div
-      className={`rounded-2xl border border-border bg-card/80 backdrop-blur-sm ${className}`}
-    >
+    <div className={`rounded-xl border border-border bg-card ${className}`}>
       {children}
     </div>
+  )
+}
+
+/**
+ * The editorial index: hairline-separated rows, no boxes.
+ *
+ * `role="list"` is not redundant — Safari + VoiceOver strip list semantics
+ * from any list whose `list-style` is `none`, which Tailwind's preflight
+ * applies globally.
+ */
+export function RowList({
+  children,
+  className = "",
+  dim = true,
+}: {
+  children: ReactNode
+  className?: string
+  /** Recede the un-pointed rows on hover. Pointer-only; see globals.css. */
+  dim?: boolean
+}) {
+  return (
+    <ol
+      role="list"
+      className={`border-t border-border/60 ${dim ? "dim-siblings" : ""} ${className}`}
+    >
+      {children}
+    </ol>
+  )
+}
+
+/**
+ * One row. `relative` is load-bearing: it is the containing block the
+ * stretched `.row-link` resolves against.
+ */
+export function Row({
+  children,
+  className = "",
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <li className={`group relative border-b border-border/60 ${className}`}>
+      {children}
+    </li>
+  )
+}
+
+/**
+ * The index numeral on a row. Tabular figures so the column stays aligned
+ * whatever the digits, which is most of why a numbered index reads as
+ * typeset rather than as decoration.
+ */
+export function RowIndex({ n, className = "" }: { n: number; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`font-mono text-eyebrow tabular-nums text-muted-foreground ${className}`}
+    >
+      {String(n).padStart(2, "0")}
+    </span>
   )
 }

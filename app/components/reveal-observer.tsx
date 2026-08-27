@@ -28,8 +28,8 @@ export function RevealObserver() {
     // honest for anything else reading it.
     if (paused) {
       document
-        .querySelectorAll<HTMLElement>(".reveal:not(.is-visible)")
-        .forEach((node) => node.classList.add("is-visible"))
+        .querySelectorAll<HTMLElement>(".reveal:not([data-revealed])")
+        .forEach((node) => { node.dataset.revealed = "" })
       return
     }
 
@@ -37,7 +37,7 @@ export function RevealObserver() {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
-          entry.target.classList.add("is-visible")
+          ;(entry.target as HTMLElement).dataset.revealed = ""
           intersection.unobserve(entry.target)
         }
       },
@@ -48,7 +48,7 @@ export function RevealObserver() {
 
     // `observe` is idempotent per element, so re-scanning is safe.
     const scan = (root: ParentNode) => {
-      root.querySelectorAll<HTMLElement>(".reveal:not(.is-visible)").forEach((node) => {
+      root.querySelectorAll<HTMLElement>(".reveal:not([data-revealed])").forEach((node) => {
         intersection.observe(node)
       })
     }
@@ -59,7 +59,7 @@ export function RevealObserver() {
       for (const record of records) {
         for (const node of record.addedNodes) {
           if (!(node instanceof HTMLElement)) continue
-          if (node.classList.contains("reveal") && !node.classList.contains("is-visible")) {
+          if (node.classList.contains("reveal") && !node.hasAttribute("data-revealed")) {
             intersection.observe(node)
           }
           scan(node)

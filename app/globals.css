@@ -152,7 +152,12 @@ body,
 }
 
 /* --- Motion primitives ---------------------------------------------------
-   Scroll reveal is driven by an IntersectionObserver adding `.is-visible`.
+   Scroll reveal is driven by an IntersectionObserver setting `data-revealed`.
+   An attribute rather than a class, deliberately: React rewrites the whole
+   `className` attribute whenever a component's className prop changes, which
+   silently wipes a class added imperatively and strands the element at
+   opacity 0 forever. React never rendered `data-revealed`, so it never
+   touches it.
    Both the reduced-motion query and the `[data-motion="paused"]` attribute
    (the user-facing Pause control) neutralise it, so the two switches are
    interchangeable and content is never left invisible. */
@@ -164,7 +169,7 @@ body,
     transform 0.52s var(--ease-entrance);
 }
 
-.reveal.is-visible {
+.reveal[data-revealed] {
   opacity: 1;
   transform: none;
 }
@@ -204,7 +209,12 @@ body,
 .stagger-children > *:nth-child(4) { animation-delay: 0.26s; }
 .stagger-children > *:nth-child(5) { animation-delay: 0.33s; }
 
-/* Interaction affordances. Transform-only so they stay on the compositor. */
+/* Interaction affordances.
+   Tailwind v4 already compiles `hover:` and `group-hover:` inside
+   `@media (hover: hover)`, so plain hover utilities are touch-safe on their
+   own — the `fine:` variant is only needed for non-hover properties such as
+   sizing. These hand-written rules are not compiled by Tailwind, so they carry
+   their own guard. */
 .btn-hover {
   transition: transform 0.2s var(--ease-pop), background-color 0.15s linear, border-color 0.15s linear;
 }
@@ -212,9 +222,6 @@ body,
 @media (hover: hover) and (pointer: fine) {
   .btn-hover:hover {
     transform: translateY(-2px);
-  }
-  .card-hover:hover {
-    transform: translateY(-3px);
   }
   .link-underline:hover::after {
     transform: scaleX(1);
@@ -225,8 +232,72 @@ body,
   transform: translateY(0) scale(0.985);
 }
 
+/* Hover moves colour, never geometry.
+   The lift this used to apply is gone for three separate reasons: no
+   well-made reference portfolio moves an item in Z; it is on the list of
+   attributes that read as templated; and a `transform` establishes a
+   containing block, which silently breaks the `.row-link` stretch below.
+   Kept as a class so any remaining usage degrades to something harmless. */
 .card-hover {
-  transition: transform 0.3s var(--ease-pop), border-color 0.2s linear;
+  transition: background-color 0.2s linear, border-color 0.2s linear;
+}
+
+/* --- Editorial row list -------------------------------------------------
+   Rows separated by hairlines rather than wrapped in boxes. GOV.UK's
+   cross-department review found cards are often used to compensate for weak
+   information hierarchy, and NN/g finds card grids less scannable than lists
+   for homogeneous items — which is what an index of roles or posts is. */
+
+/* The row's single destination. A real anchor is stretched over the whole
+   row, so middle-click and right-click keep working (only the JS
+   alternatives break those) and the accessible name stays the title alone
+   rather than the entire row read aloud.
+   The row must not carry `transform`, `filter`, `backdrop-filter`,
+   `will-change` or `contain` — each establishes a containing block and the
+   stretch would then cover only the anchor's own box. */
+.row-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* Anything else clickable in the row has to sit above the stretched layer.
+   If a row ever needs two real destinations, drop `.row-link` entirely —
+   overlapping tap targets are worse than an unstretched row. */
+.row-interactive {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hovering the list recedes the rows you are not pointing at. Pointer-only by
+   construction, and `focus-within` gives keyboard users the same emphasis
+   instead of leaving them with a flat list. */
+@media (hover: hover) and (pointer: fine) {
+  .dim-siblings:hover > * {
+    opacity: 0.45;
+  }
+  .dim-siblings > *:hover,
+  .dim-siblings > *:focus-within {
+    opacity: 1;
+  }
+}
+
+/* A row is usually BOTH a `.reveal` target and a dimmable sibling, and both
+   rules set the `transition` shorthand on the same element at equal
+   specificity — so whichever is written last wins outright. This one is, which
+   means it has to carry the reveal's transform transition too; declaring only
+   opacity here would silently drop it and make the reveal's 24px translate
+   snap instead of ease. */
+.dim-siblings > * {
+  transition:
+    opacity 0.3s var(--ease-entrance),
+    transform 0.52s var(--ease-entrance);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dim-siblings > * {
+    transition: none;
+  }
 }
 
 .link-underline {
@@ -254,22 +325,6 @@ body,
   margin: 0 0.6rem 0.28em;
   border-bottom: 1px dotted currentColor;
   opacity: 0.35;
-}
-
-/* Timeline rail + node markers on the journey section. */
-.timeline-rail {
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    var(--color-border) 6%,
-    var(--color-border) 94%,
-    transparent
-  );
-}
-
-.timeline-dot {
-  box-shadow: 0 0 0 4px var(--background);
-  transition: box-shadow 0.3s var(--ease-pop), background-color 0.3s linear;
 }
 
 /* --- Motion opt-out ------------------------------------------------------
