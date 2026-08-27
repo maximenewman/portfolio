@@ -19,7 +19,7 @@ export const bio = {
   education: {
     school: "Simon Fraser University",
     degree: "BSc Computer Science & Statistics",
-    graduation: "Expected August 2027",
+    graduation: "Expected August 2028",
   },
   picture: "/IMG_4311.jpg",
   socials: {
