@@ -82,7 +82,7 @@ export default function Navbar() {
           aria-label="Maxime Newman — home"
           className="btn-hover order-1 flex items-center rounded-full"
         >
-          <span className="rounded-full border border-border p-1 transition-colors fine:hover:border-primary">
+          <span className="rounded-full border border-border p-1 transition-colors hover:border-primary">
             <Image
               src="/logo.png"
               alt=""
@@ -130,7 +130,7 @@ export default function Navbar() {
                   // the tighter bar, so the shrink is keyed to input capability
                   // rather than to viewport width.
                   className={`link-underline flex min-h-11 items-center gap-2.5 px-3 font-mono text-eyebrow uppercase transition-colors fine:min-h-0 fine:py-2 ${
-                    active ? "text-primary" : "text-muted-foreground fine:hover:text-foreground"
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {/* Marker, not decoration-only state: `aria-current` carries the
@@ -153,7 +153,7 @@ export default function Navbar() {
             <Link
               href="/admin"
               onClick={() => setOpen(false)}
-              className="link-underline flex min-h-11 items-center px-3 font-mono text-eyebrow uppercase text-muted-foreground transition-colors fine:min-h-0 fine:py-2 fine:hover:text-foreground"
+              className="link-underline flex min-h-11 items-center px-3 font-mono text-eyebrow uppercase text-muted-foreground transition-colors fine:min-h-0 fine:py-2 hover:text-foreground"
             >
               Admin
             </Link>

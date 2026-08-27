@@ -143,7 +143,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
+          className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
           aria-label="Close gallery"
         >
           <X className="h-5 w-5" aria-hidden />
@@ -168,7 +168,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                   <button
                     type="button"
                     onClick={() => setShowVideo(false)}
-                    className="absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
+                    className="absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
                     aria-label="Back to photos"
                   >
                     <ChevronLeft className="h-5 w-5" aria-hidden />
@@ -188,7 +188,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                     <button
                       type="button"
                       onClick={() => setShowVideo(true)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors fine:hover:bg-black/40"
+                      className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors hover:bg-black/40"
                       aria-label="Play video"
                     >
                       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
@@ -205,7 +205,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                       <button
                         type="button"
                         onClick={prevImage}
-                        className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
+                        className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
                         aria-label="Previous image"
                       >
                         <ChevronLeft className="h-5 w-5" aria-hidden />
@@ -213,7 +213,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                       <button
                         type="button"
                         onClick={nextImage}
-                        className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors fine:hover:bg-background"
+                        className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-card-foreground backdrop-blur-sm transition-colors hover:bg-background"
                         aria-label="Next image"
                       >
                         <ChevronRight className="h-5 w-5" aria-hidden />
@@ -239,7 +239,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                         className={`relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
                           currentImageIndex === index && !showMoreBadge
                             ? "border-primary"
-                            : "border-transparent opacity-60 fine:hover:opacity-100"
+                            : "border-transparent opacity-60 hover:opacity-100"
                         }`}
                         aria-current={
                           currentImageIndex === index && !showMoreBadge ? "true" : undefined
@@ -338,7 +338,7 @@ function PassionModalContent({ passion, onClose }: PassionModalContentProps) {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground transition-colors fine:hover:bg-muted"
+                      className="btn-hover inline-flex min-h-11 items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-card-foreground transition-colors hover:bg-muted"
                     >
                       <ExternalLink className="h-4 w-4" aria-hidden />
                       {link.label}

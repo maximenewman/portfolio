@@ -68,7 +68,7 @@ const socialLinks = [
 // kept at every width — the columns stack on narrow screens but the rows are the
 // same rows, never a second set of markup.
 const linkClass =
-  "link-underline inline-flex min-h-11 items-center gap-3 font-mono text-eyebrow uppercase text-muted-foreground transition-colors fine:min-h-9 fine:hover:text-primary"
+  "link-underline inline-flex min-h-11 items-center gap-3 font-mono text-eyebrow uppercase text-muted-foreground transition-colors fine:min-h-9 hover:text-primary"
 
 /**
  * Site footer. A plain server component — it reads constants from `lib/bio`
