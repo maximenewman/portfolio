@@ -77,9 +77,25 @@ export default function Navbar() {
       className="sticky top-0 z-50 border-b border-border/70 bg-card/80 backdrop-blur"
     >
       <Container className="flex flex-wrap items-center gap-x-4 py-3 md:py-4">
-        <Link
-          href="/"
-          aria-label="Maxime Newman — home"
+        {/* The logo is not a home link. Home is one tap away in the nav list,
+            so the mark is free to do something better: it sends a ripple
+            through the WebGL field and spins once. Purely playful, so a page
+            with no canvas (admin, the game) still gives the spin as feedback. */}
+        <button
+          type="button"
+          onClick={(event) => {
+            window.dispatchEvent(new Event("lattice-pulse"))
+            const img = event.currentTarget.querySelector("img")
+            if (img) {
+              img.classList.remove("logo-spin")
+              // Force a reflow so removing and re-adding the class restarts
+              // the animation on rapid clicks.
+              void img.offsetWidth
+              img.classList.add("logo-spin")
+            }
+          }}
+          aria-label="Send a ripple through the background"
+          title="Send a ripple through the background"
           className="btn-hover order-1 flex items-center rounded-full"
         >
           <span className="rounded-full border border-border p-1 transition-colors hover:border-primary">
@@ -92,7 +108,7 @@ export default function Navbar() {
               className="h-10 w-10 rounded-full md:h-11 md:w-11"
             />
           </span>
-        </Link>
+        </button>
 
         {/* The disclosure sits immediately before the list in the DOM so that
             opening it puts the revealed links next in reading and tab order —

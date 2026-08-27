@@ -22,6 +22,7 @@ const VERTEX = /* glsl */ `
   uniform float uSize;
   uniform float uAmp;
   uniform float uReach;
+  uniform float uPulse;     // uTime at the moment the logo was clicked
 
   attribute float aSeed;
 
@@ -47,6 +48,17 @@ const VERTEX = /* glsl */ `
     vec2 pointerWorld = uPointer * vec2(15.0, 10.0);
     float influence = 1.0 - smoothstep(0.0, uReach, distance(p.xy, pointerWorld));
     p.z += influence * 2.4;
+
+    // Logo ripple: a ring that expands from the centre of the field and dies
+    // out over about two seconds. uPulse starts far in the past so a fresh
+    // page load has no wave in flight.
+    float age = uTime - uPulse;
+    if (age >= 0.0 && age < 2.5) {
+      float dist = length(p.xy);
+      float ring = exp(-pow(dist - age * 9.0, 2.0) * 0.22) * exp(-age * 1.4);
+      p.z += ring * 3.2;
+      influence = max(influence, ring);
+    }
 
     vGlow = influence;
 
@@ -154,6 +166,7 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
       uSize: { value: lowPower ? 2.2 : 2.6 },
       uAmp: { value: 1.15 },
       uReach: { value: 6.0 },
+      uPulse: { value: -100 },
       // `new Color(hex)` converts sRGB to the linear working space, which is
       // what the shader's trailing `colorspace_fragment` expects. Passing raw
       // triples instead means the conversion lightens them on output — a deep
@@ -187,13 +200,22 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
       foldTarget.current = Math.min(1, window.scrollY / window.innerHeight)
     }
 
+    // The nav logo fires this. Setting the uniform from an event callback is
+    // fine under the compiler lint rules; only render-time mutation is not.
+    const onPulse = () => {
+      const material = materialRef.current
+      if (material) material.uniforms.uPulse.value = material.uniforms.uTime.value
+    }
+
     window.addEventListener("pointermove", onPointer, { passive: true })
     window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("lattice-pulse", onPulse)
     onScroll()
 
     return () => {
       window.removeEventListener("pointermove", onPointer)
       window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("lattice-pulse", onPulse)
     }
   }, [paused])
 
