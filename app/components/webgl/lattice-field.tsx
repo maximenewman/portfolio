@@ -58,7 +58,7 @@ const VERTEX = /* glsl */ `
 
     gl_Position = projectionMatrix * mv;
     // Points are fill-rate bound, so point size matters more than point count.
-    gl_PointSize = uSize * (1.0 + influence * 2.2) * (12.0 / -mv.z);
+    gl_PointSize = uSize * (1.0 + influence * 0.9) * (12.0 / -mv.z);
   }
 `
 
@@ -66,6 +66,7 @@ const FRAGMENT = /* glsl */ `
   uniform vec3  uColorA;
   uniform vec3  uColorB;
   uniform float uOpacity;
+  uniform float uFold;
 
   varying float vGlow;
   varying float vDepth;
@@ -77,9 +78,22 @@ const FRAGMENT = /* glsl */ `
     if (d2 > 0.25) discard;
 
     float alpha = smoothstep(0.25, 0.01, d2);
-    vec3 col = mix(uColorA, uColorB, clamp(vGlow, 0.0, 1.0));
 
-    gl_FragColor = vec4(col, alpha * uOpacity * vDepth);
+    // Half strength on the hue shift: at full mix the pointer well reads as a
+    // coloured blob sitting on top of whatever you are reading.
+    vec3 col = mix(uColorA, uColorB, clamp(vGlow, 0.0, 1.0) * 0.5);
+
+    // The field is a hero moment, not a page-long texture. It recedes as soon
+    // as you scroll into the reading column, which is the only place it can
+    // compete with body copy — the cards used to back the text, and now
+    // nothing does.
+    // Measured against the fold, not against total page progress: a fraction
+    // of the document means a very different number of pixels on a short page
+    // than on a long one, so page progress left the field sitting over body
+    // copy on the longer pages.
+    float recede = mix(1.0, 0.28, smoothstep(0.1, 0.85, uFold));
+
+    gl_FragColor = vec4(col, alpha * uOpacity * vDepth * recede);
     #include <colorspace_fragment>
   }
 `
@@ -103,6 +117,8 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
   const pointerCurrent = useRef<[number, number]>([0, 0])
   const scrollTarget = useRef(0)
   const scrollCurrent = useRef(0)
+  const foldTarget = useRef(0)
+  const foldCurrent = useRef(0)
 
   const cols = lowPower ? 82 : 148
   const rows = lowPower ? 46 : 82
@@ -134,16 +150,17 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
       uTime: { value: 0 },
       uPointer: { value: [0, 0] as [number, number] },
       uScroll: { value: 0 },
-      uSize: { value: lowPower ? 2.8 : 3.4 },
+      uFold: { value: 0 },
+      uSize: { value: lowPower ? 2.2 : 2.6 },
       uAmp: { value: 1.15 },
-      uReach: { value: 7.5 },
+      uReach: { value: 6.0 },
       // `new Color(hex)` converts sRGB to the linear working space, which is
       // what the shader's trailing `colorspace_fragment` expects. Passing raw
       // triples instead means the conversion lightens them on output — a deep
       // indigo leaves the shader as a pale lilac.
       uColorA: { value: new Color(dark ? "#4ade80" : "#15803d") },
       uColorB: { value: new Color(dark ? "#8051ff" : "#5433eb") },
-      uOpacity: { value: dark ? 0.85 : 0.75 },
+      uOpacity: { value: dark ? 0.55 : 0.28 },
     }),
     // Rebuilt when the theme or power tier flips; not mutated here.
     [dark, lowPower],
@@ -166,6 +183,8 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight
       scrollTarget.current = max > 0 ? window.scrollY / max : 0
+      // Independent of page length: how far past the first screenful we are.
+      foldTarget.current = Math.min(1, window.scrollY / window.innerHeight)
     }
 
     window.addEventListener("pointermove", onPointer, { passive: true })
@@ -197,10 +216,12 @@ export function LatticeField({ lowPower, dark, paused }: LatticeFieldProps) {
     const [cx, cy] = pointerCurrent.current
     pointerCurrent.current = [MathUtils.damp(cx, tx, 4, dt), MathUtils.damp(cy, ty, 4, dt)]
     scrollCurrent.current = MathUtils.damp(scrollCurrent.current, scrollTarget.current, 3, dt)
+    foldCurrent.current = MathUtils.damp(foldCurrent.current, foldTarget.current, 5, dt)
 
     material.uniforms.uTime.value += dt
     material.uniforms.uPointer.value = pointerCurrent.current
     material.uniforms.uScroll.value = scrollCurrent.current
+    material.uniforms.uFold.value = foldCurrent.current
 
     mesh.rotation.z = Math.sin(material.uniforms.uTime.value * 0.05) * 0.04
   })
