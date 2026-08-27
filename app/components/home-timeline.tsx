@@ -1,6 +1,5 @@
 import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
-import { Panel } from "./page-shell"
+import { Row, RowList } from "./page-shell"
 import type { Experience } from "@/lib/experiences"
 
 const typeLabels: Record<Experience["type"], string> = {
@@ -10,16 +9,42 @@ const typeLabels: Record<Experience["type"], string> = {
 }
 
 /**
- * The experience timeline on the home page.
+ * First four-digit year in a free-text range — "Jan 2026 - May 2026" → "2026".
+ * The date column keeps the full string; this is only the grouping key for the
+ * gutter, so a row with an unparseable date simply prints no year and still
+ * reads correctly.
+ */
+function startYear(date: string): string | null {
+  return date.match(/\d{4}/)?.[0] ?? null
+}
+
+/** Metadata separator. Decorative, so it never reaches the accessibility tree. */
+function Dot() {
+  return (
+    <span aria-hidden="true" className="text-muted-foreground/50">
+      ·
+    </span>
+  )
+}
+
+/**
+ * The experience chronology on the home page.
+ *
+ * An editorial index, not a stack of cards: hairline-separated rows, a
+ * fixed-width year gutter that prints a year only when the year changes, and
+ * the dates set flush right in tabular figures so they form a real column.
+ * Each row has exactly one destination — the role title carries `.row-link`,
+ * whose stretched pseudo-element makes the whole row clickable while keeping
+ * the accessible name to the title alone and leaving middle-click and
+ * right-click intact.
+ *
+ * The rail-and-dot markers are gone with the cards. A pulsing dot per item
+ * plus a bordered panel per item is decoration standing in for hierarchy; the
+ * year gutter does the same work with type, and it survives 320px unchanged.
  *
  * A plain server component: the reveal animation is the site-wide `.reveal`
- * class, driven by the one IntersectionObserver in the root layout, so there is
- * no per-page observer and nothing here needs to ship to the browser.
- *
- * One column at every width. A left-hand rail with the cards hanging off it
- * survives 320px as readily as 1600px, so there is no alternating / centred
- * variant to keep in sync — the rail simply sits further from the text as the
- * gutter grows.
+ * class, driven by the one IntersectionObserver in the root layout, so nothing
+ * here ships to the browser.
  */
 export default function HomeTimeline({ experiences }: { experiences: Experience[] }) {
   if (experiences.length === 0) {
@@ -31,64 +56,79 @@ export default function HomeTimeline({ experiences }: { experiences: Experience[
   }
 
   return (
-    <ol className="relative max-w-[72ch] pl-8 sm:pl-12">
-      {/* The rail is decoration behind the dots; the list itself carries the
-          order for anything reading the page non-visually. */}
-      <span
-        aria-hidden="true"
-        className="timeline-rail pointer-events-none absolute bottom-0 left-[5px] top-0 w-px"
-      />
+    <RowList className="max-w-[86ch]">
+      {experiences.map((experience, index) => {
+        const year = startYear(experience.date)
+        // Compared against the previous row rather than against every year seen
+        // so far: the order is the owner's manual `position`, not a sort, so a
+        // year that recurs after a gap should print again.
+        const previousYear = index > 0 ? startYear(experiences[index - 1]?.date ?? "") : null
+        const showYear = year !== null && year !== previousYear
+        // The most recent role leads the section and is set as such — the rows
+        // are deliberately not all the same height or the same composition.
+        const isLead = index === 0
 
-      {experiences.map((experience, index) => (
-        <li
-          key={experience.slug}
-          className="reveal relative pb-4 last:pb-0 sm:pb-5"
-          // Staggered only for the first few, so a long list never ends up
-          // waiting a second and a half for its last card.
-          style={{ transitionDelay: `${Math.min(index, 4) * 60}ms` }}
-        >
-          <span
-            aria-hidden="true"
-            className="timeline-dot absolute left-[5px] top-[1.85rem] z-10 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-primary"
-          />
-
-          <Link
-            href={`/experiences/${experience.slug}`}
-            className="card-hover group block rounded-2xl"
+        return (
+          <Row
+            key={experience.slug}
+            className={`reveal ${isLead ? "py-7 sm:py-9" : "py-5 sm:py-6"}`}
           >
-            <Panel className="p-5 sm:p-6">
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-eyebrow uppercase">
-                <span className="rounded-full bg-accent px-2.5 py-1 text-accent-foreground">
-                  {typeLabels[experience.type]}
-                </span>
-                <span className="text-muted-foreground">{experience.date}</span>
-              </p>
+            <div className="flex items-baseline gap-4 sm:gap-6">
+              {/* Fixed-width gutter. Rows that continue a year leave it empty
+                  rather than repeating the number, which is what makes the
+                  column read as a chronology; the full range is in the date
+                  column, so nothing is lost when the year is not printed. */}
+              <span
+                aria-hidden="true"
+                className="w-10 shrink-0 font-mono text-eyebrow tabular-nums text-muted-foreground md:w-14"
+              >
+                {showYear ? year : null}
+              </span>
 
-              <h3 className="mt-4 flex items-start justify-between gap-4 font-display text-h3 text-balance text-card-foreground">
-                {experience.role}
-                {/* Always drawn, never hover-revealed — the hover state only
-                    nudges it, so touch users see the same affordance. */}
-                <ArrowUpRight
-                  aria-hidden="true"
-                  className="mt-1 h-5 w-5 shrink-0 text-muted-foreground transition-transform fine:group-hover:-translate-y-0.5 fine:group-hover:translate-x-0.5"
-                />
-              </h3>
+              <div className="min-w-0 flex-1">
+                {/* Stacks below `sm` because a flush-right date column needs
+                    width to be a column at all; above it, tabular figures line
+                    the dates up down the whole list. */}
+                <div className="flex flex-col gap-x-6 gap-y-1 sm:flex-row sm:items-baseline sm:justify-between">
+                  <h3 className="min-w-0 font-display text-h3 text-balance text-foreground">
+                    <Link
+                      href={`/experiences/${experience.slug}`}
+                      className="row-link transition-colors duration-200 group-hover:text-primary"
+                    >
+                      {experience.role}
+                    </Link>
+                  </h3>
+                  <span className="shrink-0 text-sm tabular-nums text-muted-foreground sm:text-right">
+                    {experience.date}
+                  </span>
+                </div>
 
-              <p className="mt-2 font-mono text-eyebrow uppercase text-muted-foreground">
-                {experience.company}
-                <span aria-hidden="true" className="mx-2 text-border">
-                  /
-                </span>
-                {experience.location}
-              </p>
+                {/* One monospace micro-label per row — the category — with the
+                    rest set in the body face and separated by middots. */}
+                <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                  <span className="font-mono text-eyebrow uppercase">
+                    {typeLabels[experience.type]}
+                  </span>
+                  <Dot />
+                  <span>{experience.company}</span>
+                  <Dot />
+                  <span>{experience.location}</span>
+                </p>
 
-              <p className="mt-4 max-w-[62ch] text-lede text-pretty text-muted-foreground">
-                {experience.headline}
-              </p>
-            </Panel>
-          </Link>
-        </li>
-      ))}
-    </ol>
+                <p
+                  className={
+                    isLead
+                      ? "mt-4 max-w-[52ch] font-serif text-[1.3rem] leading-snug text-pretty text-foreground sm:text-[1.5rem]"
+                      : "mt-2 max-w-[62ch] text-lede text-pretty text-muted-foreground"
+                  }
+                >
+                  {experience.headline}
+                </p>
+              </div>
+            </div>
+          </Row>
+        )
+      })}
+    </RowList>
   )
 }

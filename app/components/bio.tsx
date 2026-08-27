@@ -29,16 +29,21 @@ const socials = [
    the hero root, so the moving elements never re-render — React sets these
    strings once and the rAF loop only touches `style.setProperty`. Both vars
    fall back to `0`, which is what an untouched hero, a paused hero and a
-   server-rendered hero all resolve to. */
+   server-rendered hero all resolve to.
+
+   Deliberately no `will-change`. It was here as a hint, but it promoted both
+   elements to their own compositor layer permanently, for an effect that only
+   runs while a pointer is actually over the hero — MDN treats `will-change` as
+   a last resort rather than a default. The promotion also had a visible cost:
+   screenshot capture skipped the promoted layer, rendering the portrait blank.
+   Two small transform-only elements do not need the hint. */
 const PORTRAIT_TRANSFORM: React.CSSProperties = {
   transform:
     "perspective(900px) rotateX(calc(var(--px-y, 0) * -3.5deg)) rotateY(calc(var(--px-x, 0) * 3.5deg)) translate3d(calc(var(--px-x, 0) * 8px), calc(var(--px-y, 0) * 8px), 0)",
-  willChange: "transform",
 }
 
 const TEXT_TRANSFORM: React.CSSProperties = {
   transform: "translate3d(calc(var(--px-x, 0) * -5px), calc(var(--px-y, 0) * -3px), 0)",
-  willChange: "transform",
 }
 
 /**
@@ -206,7 +211,7 @@ export default function Hero() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={name}
-                    className="btn-hover inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors fine:hover:bg-muted fine:hover:text-foreground"
+                    className="btn-hover inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </a>

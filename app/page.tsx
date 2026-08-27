@@ -1,9 +1,8 @@
 import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
 import Hero from "./components/bio"
 import HomeTimeline from "./components/home-timeline"
 import { ChapterRail } from "./components/chapter-rail"
-import { Panel, Section } from "./components/page-shell"
+import { Row, RowIndex, RowList, Section } from "./components/page-shell"
 import { bio } from "@/lib/bio"
 import { isCurrentUserAdmin } from "@/lib/admin"
 import { listExperiences } from "@/lib/queries"
@@ -105,7 +104,7 @@ export default async function Home() {
                     {items.map((item) => (
                       <span
                         key={item}
-                        className="rounded-full border border-border bg-card/60 px-2.5 py-1 font-mono text-eyebrow text-foreground backdrop-blur-sm"
+                        className="rounded-full border border-border bg-card/60 px-2.5 py-1 font-mono text-eyebrow text-foreground"
                       >
                         {item}
                       </span>
@@ -125,31 +124,43 @@ export default async function Home() {
         title="The rest of the site"
         deck="Four more rooms, if you want to keep reading."
       >
-        <ul className="grid gap-4 sm:grid-cols-2">
+        {/* This is navigation, not content: four destinations. A grid of
+            identical tiles dressed it up as four articles, which is the shape
+            cards get used for when the hierarchy is doing no work. A numbered
+            contents list says the same thing in a quarter of the space, and
+            the title — not the tile — is the link. */}
+        <RowList className="max-w-[68ch]">
           {elsewhere.map((item, index) => (
-            <li
-              key={item.href}
-              className="reveal"
-              style={{ transitionDelay: `${index * 60}ms` }}
-            >
-              <Link href={item.href} className="card-hover group block h-full rounded-2xl">
-                <Panel className="flex h-full flex-col p-6">
-                  <p className="flex items-center justify-between gap-4 font-mono text-eyebrow uppercase text-primary">
-                    {item.kicker}
-                    {/* Drawn at rest, not revealed on hover, so the same
-                        affordance is visible to a touch user. */}
-                    <ArrowUpRight
-                      aria-hidden="true"
-                      className="h-4 w-4 shrink-0 transition-transform fine:group-hover:-translate-y-0.5 fine:group-hover:translate-x-0.5"
-                    />
+            <Row key={item.href} className="reveal py-5 sm:py-6">
+              <div className="flex items-baseline gap-4 sm:gap-6">
+                <RowIndex n={index + 1} className="w-6 shrink-0 md:w-8" />
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <h3 className="font-display text-h3 text-foreground">
+                      <Link
+                        href={item.href}
+                        className="row-link transition-colors duration-200 group-hover:text-primary"
+                      >
+                        {item.title}
+                      </Link>
+                    </h3>
+                    <span aria-hidden="true" className="text-muted-foreground/50">
+                      —
+                    </span>
+                    <span className="font-mono text-eyebrow uppercase text-muted-foreground">
+                      {item.kicker}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 max-w-[56ch] text-lede text-pretty text-muted-foreground">
+                    {item.blurb}
                   </p>
-                  <h3 className="mt-4 font-display text-h3 text-card-foreground">{item.title}</h3>
-                  <p className="mt-3 text-lede text-pretty text-muted-foreground">{item.blurb}</p>
-                </Panel>
-              </Link>
-            </li>
+                </div>
+              </div>
+            </Row>
           ))}
-        </ul>
+        </RowList>
       </Section>
     </div>
   )
